@@ -41,5 +41,8 @@
     "jest-cli": "^29.7.0",
     "puppeteer": "^21.9.0"
   },
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "@material/web": "^1.4.0"
+  }
 }
