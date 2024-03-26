@@ -49,7 +49,7 @@ jobs:
         uses: docker/metadata-action@v3
         with:
           images: |
-            xkappel/ambulance-ufe
+            xkappel/project-ufe
           tags: |
             type=schedule
             type=ref,event=branch
