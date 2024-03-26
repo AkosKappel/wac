@@ -7,12 +7,11 @@ describe('harkap-ambulance-wl-list', () => {
       components: [HarkapAmbulanceWlList],
       html: `<harkap-ambulance-wl-list></harkap-ambulance-wl-list>`,
     });
-    expect(page.root).toEqualHtml(`
-      <harkap-ambulance-wl-list>
-        <mock:shadow-root>
-          <slot></slot>
-        </mock:shadow-root>
-      </harkap-ambulance-wl-list>
-    `);
+
+    const wlList = page.rootInstance as HarkapAmbulanceWlList;
+    const expectedPatients = wlList?.waitingPatients?.length;
+
+    const items = page.root.shadowRoot.querySelectorAll('md-list-item');
+    expect(items.length).toEqual(expectedPatients);
   });
 });
