@@ -1,18 +1,16 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: harkap-ambulance-ufe-deployment      # meno deployment-u od ktorého sa odvádza meno podu
+  name: harkap-ambulance-ufe-deployment
 spec:
   replicas: 2
   selector:
     matchLabels:
-      pod: harkap-ambulance-ufe-label    # tento riadok je len označenie štítku
-                                    # key-value pair pod=ambualnce ufe
-                                    # určený pre výber podov s rovnakým štítkom
-  template:                    # šablóna pre vytvorenie replík podov
+      pod: harkap-ambulance-ufe-label # tento riadok je len označenie štítku key-value pair pod=ambualnce ufe určený pre výber podov s rovnakým štítkom
+  template: # šablóna pre vytvorenie replík podov
     metadata:
       labels:
-        pod: harkap-ambulance-ufe-label    # štítky podu
+        pod: harkap-ambulance-ufe-label # štítky podu
     spec:
       containers:
         - name: ambulance-ufe-container # meno kontaineru - v pod-e ich môže byť viac
@@ -21,14 +19,12 @@ spec:
 
           ports:
             - name: http
-              containerPort: 8080       # port na ktorom počúva kontajner, pomenovaný ako `http`
+              containerPort: 8080 # port na ktorom počúva kontajner, pomenovaný ako `http`
 
-          resources:                  # určenie kvót pre využívané fyzické prostriedky
-                                      # je dôležité pre riadenie záťaže v rámci kubernetes
-                                      # klastra
+          resources: # určenie kvót pre využívané fyzické prostriedky je dôležité pre riadenie záťaže v rámci kubernetes klastra
             requests:
-                memory: "32M"
-                cpu: "0.1"
+              memory: '32M'
+              cpu: '0.1'
             limits:
-                memory: "320M"
-                cpu: "0.3"
+              memory: '320M'
+              cpu: '0.3'
