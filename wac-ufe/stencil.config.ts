@@ -2,6 +2,7 @@ import { Config } from '@stencil/core';
 
 export const config: Config = {
   namespace: 'project-ufe',
+  globalScript: 'src/global/app.ts',
   outputTargets: [
     {
       type: 'dist',
@@ -9,8 +10,6 @@ export const config: Config = {
     },
     {
       type: 'dist-custom-elements',
-      customElementsExportBehavior: 'auto-define-custom-elements',
-      externalRuntime: false,
     },
     {
       type: 'docs-readme',
@@ -22,6 +21,9 @@ export const config: Config = {
   ],
   testing: {
     browserHeadless: 'new',
+    transformIgnorePatterns: ['/node_modules/(?!axios)'],
+    transform: {
+      '^.+\\.(js|jsx)$': 'babel-jest',
+    },
   },
-  globalScript: 'src/global/app.ts',
 };
