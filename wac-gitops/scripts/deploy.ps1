@@ -72,7 +72,7 @@ Write-Host -Foreground green "Created repository-pat secret in the namespace ${n
 if ($installFlux) {
   Write-Host -Foreground blue "Deploying the Flux CD controller"
   # first ensure crds exists when applying the repos
-  kubectl apply -k $ProjectRoot/ambulance-gitops/infrastructure/fluxcd --wait
+  kubectl apply -k $ProjectRoot/infrastructure/fluxcd --wait
 
   if ($LASTEXITCODE -ne 0) {
     Write-Host -Foreground red "Failed to deploy fluxcd"
