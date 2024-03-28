@@ -1,7 +1,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: harkap-ambulance-ufe-deployment
+  name: harkap-ambulance-ufe-deployment # meno deployment-u od ktorého sa odvádza meno podu
 spec:
   replicas: 2
   selector:
