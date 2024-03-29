@@ -1,7 +1,4 @@
-import { Component, Event, EventEmitter,  Host, h } from '@stencil/core';
-import '@material/web/list/list'
-import '@material/web/list/list-item'
-import '@material/web/icon/icon'
+import { Component, Event, EventEmitter, Host, h } from '@stencil/core';
 
 @Component({
   tag: 'harkap-ambulance-wl-list',
