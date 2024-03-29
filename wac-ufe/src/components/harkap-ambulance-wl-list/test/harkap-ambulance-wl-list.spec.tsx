@@ -1,5 +1,5 @@
-import { newSpecPage } from '@stencil/core/testing';
-import { HarkapAmbulanceWlList } from '../harkap-ambulance-wl-list';
+// import { newSpecPage } from '@stencil/core/testing';
+// import { HarkapAmbulanceWlList } from '../harkap-ambulance-wl-list';
 
 describe('harkap-ambulance-wl-list', () => {
   it('renders', async () => {
