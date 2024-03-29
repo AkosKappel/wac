@@ -61,7 +61,7 @@ export class HarkapAmbulanceWlApp {
         {element === 'editor' ? (
           <h1>Editor</h1>
         ) : (
-          <h1>Ambulance uFE</h1>
+            <h1>Ambulance uFE - sprava zariadeni</h1>
         )}
       </Host>
     );
