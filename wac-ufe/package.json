@@ -1,5 +1,5 @@
 {
-  "name": "project-ufe",
+  "name": "ambulance-ufe",
   "version": "0.0.1",
   "description": "Stencil Component Starter",
   "main": "dist/index.cjs.js",
@@ -9,7 +9,7 @@
   "types": "dist/types/index.d.ts",
   "collection": "dist/collection/collection-manifest.json",
   "collection:main": "dist/collection/index.js",
-  "unpkg": "dist/project-ufe/project-ufe.esm.js",
+  "unpkg": "dist/ambulance-ufe/ambulance-ufe.esm.js",
   "repository": {
     "type": "git",
     "url": "https://github.com/ionic-team/stencil-component-starter.git"

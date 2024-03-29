@@ -1,7 +1,7 @@
 import { Config } from '@stencil/core';
 
 export const config: Config = {
-  namespace: 'project-ufe',
+  namespace: 'ambulance-ufe',
   globalScript: 'src/global/app.ts',
   outputTargets: [
     {
