@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: ambulance-ufe-container # meno kontaineru - v pod-e ich môže byť viac
-          image: xkappel/project-ufe
+          image: xkappel/wac-project-ufe
           imagePullPolicy: Always
 
           ports:

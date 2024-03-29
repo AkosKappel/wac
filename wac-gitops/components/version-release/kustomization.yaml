@@ -1,8 +1,8 @@
 apiVersion: kustomize.config.k8s.io/v1alpha1
 kind: Component
 images:
-  - name: xkappel/project-ufe
-    newName: xkappel/project-ufe
+  - name: xkappel/wac-project-ufe
+    newName: xkappel/wac-project-ufe
     newTag: 1.0.0 # aktuálna verzia docker obrazu, ktorú chcete aby používatelia - cvičiaci - videli nasadenú
 
 replacements:
