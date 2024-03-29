@@ -3,7 +3,7 @@ kind: Component
 images:
   - name: xkappel/wac-project-ufe
     newName: xkappel/wac-project-ufe
-    newTag: 1.0.1 # aktuálna verzia docker obrazu, ktorú chcete aby používatelia - cvičiaci - videli nasadenú
+    newTag: 1.0.2 # aktuálna verzia docker obrazu, ktorú chcete aby používatelia - cvičiaci - videli nasadenú
 
 replacements:
   - targets:
@@ -20,5 +20,5 @@ replacements:
       name: harkap-ambulance-ufe-deployment
       fieldPath: spec.template.spec.containers.0.image
       options:
-        delimiter: ':'
+        delimiter: ":"
         index: 1
