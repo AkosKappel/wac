@@ -63,8 +63,8 @@ export class HarkapAmbulanceWlList {
     );
   }
 
-  private isoDateToLocale(iso:string) {
-    if(!iso) return '';
-    return new Date(Date.parse(iso)).toLocaleTimeString()
-  }
+  // private isoDateToLocale(iso:string) {
+  //   if(!iso) return '';
+  //   return new Date(Date.parse(iso)).toLocaleTimeString()
+  // }
 }

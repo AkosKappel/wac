@@ -1,4 +1,4 @@
- import { Component, Host, Prop, State, h, EventEmitter, Event } from '@stencil/core';
+ import { Component, Host, Prop, h, EventEmitter, Event } from '@stencil/core';
 
 
 @Component({
@@ -11,12 +11,6 @@ export class HarkapAmbulanceWlEditor {
    @Prop() entryId: string;
 
    @Event({eventName: "editor-closed"}) editorClosed: EventEmitter<string>;
-
-   @State() private duration = 15
-
-   private handleSliderInput(event: Event) {
-     this.duration = +(event.target as HTMLInputElement).value;
-   }
 
   render() {
    return (
