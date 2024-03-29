@@ -1,3 +1,21 @@
 :host {
   display: block;
 }
+
+.list {
+  background-color: rgb(207, 233, 255) !important;
+  padding: 0 !important;
+}
+
+.list-item {
+  padding: 10px;
+  border-bottom: 1px solid #ccc;
+}
+
+.list-item:hover {
+  background-color: rgb(234, 244, 253) !important;
+}
+
+.list-item:last-child {
+  border-bottom: none;
+}

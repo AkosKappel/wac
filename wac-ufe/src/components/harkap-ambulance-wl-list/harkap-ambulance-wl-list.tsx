@@ -17,21 +17,21 @@ export class HarkapAmbulanceWlList {
     return await Promise.resolve(
       [{
           name: 'Magnetická rezonancia',
-          patientId: '10001',
+          section: 'Chirurgia',
           since: new Date(Date.now() - 10 * 60).toISOString(),
           estimatedStart: new Date(Date.now() + 65 * 60).toISOString(),
           estimatedDurationMinutes: 15,
           condition: 'Kontrola'
       }, {
           name: 'Röntgen',
-          patientId: '10096',
+          section: 'Detské',
           since: new Date(Date.now() - 30 * 60).toISOString(),
           estimatedStart: new Date(Date.now() + 30 * 60).toISOString(),
           estimatedDurationMinutes: 20,
           condition: 'Teploty'
       }, {
           name: 'CRP prístroj 1',
-          patientId: '10028',
+          section: 'Chirurgia',
           since: new Date(Date.now() - 72 * 60).toISOString(),
           estimatedStart: new Date(Date.now() + 5 * 60).toISOString(),
           estimatedDurationMinutes: 15,
@@ -50,12 +50,12 @@ export class HarkapAmbulanceWlList {
         <h1>
           Nemocnica HarKap - zoznam zdravotníckeho vybavenia
         </h1>
-        <md-list>
+        <md-list class="list">
           {this.waitingPatients.map((patient, index) =>
-            <md-list-item onClick={ () => this.entryClicked.emit(index.toString())}>
+            <md-list-item class="list-item" onClick={ () => this.entryClicked.emit(index.toString())}>
               <div slot="headline">{patient.name}</div>
-              <div slot="supporting-text">{"Predpokladaný vstup: " + this.isoDateToLocale(patient.estimatedStart)}</div>
-                <md-icon slot="start">person</md-icon>
+              <div slot="supporting-text">{"Oddelenie: " + patient.section}</div>
+                <md-icon slot="start">devices</md-icon>
             </md-list-item>
           )}
         </md-list>

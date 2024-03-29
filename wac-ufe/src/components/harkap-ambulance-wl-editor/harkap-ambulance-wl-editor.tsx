@@ -21,42 +21,46 @@ export class HarkapAmbulanceWlEditor {
   render() {
    return (
      <Host>
-       <md-filled-text-field label="Meno a Priezvisko" >
-         <md-icon slot="leading-icon">person</md-icon>
+       <md-filled-text-field label="Názov zariadenia" >
+         <md-icon slot="leading-icon">devices</md-icon>
        </md-filled-text-field>
 
-       <md-filled-text-field label="Registračné číslo pacienta" >
-         <md-icon slot="leading-icon">fingerprint</md-icon>
+       <md-filled-text-field label="Registračné číslo zariadenia" >
+         <md-icon slot="leading-icon">pin</md-icon>
        </md-filled-text-field>
 
-       <md-filled-text-field label="Čakáte od" disabled>
+       <md-filled-text-field label="Záruka do">
          <md-icon slot="leading-icon">watch_later</md-icon>
        </md-filled-text-field>
 
-       <md-filled-select label="Dôvod návštevy">
-         <md-icon slot="leading-icon">sick</md-icon>
+       <md-filled-select label="Oddelenie">
+         <md-icon slot="leading-icon">local_hospital</md-icon>
          <md-select-option value="folowup">
-           <div slot="headline">Kontrola</div>
+           <div slot="headline">Chirurgia</div>
          </md-select-option>
          <md-select-option value="nausea">
-           <div slot="headline">Nevoľnosť</div>
+           <div slot="headline">Geriatria</div>
          </md-select-option>
          <md-select-option value="fever">
-           <div slot="headline">Horúčka</div>
+           <div slot="headline">Gynekológia</div>
          </md-select-option>
          <md-select-option value="ache-in-throat">
-           <div slot="headline">Bolesti hrdla</div>
+           <div slot="headline">Detské</div>
          </md-select-option>
        </md-filled-select>
 
-       <div class="duration-slider">
+       {/* <div class="duration-slider">
          <span class="label">Predpokladaná doba trvania:&nbsp; </span>
          <span class="label">{this.duration}</span>
          <span class="label">&nbsp;minút</span>
          <md-slider
            min="2" max="45" value={this.duration} ticks labeled
            oninput={this.handleSliderInput.bind(this)}></md-slider>
-       </div>
+       </div> */}
+
+       <md-filled-text-field label="Cena zariadenia" >
+         <md-icon slot="leading-icon">euro</md-icon>
+       </md-filled-text-field>
 
        <md-divider></md-divider>
        <div class="actions">
