@@ -7,10 +7,21 @@
 import { HTMLStencilElement, JSXBase } from "@stencil/core/internal";
 export namespace Components {
     interface HarkapAmbulanceWlApp {
-        "ambulanceId": string;
-        "apiBase": string;
         "basePath": string;
     }
+    interface HarkapAmbulanceWlEditor {
+        "entryId": string;
+    }
+    interface HarkapAmbulanceWlList {
+    }
+}
+export interface HarkapAmbulanceWlEditorCustomEvent<T> extends CustomEvent<T> {
+    detail: T;
+    target: HTMLHarkapAmbulanceWlEditorElement;
+}
+export interface HarkapAmbulanceWlListCustomEvent<T> extends CustomEvent<T> {
+    detail: T;
+    target: HTMLHarkapAmbulanceWlListElement;
 }
 declare global {
     interface HTMLHarkapAmbulanceWlAppElement extends Components.HarkapAmbulanceWlApp, HTMLStencilElement {
@@ -19,18 +30,61 @@ declare global {
         prototype: HTMLHarkapAmbulanceWlAppElement;
         new (): HTMLHarkapAmbulanceWlAppElement;
     };
+    interface HTMLHarkapAmbulanceWlEditorElementEventMap {
+        "editor-closed": string;
+    }
+    interface HTMLHarkapAmbulanceWlEditorElement extends Components.HarkapAmbulanceWlEditor, HTMLStencilElement {
+        addEventListener<K extends keyof HTMLHarkapAmbulanceWlEditorElementEventMap>(type: K, listener: (this: HTMLHarkapAmbulanceWlEditorElement, ev: HarkapAmbulanceWlEditorCustomEvent<HTMLHarkapAmbulanceWlEditorElementEventMap[K]>) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLHarkapAmbulanceWlEditorElementEventMap>(type: K, listener: (this: HTMLHarkapAmbulanceWlEditorElement, ev: HarkapAmbulanceWlEditorCustomEvent<HTMLHarkapAmbulanceWlEditorElementEventMap[K]>) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | EventListenerOptions): void;
+    }
+    var HTMLHarkapAmbulanceWlEditorElement: {
+        prototype: HTMLHarkapAmbulanceWlEditorElement;
+        new (): HTMLHarkapAmbulanceWlEditorElement;
+    };
+    interface HTMLHarkapAmbulanceWlListElementEventMap {
+        "entry-clicked": string;
+    }
+    interface HTMLHarkapAmbulanceWlListElement extends Components.HarkapAmbulanceWlList, HTMLStencilElement {
+        addEventListener<K extends keyof HTMLHarkapAmbulanceWlListElementEventMap>(type: K, listener: (this: HTMLHarkapAmbulanceWlListElement, ev: HarkapAmbulanceWlListCustomEvent<HTMLHarkapAmbulanceWlListElementEventMap[K]>) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLHarkapAmbulanceWlListElementEventMap>(type: K, listener: (this: HTMLHarkapAmbulanceWlListElement, ev: HarkapAmbulanceWlListCustomEvent<HTMLHarkapAmbulanceWlListElementEventMap[K]>) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | EventListenerOptions): void;
+    }
+    var HTMLHarkapAmbulanceWlListElement: {
+        prototype: HTMLHarkapAmbulanceWlListElement;
+        new (): HTMLHarkapAmbulanceWlListElement;
+    };
     interface HTMLElementTagNameMap {
         "harkap-ambulance-wl-app": HTMLHarkapAmbulanceWlAppElement;
+        "harkap-ambulance-wl-editor": HTMLHarkapAmbulanceWlEditorElement;
+        "harkap-ambulance-wl-list": HTMLHarkapAmbulanceWlListElement;
     }
 }
 declare namespace LocalJSX {
     interface HarkapAmbulanceWlApp {
-        "ambulanceId"?: string;
-        "apiBase"?: string;
         "basePath"?: string;
+    }
+    interface HarkapAmbulanceWlEditor {
+        "entryId"?: string;
+        "onEditor-closed"?: (event: HarkapAmbulanceWlEditorCustomEvent<string>) => void;
+    }
+    interface HarkapAmbulanceWlList {
+        "onEntry-clicked"?: (event: HarkapAmbulanceWlListCustomEvent<string>) => void;
     }
     interface IntrinsicElements {
         "harkap-ambulance-wl-app": HarkapAmbulanceWlApp;
+        "harkap-ambulance-wl-editor": HarkapAmbulanceWlEditor;
+        "harkap-ambulance-wl-list": HarkapAmbulanceWlList;
     }
 }
 export { LocalJSX as JSX };
@@ -38,6 +92,8 @@ declare module "@stencil/core" {
     export namespace JSX {
         interface IntrinsicElements {
             "harkap-ambulance-wl-app": LocalJSX.HarkapAmbulanceWlApp & JSXBase.HTMLAttributes<HTMLHarkapAmbulanceWlAppElement>;
+            "harkap-ambulance-wl-editor": LocalJSX.HarkapAmbulanceWlEditor & JSXBase.HTMLAttributes<HTMLHarkapAmbulanceWlEditorElement>;
+            "harkap-ambulance-wl-list": LocalJSX.HarkapAmbulanceWlList & JSXBase.HTMLAttributes<HTMLHarkapAmbulanceWlListElement>;
         }
     }
 }
