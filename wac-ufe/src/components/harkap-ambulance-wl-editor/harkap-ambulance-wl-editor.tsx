@@ -35,18 +35,18 @@ export class HarkapAmbulanceWlEditor {
 
   render() {
     let element = "list"
-    let entryId = "@new-log"
+    // let entryId = "@new-log"
 
     if ( this.relativePath.startsWith("entry-log/"))
     {
       element = "editor";
-      entryId = this.relativePath.split("/")[1]
+      // entryId = this.relativePath.split("/")[1]
     }
 
-    const navigate = (path:string) => {
-      const absolute = new URL(path, new URL(this.basePath, document.baseURI)).pathname;
-      window.navigation.navigate(absolute)
-    }
+    // const navigate = (path:string) => {
+    //   const absolute = new URL(path, new URL(this.basePath, document.baseURI)).pathname;
+    //   window.navigation.navigate(absolute)
+    // }
     return (
       <Host>
         <md-filled-text-field label="Názov zariadenia" >
