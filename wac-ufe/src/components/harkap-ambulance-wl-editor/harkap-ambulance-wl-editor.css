@@ -4,7 +4,12 @@
   display: flex;
   flex-direction: column;
   gap: var(--_wl-editor_gap);
-  padding: var(--_wl-editor_gap);
+  padding: 20px 50px;
+}
+
+.device-log {
+  margin-top: 50px;
+  border-top: 1px solid #ccc;
 }
 
 .duration-slider {

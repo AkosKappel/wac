@@ -4,6 +4,10 @@
   height: 100%;
 }
 
+.container {
+  padding: 20px 50px;
+}
+
 .error {
   margin: auto;
   color: red;
@@ -28,4 +32,8 @@
 
 .list-item:last-child {
   border-bottom: none;
+}
+
+.add-button {
+  margin-bottom: 20px;
 }

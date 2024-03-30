@@ -36,31 +36,33 @@ export class HarkapAmbulanceWlApp {
    }
 
   render() {
-  let element = "list"
-  let entryId = "@new"
+    let element = "list"
+    let entryId = "@new"
 
-  if ( this.relativePath.startsWith("entry/"))
-  {
-    element = "editor";
-    entryId = this.relativePath.split("/")[1]
+    if ( this.relativePath.startsWith("entry/"))
+    {
+      element = "editor";
+      entryId = this.relativePath.split("/")[1]
+    }
+
+    const navigate = (path:string) => {
+      const absolute = new URL(path, new URL(this.basePath, document.baseURI)).pathname;
+      window.navigation.navigate(absolute)
+    }
+
+    return (
+      <Host>
+        { element === "editor"
+          ? <harkap-ambulance-wl-editor entry-id={entryId} base-path="/ambulance-wl/"
+              oneditor-closed={ () => navigate("./list")} >
+            </harkap-ambulance-wl-editor>
+          : <div>
+            <harkap-ambulance-wl-list ambulance-id={this.ambulanceId} api-base={this.apiBase}
+              onentry-clicked={ (ev: CustomEvent<string>)=> navigate("./entry/" + ev.detail) } >
+            </harkap-ambulance-wl-list>
+          </div>
+        }
+      </Host>
+    );
   }
-
-  const navigate = (path:string) => {
-    const absolute = new URL(path, new URL(this.basePath, document.baseURI)).pathname;
-    window.navigation.navigate(absolute)
-  }
-
-  return (
-    <Host>
-      { element === "editor"
-        ? <harkap-ambulance-wl-editor entry-id={entryId}
-            oneditor-closed={ () => navigate("./list")} >
-          </harkap-ambulance-wl-editor>
-        : <harkap-ambulance-wl-list  ambulance-id={this.ambulanceId} api-base={this.apiBase}
-          onentry-clicked={ (ev: CustomEvent<string>)=> navigate("./entry/" + ev.detail) } >
-        </harkap-ambulance-wl-list>
-      }
-    </Host>
-  );
-}
 }
