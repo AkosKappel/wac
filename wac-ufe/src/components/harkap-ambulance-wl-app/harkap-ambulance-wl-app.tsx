@@ -11,10 +11,11 @@ declare global {
 })
 export class HarkapAmbulanceWlApp {
   @State() private relativePath = "";
+  @Prop() basePath: string = "";
+  @Prop() apiBase: string;
+  @Prop() ambulanceId: string;
 
-   @Prop() basePath: string="";
-
-   componentWillLoad() {
+  componentWillLoad() {
      const baseUri = new URL(this.basePath, document.baseURI || "/").pathname;
 
      const toRelative = (path: string) => {
@@ -55,7 +56,7 @@ export class HarkapAmbulanceWlApp {
         ? <harkap-ambulance-wl-editor entry-id={entryId}
             oneditor-closed={ () => navigate("./list")} >
           </harkap-ambulance-wl-editor>
-        : <harkap-ambulance-wl-list
+        : <harkap-ambulance-wl-list  ambulance-id={this.ambulanceId} api-base={this.apiBase}
           onentry-clicked={ (ev: CustomEvent<string>)=> navigate("./entry/" + ev.detail) } >
         </harkap-ambulance-wl-list>
       }
