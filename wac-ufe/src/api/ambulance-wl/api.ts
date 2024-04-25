@@ -1,8 +1,8 @@
 /* tslint:disable */
 /* eslint-disable */
 /**
- * Waiting List Api
- * Ambulance Waiting List management for Web-In-Cloud system
+ * Device List Api
+ * Ambulance Device List management for Web-In-Cloud system
  *
  * The version of the OpenAPI document: 1.0.0
  * Contact: <your_email>
@@ -24,230 +24,116 @@ import type { RequestArgs } from './base';
 import { BASE_PATH, COLLECTION_FORMATS, BaseAPI, RequiredError } from './base';
 
 /**
- * Describes disease, symptoms, or other reasons of patient   visit
+ * Department of the hospital
  * @export
- * @interface Condition
+ * @interface Department
  */
-export interface Condition {
+export interface Department {
     /**
      * 
      * @type {string}
-     * @memberof Condition
+     * @memberof Department
      */
-    'value': string;
+    'name': string;
     /**
      * 
      * @type {string}
-     * @memberof Condition
+     * @memberof Department
      */
     'code'?: string;
-    /**
-     * Link to encyclopedical explanation of the patient\'s condition
-     * @type {string}
-     * @memberof Condition
-     */
-    'reference'?: string;
-    /**
-     * 
-     * @type {number}
-     * @memberof Condition
-     */
-    'typicalDurationMinutes'?: number;
 }
 /**
  * 
  * @export
- * @interface WaitingListEntry
+ * @interface DeviceListEntry
  */
-export interface WaitingListEntry {
+export interface DeviceListEntry {
     /**
      * Unique id of the entry in this waiting list
      * @type {string}
-     * @memberof WaitingListEntry
+     * @memberof DeviceListEntry
      */
     'id': string;
     /**
      * Name of patient in waiting list
      * @type {string}
-     * @memberof WaitingListEntry
+     * @memberof DeviceListEntry
      */
-    'name'?: string;
+    'name': string;
     /**
      * Unique identifier of the patient known to Web-In-Cloud system
      * @type {string}
-     * @memberof WaitingListEntry
+     * @memberof DeviceListEntry
      */
-    'patientId': string;
+    'deviceId': string;
     /**
      * Timestamp since when the patient entered the waiting list
      * @type {string}
-     * @memberof WaitingListEntry
+     * @memberof DeviceListEntry
      */
-    'waitingSince': string;
+    'warrantyUntil'?: string;
     /**
-     * Estimated time of entering ambulance. Ignored on post.
-     * @type {string}
-     * @memberof WaitingListEntry
-     */
-    'estimatedStart'?: string;
-    /**
-     * Estimated duration of ambulance visit. If not provided then it will be computed based on condition and ambulance settings
+     * Price of device
      * @type {number}
-     * @memberof WaitingListEntry
+     * @memberof DeviceListEntry
      */
-    'estimatedDurationMinutes': number;
+    'price'?: number;
     /**
      * 
-     * @type {Condition}
-     * @memberof WaitingListEntry
+     * @type {Department}
+     * @memberof DeviceListEntry
      */
-    'condition'?: Condition;
+    'department'?: Department;
 }
-
 /**
- * AmbulanceConditionsApi - axios parameter creator
+ * 
  * @export
+ * @interface DeviceLog
  */
-export const AmbulanceConditionsApiAxiosParamCreator = function (configuration?: Configuration) {
-    return {
-        /**
-         * By using ambulanceId you get list of predefined conditions
-         * @summary Provides the list of conditions associated with ambulance
-         * @param {string} ambulanceId pass the id of the particular ambulance
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        getConditions: async (ambulanceId: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
-            // verify required parameter 'ambulanceId' is not null or undefined
-            assertParamExists('getConditions', 'ambulanceId', ambulanceId)
-            const localVarPath = `/waiting-list/{ambulanceId}/condition`
-                .replace(`{${"ambulanceId"}}`, encodeURIComponent(String(ambulanceId)));
-            // use dummy base URL string because the URL constructor only accepts absolute URLs.
-            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
-            let baseOptions;
-            if (configuration) {
-                baseOptions = configuration.baseOptions;
-            }
-
-            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
-            const localVarHeaderParameter = {} as any;
-            const localVarQueryParameter = {} as any;
-
-
-    
-            setSearchParams(localVarUrlObj, localVarQueryParameter);
-            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
-            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-
-            return {
-                url: toPathString(localVarUrlObj),
-                options: localVarRequestOptions,
-            };
-        },
-    }
-};
-
-/**
- * AmbulanceConditionsApi - functional programming interface
- * @export
- */
-export const AmbulanceConditionsApiFp = function(configuration?: Configuration) {
-    const localVarAxiosParamCreator = AmbulanceConditionsApiAxiosParamCreator(configuration)
-    return {
-        /**
-         * By using ambulanceId you get list of predefined conditions
-         * @summary Provides the list of conditions associated with ambulance
-         * @param {string} ambulanceId pass the id of the particular ambulance
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        async getConditions(ambulanceId: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<Condition>>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.getConditions(ambulanceId, options);
-            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
-        },
-    }
-};
-
-/**
- * AmbulanceConditionsApi - factory interface
- * @export
- */
-export const AmbulanceConditionsApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
-    const localVarFp = AmbulanceConditionsApiFp(configuration)
-    return {
-        /**
-         * By using ambulanceId you get list of predefined conditions
-         * @summary Provides the list of conditions associated with ambulance
-         * @param {string} ambulanceId pass the id of the particular ambulance
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        getConditions(ambulanceId: string, options?: any): AxiosPromise<Array<Condition>> {
-            return localVarFp.getConditions(ambulanceId, options).then((request) => request(axios, basePath));
-        },
-    };
-};
-
-/**
- * AmbulanceConditionsApi - interface
- * @export
- * @interface AmbulanceConditionsApi
- */
-export interface AmbulanceConditionsApiInterface {
+export interface DeviceLog {
     /**
-     * By using ambulanceId you get list of predefined conditions
-     * @summary Provides the list of conditions associated with ambulance
-     * @param {string} ambulanceId pass the id of the particular ambulance
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     * @memberof AmbulanceConditionsApiInterface
+     * Unique id of the log
+     * @type {string}
+     * @memberof DeviceLog
      */
-    getConditions(ambulanceId: string, options?: AxiosRequestConfig): AxiosPromise<Array<Condition>>;
-
-}
-
-/**
- * AmbulanceConditionsApi - object-oriented interface
- * @export
- * @class AmbulanceConditionsApi
- * @extends {BaseAPI}
- */
-export class AmbulanceConditionsApi extends BaseAPI implements AmbulanceConditionsApiInterface {
+    'id': string;
     /**
-     * By using ambulanceId you get list of predefined conditions
-     * @summary Provides the list of conditions associated with ambulance
-     * @param {string} ambulanceId pass the id of the particular ambulance
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     * @memberof AmbulanceConditionsApi
+     * Text of log operation
+     * @type {string}
+     * @memberof DeviceLog
      */
-    public getConditions(ambulanceId: string, options?: AxiosRequestConfig) {
-        return AmbulanceConditionsApiFp(this.configuration).getConditions(ambulanceId, options).then((request) => request(this.axios, this.basePath));
-    }
+    'text': string;
+    /**
+     * Unique identifier of the device
+     * @type {string}
+     * @memberof DeviceLog
+     */
+    'deviceId': string;
+    /**
+     * Timestamp since when the patient entered the waiting list
+     * @type {string}
+     * @memberof DeviceLog
+     */
+    'createdAt'?: string;
 }
 
-
 /**
- * AmbulanceWaitingListApi - axios parameter creator
+ * AmbulanceDeviceListApi - axios parameter creator
  * @export
  */
-export const AmbulanceWaitingListApiAxiosParamCreator = function (configuration?: Configuration) {
+export const AmbulanceDeviceListApiAxiosParamCreator = function (configuration?: Configuration) {
     return {
         /**
-         * Use this method to store new entry into the waiting list.
-         * @summary Saves new entry into waiting list
-         * @param {string} ambulanceId pass the id of the particular ambulance
-         * @param {WaitingListEntry} waitingListEntry Waiting list entry to store
+         * Use this method to store new entry into the device list.
+         * @summary Saves new entry into device list
+         * @param {DeviceListEntry} deviceListEntry Device list entry to store
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        createWaitingListEntry: async (ambulanceId: string, waitingListEntry: WaitingListEntry, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
-            // verify required parameter 'ambulanceId' is not null or undefined
-            assertParamExists('createWaitingListEntry', 'ambulanceId', ambulanceId)
-            // verify required parameter 'waitingListEntry' is not null or undefined
-            assertParamExists('createWaitingListEntry', 'waitingListEntry', waitingListEntry)
-            const localVarPath = `/waiting-list/{ambulanceId}/entries`
-                .replace(`{${"ambulanceId"}}`, encodeURIComponent(String(ambulanceId)));
+        createDeviceListEntry: async (deviceListEntry: DeviceListEntry, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'deviceListEntry' is not null or undefined
+            assertParamExists('createDeviceListEntry', 'deviceListEntry', deviceListEntry)
+            const localVarPath = `/device-list/entries`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -266,7 +152,7 @@ export const AmbulanceWaitingListApiAxiosParamCreator = function (configuration?
             setSearchParams(localVarUrlObj, localVarQueryParameter);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-            localVarRequestOptions.data = serializeDataIfNeeded(waitingListEntry, localVarRequestOptions, configuration)
+            localVarRequestOptions.data = serializeDataIfNeeded(deviceListEntry, localVarRequestOptions, configuration)
 
             return {
                 url: toPathString(localVarUrlObj),
@@ -274,20 +160,16 @@ export const AmbulanceWaitingListApiAxiosParamCreator = function (configuration?
             };
         },
         /**
-         * Use this method to delete the specific entry from the waiting list.
+         * Use this method to delete the specific entry from the device list.
          * @summary Deletes specific entry
-         * @param {string} ambulanceId pass the id of the particular ambulance
-         * @param {string} entryId pass the id of the particular entry in the waiting list
+         * @param {string} entryId pass the id of the particular entry in the device list
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        deleteWaitingListEntry: async (ambulanceId: string, entryId: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
-            // verify required parameter 'ambulanceId' is not null or undefined
-            assertParamExists('deleteWaitingListEntry', 'ambulanceId', ambulanceId)
+        deleteDeviceListEntry: async (entryId: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'entryId' is not null or undefined
-            assertParamExists('deleteWaitingListEntry', 'entryId', entryId)
-            const localVarPath = `/waiting-list/{ambulanceId}/entries/{entryId}`
-                .replace(`{${"ambulanceId"}}`, encodeURIComponent(String(ambulanceId)))
+            assertParamExists('deleteDeviceListEntry', 'entryId', entryId)
+            const localVarPath = `/device-list/entries/{entryId}`
                 .replace(`{${"entryId"}}`, encodeURIComponent(String(entryId)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -312,17 +194,13 @@ export const AmbulanceWaitingListApiAxiosParamCreator = function (configuration?
             };
         },
         /**
-         * By using ambulanceId you get list of entries in ambulance waiting list
-         * @summary Provides the ambulance waiting list
-         * @param {string} ambulanceId pass the id of the particular ambulance
+         * Get list of devices in ambulance
+         * @summary Provides the ambulance device list
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getWaitingListEntries: async (ambulanceId: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
-            // verify required parameter 'ambulanceId' is not null or undefined
-            assertParamExists('getWaitingListEntries', 'ambulanceId', ambulanceId)
-            const localVarPath = `/waiting-list/{ambulanceId}/entries`
-                .replace(`{${"ambulanceId"}}`, encodeURIComponent(String(ambulanceId)));
+        getDeviceListEntries: async (options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/device-list/entries`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -346,20 +224,16 @@ export const AmbulanceWaitingListApiAxiosParamCreator = function (configuration?
             };
         },
         /**
-         * By using ambulanceId and entryId you can details of particular entry item ambulance.
-         * @summary Provides details about waiting list entry
-         * @param {string} ambulanceId pass the id of the particular ambulance
-         * @param {string} entryId pass the id of the particular entry in the waiting list
+         * By using entryId you get details of particular device
+         * @summary Provides details about device list entry
+         * @param {string} entryId pass the id of the particular entry in the device list
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getWaitingListEntry: async (ambulanceId: string, entryId: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
-            // verify required parameter 'ambulanceId' is not null or undefined
-            assertParamExists('getWaitingListEntry', 'ambulanceId', ambulanceId)
+        getDeviceListEntry: async (entryId: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'entryId' is not null or undefined
-            assertParamExists('getWaitingListEntry', 'entryId', entryId)
-            const localVarPath = `/waiting-list/{ambulanceId}/entries/{entryId}`
-                .replace(`{${"ambulanceId"}}`, encodeURIComponent(String(ambulanceId)))
+            assertParamExists('getDeviceListEntry', 'entryId', entryId)
+            const localVarPath = `/device-list/entries/{entryId}`
                 .replace(`{${"entryId"}}`, encodeURIComponent(String(entryId)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -384,23 +258,19 @@ export const AmbulanceWaitingListApiAxiosParamCreator = function (configuration?
             };
         },
         /**
-         * Use this method to update content of the waiting list entry.
+         * Use this method to update content of the device list entry.
          * @summary Updates specific entry
-         * @param {string} ambulanceId pass the id of the particular ambulance
-         * @param {string} entryId pass the id of the particular entry in the waiting list
-         * @param {WaitingListEntry} waitingListEntry Waiting list entry to update
+         * @param {string} entryId pass the id of the particular entry in the device list
+         * @param {DeviceListEntry} deviceListEntry Device list entry to update
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        updateWaitingListEntry: async (ambulanceId: string, entryId: string, waitingListEntry: WaitingListEntry, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
-            // verify required parameter 'ambulanceId' is not null or undefined
-            assertParamExists('updateWaitingListEntry', 'ambulanceId', ambulanceId)
+        updateDeviceListEntry: async (entryId: string, deviceListEntry: DeviceListEntry, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'entryId' is not null or undefined
-            assertParamExists('updateWaitingListEntry', 'entryId', entryId)
-            // verify required parameter 'waitingListEntry' is not null or undefined
-            assertParamExists('updateWaitingListEntry', 'waitingListEntry', waitingListEntry)
-            const localVarPath = `/waiting-list/{ambulanceId}/entries/{entryId}`
-                .replace(`{${"ambulanceId"}}`, encodeURIComponent(String(ambulanceId)))
+            assertParamExists('updateDeviceListEntry', 'entryId', entryId)
+            // verify required parameter 'deviceListEntry' is not null or undefined
+            assertParamExists('updateDeviceListEntry', 'deviceListEntry', deviceListEntry)
+            const localVarPath = `/device-list/entries/{entryId}`
                 .replace(`{${"entryId"}}`, encodeURIComponent(String(entryId)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -420,7 +290,7 @@ export const AmbulanceWaitingListApiAxiosParamCreator = function (configuration?
             setSearchParams(localVarUrlObj, localVarQueryParameter);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-            localVarRequestOptions.data = serializeDataIfNeeded(waitingListEntry, localVarRequestOptions, configuration)
+            localVarRequestOptions.data = serializeDataIfNeeded(deviceListEntry, localVarRequestOptions, configuration)
 
             return {
                 url: toPathString(localVarUrlObj),
@@ -431,273 +301,376 @@ export const AmbulanceWaitingListApiAxiosParamCreator = function (configuration?
 };
 
 /**
- * AmbulanceWaitingListApi - functional programming interface
+ * AmbulanceDeviceListApi - functional programming interface
  * @export
  */
-export const AmbulanceWaitingListApiFp = function(configuration?: Configuration) {
-    const localVarAxiosParamCreator = AmbulanceWaitingListApiAxiosParamCreator(configuration)
+export const AmbulanceDeviceListApiFp = function(configuration?: Configuration) {
+    const localVarAxiosParamCreator = AmbulanceDeviceListApiAxiosParamCreator(configuration)
     return {
         /**
-         * Use this method to store new entry into the waiting list.
-         * @summary Saves new entry into waiting list
-         * @param {string} ambulanceId pass the id of the particular ambulance
-         * @param {WaitingListEntry} waitingListEntry Waiting list entry to store
+         * Use this method to store new entry into the device list.
+         * @summary Saves new entry into device list
+         * @param {DeviceListEntry} deviceListEntry Device list entry to store
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async createWaitingListEntry(ambulanceId: string, waitingListEntry: WaitingListEntry, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<WaitingListEntry>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.createWaitingListEntry(ambulanceId, waitingListEntry, options);
+        async createDeviceListEntry(deviceListEntry: DeviceListEntry, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<DeviceListEntry>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.createDeviceListEntry(deviceListEntry, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
-         * Use this method to delete the specific entry from the waiting list.
+         * Use this method to delete the specific entry from the device list.
          * @summary Deletes specific entry
-         * @param {string} ambulanceId pass the id of the particular ambulance
-         * @param {string} entryId pass the id of the particular entry in the waiting list
+         * @param {string} entryId pass the id of the particular entry in the device list
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async deleteWaitingListEntry(ambulanceId: string, entryId: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.deleteWaitingListEntry(ambulanceId, entryId, options);
+        async deleteDeviceListEntry(entryId: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.deleteDeviceListEntry(entryId, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
-         * By using ambulanceId you get list of entries in ambulance waiting list
-         * @summary Provides the ambulance waiting list
-         * @param {string} ambulanceId pass the id of the particular ambulance
+         * Get list of devices in ambulance
+         * @summary Provides the ambulance device list
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async getWaitingListEntries(ambulanceId: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<WaitingListEntry>>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.getWaitingListEntries(ambulanceId, options);
+        async getDeviceListEntries(options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<DeviceListEntry>>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getDeviceListEntries(options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
-         * By using ambulanceId and entryId you can details of particular entry item ambulance.
-         * @summary Provides details about waiting list entry
-         * @param {string} ambulanceId pass the id of the particular ambulance
-         * @param {string} entryId pass the id of the particular entry in the waiting list
+         * By using entryId you get details of particular device
+         * @summary Provides details about device list entry
+         * @param {string} entryId pass the id of the particular entry in the device list
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async getWaitingListEntry(ambulanceId: string, entryId: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<WaitingListEntry>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.getWaitingListEntry(ambulanceId, entryId, options);
+        async getDeviceListEntry(entryId: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<DeviceListEntry>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getDeviceListEntry(entryId, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
-         * Use this method to update content of the waiting list entry.
+         * Use this method to update content of the device list entry.
          * @summary Updates specific entry
-         * @param {string} ambulanceId pass the id of the particular ambulance
-         * @param {string} entryId pass the id of the particular entry in the waiting list
-         * @param {WaitingListEntry} waitingListEntry Waiting list entry to update
+         * @param {string} entryId pass the id of the particular entry in the device list
+         * @param {DeviceListEntry} deviceListEntry Device list entry to update
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async updateWaitingListEntry(ambulanceId: string, entryId: string, waitingListEntry: WaitingListEntry, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<WaitingListEntry>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.updateWaitingListEntry(ambulanceId, entryId, waitingListEntry, options);
+        async updateDeviceListEntry(entryId: string, deviceListEntry: DeviceListEntry, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<DeviceListEntry>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.updateDeviceListEntry(entryId, deviceListEntry, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
     }
 };
 
 /**
- * AmbulanceWaitingListApi - factory interface
+ * AmbulanceDeviceListApi - factory interface
  * @export
  */
-export const AmbulanceWaitingListApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
-    const localVarFp = AmbulanceWaitingListApiFp(configuration)
+export const AmbulanceDeviceListApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
+    const localVarFp = AmbulanceDeviceListApiFp(configuration)
     return {
         /**
-         * Use this method to store new entry into the waiting list.
-         * @summary Saves new entry into waiting list
-         * @param {string} ambulanceId pass the id of the particular ambulance
-         * @param {WaitingListEntry} waitingListEntry Waiting list entry to store
+         * Use this method to store new entry into the device list.
+         * @summary Saves new entry into device list
+         * @param {DeviceListEntry} deviceListEntry Device list entry to store
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        createWaitingListEntry(ambulanceId: string, waitingListEntry: WaitingListEntry, options?: any): AxiosPromise<WaitingListEntry> {
-            return localVarFp.createWaitingListEntry(ambulanceId, waitingListEntry, options).then((request) => request(axios, basePath));
+        createDeviceListEntry(deviceListEntry: DeviceListEntry, options?: any): AxiosPromise<DeviceListEntry> {
+            return localVarFp.createDeviceListEntry(deviceListEntry, options).then((request) => request(axios, basePath));
         },
         /**
-         * Use this method to delete the specific entry from the waiting list.
+         * Use this method to delete the specific entry from the device list.
          * @summary Deletes specific entry
-         * @param {string} ambulanceId pass the id of the particular ambulance
-         * @param {string} entryId pass the id of the particular entry in the waiting list
+         * @param {string} entryId pass the id of the particular entry in the device list
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        deleteWaitingListEntry(ambulanceId: string, entryId: string, options?: any): AxiosPromise<void> {
-            return localVarFp.deleteWaitingListEntry(ambulanceId, entryId, options).then((request) => request(axios, basePath));
+        deleteDeviceListEntry(entryId: string, options?: any): AxiosPromise<void> {
+            return localVarFp.deleteDeviceListEntry(entryId, options).then((request) => request(axios, basePath));
         },
         /**
-         * By using ambulanceId you get list of entries in ambulance waiting list
-         * @summary Provides the ambulance waiting list
-         * @param {string} ambulanceId pass the id of the particular ambulance
+         * Get list of devices in ambulance
+         * @summary Provides the ambulance device list
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getWaitingListEntries(ambulanceId: string, options?: any): AxiosPromise<Array<WaitingListEntry>> {
-            return localVarFp.getWaitingListEntries(ambulanceId, options).then((request) => request(axios, basePath));
+        getDeviceListEntries(options?: any): AxiosPromise<Array<DeviceListEntry>> {
+            return localVarFp.getDeviceListEntries(options).then((request) => request(axios, basePath));
         },
         /**
-         * By using ambulanceId and entryId you can details of particular entry item ambulance.
-         * @summary Provides details about waiting list entry
-         * @param {string} ambulanceId pass the id of the particular ambulance
-         * @param {string} entryId pass the id of the particular entry in the waiting list
+         * By using entryId you get details of particular device
+         * @summary Provides details about device list entry
+         * @param {string} entryId pass the id of the particular entry in the device list
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getWaitingListEntry(ambulanceId: string, entryId: string, options?: any): AxiosPromise<WaitingListEntry> {
-            return localVarFp.getWaitingListEntry(ambulanceId, entryId, options).then((request) => request(axios, basePath));
+        getDeviceListEntry(entryId: string, options?: any): AxiosPromise<DeviceListEntry> {
+            return localVarFp.getDeviceListEntry(entryId, options).then((request) => request(axios, basePath));
         },
         /**
-         * Use this method to update content of the waiting list entry.
+         * Use this method to update content of the device list entry.
          * @summary Updates specific entry
-         * @param {string} ambulanceId pass the id of the particular ambulance
-         * @param {string} entryId pass the id of the particular entry in the waiting list
-         * @param {WaitingListEntry} waitingListEntry Waiting list entry to update
+         * @param {string} entryId pass the id of the particular entry in the device list
+         * @param {DeviceListEntry} deviceListEntry Device list entry to update
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        updateWaitingListEntry(ambulanceId: string, entryId: string, waitingListEntry: WaitingListEntry, options?: any): AxiosPromise<WaitingListEntry> {
-            return localVarFp.updateWaitingListEntry(ambulanceId, entryId, waitingListEntry, options).then((request) => request(axios, basePath));
+        updateDeviceListEntry(entryId: string, deviceListEntry: DeviceListEntry, options?: any): AxiosPromise<DeviceListEntry> {
+            return localVarFp.updateDeviceListEntry(entryId, deviceListEntry, options).then((request) => request(axios, basePath));
         },
     };
 };
 
 /**
- * AmbulanceWaitingListApi - interface
+ * AmbulanceDeviceListApi - interface
  * @export
- * @interface AmbulanceWaitingListApi
+ * @interface AmbulanceDeviceListApi
  */
-export interface AmbulanceWaitingListApiInterface {
+export interface AmbulanceDeviceListApiInterface {
     /**
-     * Use this method to store new entry into the waiting list.
-     * @summary Saves new entry into waiting list
-     * @param {string} ambulanceId pass the id of the particular ambulance
-     * @param {WaitingListEntry} waitingListEntry Waiting list entry to store
+     * Use this method to store new entry into the device list.
+     * @summary Saves new entry into device list
+     * @param {DeviceListEntry} deviceListEntry Device list entry to store
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof AmbulanceWaitingListApiInterface
+     * @memberof AmbulanceDeviceListApiInterface
      */
-    createWaitingListEntry(ambulanceId: string, waitingListEntry: WaitingListEntry, options?: AxiosRequestConfig): AxiosPromise<WaitingListEntry>;
+    createDeviceListEntry(deviceListEntry: DeviceListEntry, options?: AxiosRequestConfig): AxiosPromise<DeviceListEntry>;
 
     /**
-     * Use this method to delete the specific entry from the waiting list.
+     * Use this method to delete the specific entry from the device list.
      * @summary Deletes specific entry
-     * @param {string} ambulanceId pass the id of the particular ambulance
-     * @param {string} entryId pass the id of the particular entry in the waiting list
+     * @param {string} entryId pass the id of the particular entry in the device list
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof AmbulanceWaitingListApiInterface
+     * @memberof AmbulanceDeviceListApiInterface
      */
-    deleteWaitingListEntry(ambulanceId: string, entryId: string, options?: AxiosRequestConfig): AxiosPromise<void>;
+    deleteDeviceListEntry(entryId: string, options?: AxiosRequestConfig): AxiosPromise<void>;
 
     /**
-     * By using ambulanceId you get list of entries in ambulance waiting list
-     * @summary Provides the ambulance waiting list
-     * @param {string} ambulanceId pass the id of the particular ambulance
+     * Get list of devices in ambulance
+     * @summary Provides the ambulance device list
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof AmbulanceWaitingListApiInterface
+     * @memberof AmbulanceDeviceListApiInterface
      */
-    getWaitingListEntries(ambulanceId: string, options?: AxiosRequestConfig): AxiosPromise<Array<WaitingListEntry>>;
+    getDeviceListEntries(options?: AxiosRequestConfig): AxiosPromise<Array<DeviceListEntry>>;
 
     /**
-     * By using ambulanceId and entryId you can details of particular entry item ambulance.
-     * @summary Provides details about waiting list entry
-     * @param {string} ambulanceId pass the id of the particular ambulance
-     * @param {string} entryId pass the id of the particular entry in the waiting list
+     * By using entryId you get details of particular device
+     * @summary Provides details about device list entry
+     * @param {string} entryId pass the id of the particular entry in the device list
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof AmbulanceWaitingListApiInterface
+     * @memberof AmbulanceDeviceListApiInterface
      */
-    getWaitingListEntry(ambulanceId: string, entryId: string, options?: AxiosRequestConfig): AxiosPromise<WaitingListEntry>;
+    getDeviceListEntry(entryId: string, options?: AxiosRequestConfig): AxiosPromise<DeviceListEntry>;
 
     /**
-     * Use this method to update content of the waiting list entry.
+     * Use this method to update content of the device list entry.
      * @summary Updates specific entry
-     * @param {string} ambulanceId pass the id of the particular ambulance
-     * @param {string} entryId pass the id of the particular entry in the waiting list
-     * @param {WaitingListEntry} waitingListEntry Waiting list entry to update
+     * @param {string} entryId pass the id of the particular entry in the device list
+     * @param {DeviceListEntry} deviceListEntry Device list entry to update
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof AmbulanceWaitingListApiInterface
+     * @memberof AmbulanceDeviceListApiInterface
      */
-    updateWaitingListEntry(ambulanceId: string, entryId: string, waitingListEntry: WaitingListEntry, options?: AxiosRequestConfig): AxiosPromise<WaitingListEntry>;
+    updateDeviceListEntry(entryId: string, deviceListEntry: DeviceListEntry, options?: AxiosRequestConfig): AxiosPromise<DeviceListEntry>;
 
 }
 
 /**
- * AmbulanceWaitingListApi - object-oriented interface
+ * AmbulanceDeviceListApi - object-oriented interface
  * @export
- * @class AmbulanceWaitingListApi
+ * @class AmbulanceDeviceListApi
  * @extends {BaseAPI}
  */
-export class AmbulanceWaitingListApi extends BaseAPI implements AmbulanceWaitingListApiInterface {
+export class AmbulanceDeviceListApi extends BaseAPI implements AmbulanceDeviceListApiInterface {
     /**
-     * Use this method to store new entry into the waiting list.
-     * @summary Saves new entry into waiting list
-     * @param {string} ambulanceId pass the id of the particular ambulance
-     * @param {WaitingListEntry} waitingListEntry Waiting list entry to store
+     * Use this method to store new entry into the device list.
+     * @summary Saves new entry into device list
+     * @param {DeviceListEntry} deviceListEntry Device list entry to store
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof AmbulanceWaitingListApi
+     * @memberof AmbulanceDeviceListApi
      */
-    public createWaitingListEntry(ambulanceId: string, waitingListEntry: WaitingListEntry, options?: AxiosRequestConfig) {
-        return AmbulanceWaitingListApiFp(this.configuration).createWaitingListEntry(ambulanceId, waitingListEntry, options).then((request) => request(this.axios, this.basePath));
+    public createDeviceListEntry(deviceListEntry: DeviceListEntry, options?: AxiosRequestConfig) {
+        return AmbulanceDeviceListApiFp(this.configuration).createDeviceListEntry(deviceListEntry, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
-     * Use this method to delete the specific entry from the waiting list.
+     * Use this method to delete the specific entry from the device list.
      * @summary Deletes specific entry
-     * @param {string} ambulanceId pass the id of the particular ambulance
-     * @param {string} entryId pass the id of the particular entry in the waiting list
+     * @param {string} entryId pass the id of the particular entry in the device list
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof AmbulanceWaitingListApi
+     * @memberof AmbulanceDeviceListApi
      */
-    public deleteWaitingListEntry(ambulanceId: string, entryId: string, options?: AxiosRequestConfig) {
-        return AmbulanceWaitingListApiFp(this.configuration).deleteWaitingListEntry(ambulanceId, entryId, options).then((request) => request(this.axios, this.basePath));
+    public deleteDeviceListEntry(entryId: string, options?: AxiosRequestConfig) {
+        return AmbulanceDeviceListApiFp(this.configuration).deleteDeviceListEntry(entryId, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
-     * By using ambulanceId you get list of entries in ambulance waiting list
-     * @summary Provides the ambulance waiting list
-     * @param {string} ambulanceId pass the id of the particular ambulance
+     * Get list of devices in ambulance
+     * @summary Provides the ambulance device list
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof AmbulanceWaitingListApi
+     * @memberof AmbulanceDeviceListApi
      */
-    public getWaitingListEntries(ambulanceId: string, options?: AxiosRequestConfig) {
-        return AmbulanceWaitingListApiFp(this.configuration).getWaitingListEntries(ambulanceId, options).then((request) => request(this.axios, this.basePath));
+    public getDeviceListEntries(options?: AxiosRequestConfig) {
+        return AmbulanceDeviceListApiFp(this.configuration).getDeviceListEntries(options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
-     * By using ambulanceId and entryId you can details of particular entry item ambulance.
-     * @summary Provides details about waiting list entry
-     * @param {string} ambulanceId pass the id of the particular ambulance
-     * @param {string} entryId pass the id of the particular entry in the waiting list
+     * By using entryId you get details of particular device
+     * @summary Provides details about device list entry
+     * @param {string} entryId pass the id of the particular entry in the device list
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof AmbulanceWaitingListApi
+     * @memberof AmbulanceDeviceListApi
      */
-    public getWaitingListEntry(ambulanceId: string, entryId: string, options?: AxiosRequestConfig) {
-        return AmbulanceWaitingListApiFp(this.configuration).getWaitingListEntry(ambulanceId, entryId, options).then((request) => request(this.axios, this.basePath));
+    public getDeviceListEntry(entryId: string, options?: AxiosRequestConfig) {
+        return AmbulanceDeviceListApiFp(this.configuration).getDeviceListEntry(entryId, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
-     * Use this method to update content of the waiting list entry.
+     * Use this method to update content of the device list entry.
      * @summary Updates specific entry
-     * @param {string} ambulanceId pass the id of the particular ambulance
-     * @param {string} entryId pass the id of the particular entry in the waiting list
-     * @param {WaitingListEntry} waitingListEntry Waiting list entry to update
+     * @param {string} entryId pass the id of the particular entry in the device list
+     * @param {DeviceListEntry} deviceListEntry Device list entry to update
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof AmbulanceWaitingListApi
+     * @memberof AmbulanceDeviceListApi
      */
-    public updateWaitingListEntry(ambulanceId: string, entryId: string, waitingListEntry: WaitingListEntry, options?: AxiosRequestConfig) {
-        return AmbulanceWaitingListApiFp(this.configuration).updateWaitingListEntry(ambulanceId, entryId, waitingListEntry, options).then((request) => request(this.axios, this.basePath));
+    public updateDeviceListEntry(entryId: string, deviceListEntry: DeviceListEntry, options?: AxiosRequestConfig) {
+        return AmbulanceDeviceListApiFp(this.configuration).updateDeviceListEntry(entryId, deviceListEntry, options).then((request) => request(this.axios, this.basePath));
+    }
+}
+
+
+/**
+ * AmbulanceDeviceLogListApi - axios parameter creator
+ * @export
+ */
+export const AmbulanceDeviceLogListApiAxiosParamCreator = function (configuration?: Configuration) {
+    return {
+        /**
+         * By using entryId you get logs of a particular device
+         * @summary Provides device logs list
+         * @param {string} entryId pass the id of the particular entry in the device list
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getDeviceLogs: async (entryId: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'entryId' is not null or undefined
+            assertParamExists('getDeviceLogs', 'entryId', entryId)
+            const localVarPath = `/device-list/entries/{entryId}/logs`
+                .replace(`{${"entryId"}}`, encodeURIComponent(String(entryId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+    }
+};
+
+/**
+ * AmbulanceDeviceLogListApi - functional programming interface
+ * @export
+ */
+export const AmbulanceDeviceLogListApiFp = function(configuration?: Configuration) {
+    const localVarAxiosParamCreator = AmbulanceDeviceLogListApiAxiosParamCreator(configuration)
+    return {
+        /**
+         * By using entryId you get logs of a particular device
+         * @summary Provides device logs list
+         * @param {string} entryId pass the id of the particular entry in the device list
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async getDeviceLogs(entryId: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<DeviceLog>>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getDeviceLogs(entryId, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+    }
+};
+
+/**
+ * AmbulanceDeviceLogListApi - factory interface
+ * @export
+ */
+export const AmbulanceDeviceLogListApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
+    const localVarFp = AmbulanceDeviceLogListApiFp(configuration)
+    return {
+        /**
+         * By using entryId you get logs of a particular device
+         * @summary Provides device logs list
+         * @param {string} entryId pass the id of the particular entry in the device list
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getDeviceLogs(entryId: string, options?: any): AxiosPromise<Array<DeviceLog>> {
+            return localVarFp.getDeviceLogs(entryId, options).then((request) => request(axios, basePath));
+        },
+    };
+};
+
+/**
+ * AmbulanceDeviceLogListApi - interface
+ * @export
+ * @interface AmbulanceDeviceLogListApi
+ */
+export interface AmbulanceDeviceLogListApiInterface {
+    /**
+     * By using entryId you get logs of a particular device
+     * @summary Provides device logs list
+     * @param {string} entryId pass the id of the particular entry in the device list
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof AmbulanceDeviceLogListApiInterface
+     */
+    getDeviceLogs(entryId: string, options?: AxiosRequestConfig): AxiosPromise<Array<DeviceLog>>;
+
+}
+
+/**
+ * AmbulanceDeviceLogListApi - object-oriented interface
+ * @export
+ * @class AmbulanceDeviceLogListApi
+ * @extends {BaseAPI}
+ */
+export class AmbulanceDeviceLogListApi extends BaseAPI implements AmbulanceDeviceLogListApiInterface {
+    /**
+     * By using entryId you get logs of a particular device
+     * @summary Provides device logs list
+     * @param {string} entryId pass the id of the particular entry in the device list
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof AmbulanceDeviceLogListApi
+     */
+    public getDeviceLogs(entryId: string, options?: AxiosRequestConfig) {
+        return AmbulanceDeviceLogListApiFp(this.configuration).getDeviceLogs(entryId, options).then((request) => request(this.axios, this.basePath));
     }
 }
 

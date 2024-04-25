@@ -1,4 +1,6 @@
-import { Component, Host, State, h } from '@stencil/core';
+import { Component, Host, Prop, State, h } from '@stencil/core';
+import { AmbulanceDeviceLogListApiFactory, DeviceLog } from '../../api/ambulance-wl';
+
 
 @Component({
   tag: 'harkap-ambulance-log-list',
@@ -7,38 +9,29 @@ import { Component, Host, State, h } from '@stencil/core';
 })
 export class HarkapAmbulanceLogList {
   @State() errorMessage: string;
+  @Prop() apiBase: string;
+  @Prop() deviceId: string;
 
-  waitingPatients: any[];
+  deviceLogs: DeviceLog[];
 
-  private async getWaitingPatientsAsync(){
-    return await Promise.resolve(
-      [{
-          name: 'Použitie',
-          section: 'Chirurgia',
-          since: new Date(Date.now() - 10 * 60).toISOString(),
-          estimatedStart: new Date(Date.now() + 65 * 60).toISOString(),
-          estimatedDurationMinutes: 15,
-          condition: 'Kontrola'
-      }, {
-          name: 'Operácia',
-          section: 'Radiológia',
-          since: new Date(Date.now() - 30 * 60).toISOString(),
-          estimatedStart: new Date(Date.now() + 30 * 60).toISOString(),
-          estimatedDurationMinutes: 20,
-          condition: 'Teploty'
-      }, {
-          name: 'Vyšetrenie krvi',
-          section: 'Laboratórium',
-          since: new Date(Date.now() - 72 * 60).toISOString(),
-          estimatedStart: new Date(Date.now() + 5 * 60).toISOString(),
-          estimatedDurationMinutes: 15,
-          condition: 'Bolesti hrdla'
-      }]
-    );
+  private async getDeviceLogsAsync() {
+    try {
+       const response = await
+         AmbulanceDeviceLogListApiFactory(undefined, this.apiBase).
+           getDeviceLogs(this.deviceId)
+       if (response.status < 299) {
+         return response.data;
+       } else {
+         this.errorMessage = `Cannot retrieve device logs: ${response.statusText}`
+       }
+     } catch (err: any) {
+       this.errorMessage = `Cannot retrieve device logs: ${err.message || "unknown"}`
+     }
+     return [];
   }
 
   async componentWillLoad() {
-    this.waitingPatients = await this.getWaitingPatientsAsync();
+    this.deviceLogs = await this.getDeviceLogsAsync();
   }
 
   render() {
@@ -49,11 +42,11 @@ export class HarkapAmbulanceLogList {
           :
           <div class="container">
             <md-list class="list">
-              {this.waitingPatients.map((patient) =>
+              {this.deviceLogs.map((device) =>
                 <md-list-item class="list-item">
-                  <div slot="headline">{patient.name}</div>
-                  <div slot="supporting-text">{"Štart: " + patient.estimatedStart}</div>
-                  <div slot="supporting-text">{"Trvanie: " + patient.estimatedDurationMinutes + " min"}</div>
+                  <div slot="headline">{device.id}</div>
+                  <div slot="headline">{device.text}</div>
+                  <div slot="supporting-text">{"Čas: " + device.createdAt}</div>
                 </md-list-item>
               )}
             </md-list>
