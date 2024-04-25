@@ -12,16 +12,19 @@ export class HarkapAmbulanceWlEditor {
   @Prop() basePath: string = "";
   @Prop() apiBase: string;
   @State() entry: DeviceListEntry;
-   @State() errorMessage:string;
-   @State() isValid: boolean;
+  @State() errorMessage:string;
+  @State() isValid: boolean;
 
   private formElement: HTMLFormElement;
 
   private async getDeviceEntryAsync(): Promise<DeviceListEntry> {
     if(this.entryId === "@new") {
-         this.isValid = false;
+      this.isValid = false;
+      let uniqueId = () => {
+        return Math.random().toString(36).substr(2, 9);
+      }
          this.entry = {
-           id: "@new",
+           id: uniqueId(),
            name: "",
            deviceId: "",
            warrantyUntil: "",
@@ -121,9 +124,10 @@ export class HarkapAmbulanceWlEditor {
           </md-filled-text-field>
 
           <md-filled-text-field
-            required value={this.entry?.warrantyUntil}
+            type="date"
+            required value={this.entry?.warrantyUntil ? new Date(this.entry?.warrantyUntil).toISOString().substring(0, 10) : ''}
             oninput={ (ev: InputEvent) => {
-               if(this.entry) {this.entry.warrantyUntil = this.handleInputEvent(ev)}
+               if(this.entry) {this.entry.warrantyUntil = this.handleDateInputEvent(ev)}
             }}
             label="Záruka do">
             <md-icon slot="leading-icon">watch_later</md-icon>
@@ -207,6 +211,18 @@ export class HarkapAmbulanceWlEditor {
    }
    return target.value
   }
+
+  private handleDateInputEvent(ev: InputEvent): string {
+    const target = ev.target as HTMLInputElement;
+     console.log(target.value);
+    const date = new Date(target.value);
+    if (isNaN(date.getTime())) {
+        target.setCustomValidity("Invalid date format")
+    } else {
+        target.setCustomValidity("")
+    }
+    return date.toISOString();
+    }
 
   private async updateEntry() {
    try {

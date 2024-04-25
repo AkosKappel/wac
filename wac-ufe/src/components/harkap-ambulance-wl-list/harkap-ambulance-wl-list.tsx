@@ -75,10 +75,10 @@ export class HarkapAmbulanceWlList {
               <span>Pridať nové zariadenie</span>
             </md-elevated-button>
             <md-list class="list">
-              {this.waitingPatients.map((patient) =>
-                <md-list-item class="list-item" onClick={ () => this.entryClicked.emit(patient.id)}>
-                  <div slot="headline">{patient.name}</div>
-                  <div slot="supporting-text">{"Oddelenie: " + patient.department.name}</div>
+              {this.waitingPatients.map((device) =>
+                <md-list-item class="list-item" onClick={ () => this.entryClicked.emit(device.id)}>
+                  <div slot="headline">{device.name}</div>
+                  <div slot="supporting-text">{"Oddelenie: " + device.department.name}</div>
                   <md-icon slot="start">devices</md-icon>
                   <md-icon slot="end">chevron_right</md-icon>
                 </md-list-item>
