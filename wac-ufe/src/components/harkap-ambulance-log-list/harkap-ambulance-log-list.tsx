@@ -1,4 +1,4 @@
-import { Component, Host, Prop, State, h } from '@stencil/core';
+import { Component, Event, Host, Prop, EventEmitter, State, h } from '@stencil/core';
 import { AmbulanceDeviceLogListApiFactory, DeviceLog } from '../../api/ambulance-wl';
 
 
@@ -8,6 +8,7 @@ import { AmbulanceDeviceLogListApiFactory, DeviceLog } from '../../api/ambulance
   shadow: true,
 })
 export class HarkapAmbulanceLogList {
+  @Event({ eventName: "log-clicked" }) logClicked: EventEmitter<string>;
   @State() errorMessage: string;
   @Prop() apiBase: string;
   @Prop() deviceId: string;
@@ -41,12 +42,15 @@ export class HarkapAmbulanceLogList {
           ? <div class="error">{this.errorMessage}</div>
           :
           <div class="container">
+            <md-elevated-button class="add-button" onclick={() => this.logClicked.emit("@new")}>
+              <span>Pridať nový log</span>
+            </md-elevated-button>
             <md-list class="list">
               {this.deviceLogs.map((device) =>
-                <md-list-item class="list-item">
-                  <div slot="headline">{device.id}</div>
-                  <div slot="headline">{device.text}</div>
-                  <div slot="supporting-text">{"Čas: " + device.createdAt}</div>
+                <md-list-item class="list-item" onClick={ () => this.logClicked.emit(device.id)}>
+                  <div slot="headline"><b>ID: </b>{device.id}</div>
+                  <div slot="headline"><b>Typ: </b>{device.text}</div>
+                  <div slot="supporting-text"><b>Čas: </b>{device.createdAt}</div>
                 </md-list-item>
               )}
             </md-list>

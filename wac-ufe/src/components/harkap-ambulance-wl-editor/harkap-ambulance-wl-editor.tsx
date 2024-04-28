@@ -81,18 +81,18 @@ export class HarkapAmbulanceWlEditor {
 
   render() {
     let element = "list"
-    // let entryId = "@new-log"
+    let logId = "@new-log"
 
-    if ( this.relativePath.startsWith("entry-log/"))
+    if ( this.relativePath.includes("log/"))
     {
       element = "editor";
-      // entryId = this.relativePath.split("/")[1]
+      logId = this.relativePath.split("/")[3]
     }
 
-    // const navigate = (path:string) => {
-    //   const absolute = new URL(path, new URL(this.basePath, document.baseURI)).pathname;
-    //   window.navigation.navigate(absolute)
-    // }
+    const navigate = (path:string) => {
+      const absolute = new URL(path, new URL(this.basePath, document.baseURI)).pathname;
+      window.navigation.navigate(absolute)
+    }
 
     if(this.errorMessage) {
       return (
@@ -183,16 +183,18 @@ export class HarkapAmbulanceWlEditor {
         </div>
         {this.entryId !== "@new" ? <div class="device-log">
           <h2>
-            Prevádzkový log zariadenia {this.entryId}
+            Prevádzkový log zariadenia {this.entry?.name || "..."}
           </h2>
-          {/* { element === "editor"
-            ? <harkap-ambulance-log-editor>
+          { element === "editor"
+            ? <harkap-ambulance-log-editor entry-id={this.entryId} log-id={logId} base-path="/ambulance-wl/" api-base={this.apiBase}
+                onlog-closed={ () => navigate("./entry/" + this.entryId)} >
               </harkap-ambulance-log-editor>
-            : <div> */}
-              <harkap-ambulance-log-list device-id={this.entryId} api-base={this.apiBase}>
-              </harkap-ambulance-log-list>
-            {/* </div>
-          } */}
+            : <div>
+          <harkap-ambulance-log-list device-id={this.entryId} api-base={this.apiBase}
+            onlog-clicked={ (ev: CustomEvent<string>)=> navigate("./entry/" + this.entryId + "/log/" + ev.detail) } >
+          </harkap-ambulance-log-list>
+            </div>
+          }
         </div> : null}
       </Host>
     );

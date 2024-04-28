@@ -7,6 +7,10 @@
 import { HTMLStencilElement, JSXBase } from "@stencil/core/internal";
 export namespace Components {
     interface HarkapAmbulanceLogEditor {
+        "apiBase": string;
+        "basePath": string;
+        "entryId": string;
+        "logId": string;
     }
     interface HarkapAmbulanceLogList {
         "apiBase": string;
@@ -27,6 +31,14 @@ export namespace Components {
         "apiBase": string;
     }
 }
+export interface HarkapAmbulanceLogEditorCustomEvent<T> extends CustomEvent<T> {
+    detail: T;
+    target: HTMLHarkapAmbulanceLogEditorElement;
+}
+export interface HarkapAmbulanceLogListCustomEvent<T> extends CustomEvent<T> {
+    detail: T;
+    target: HTMLHarkapAmbulanceLogListElement;
+}
 export interface HarkapAmbulanceWlEditorCustomEvent<T> extends CustomEvent<T> {
     detail: T;
     target: HTMLHarkapAmbulanceWlEditorElement;
@@ -36,13 +48,35 @@ export interface HarkapAmbulanceWlListCustomEvent<T> extends CustomEvent<T> {
     target: HTMLHarkapAmbulanceWlListElement;
 }
 declare global {
+    interface HTMLHarkapAmbulanceLogEditorElementEventMap {
+        "log-closed": string;
+    }
     interface HTMLHarkapAmbulanceLogEditorElement extends Components.HarkapAmbulanceLogEditor, HTMLStencilElement {
+        addEventListener<K extends keyof HTMLHarkapAmbulanceLogEditorElementEventMap>(type: K, listener: (this: HTMLHarkapAmbulanceLogEditorElement, ev: HarkapAmbulanceLogEditorCustomEvent<HTMLHarkapAmbulanceLogEditorElementEventMap[K]>) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLHarkapAmbulanceLogEditorElementEventMap>(type: K, listener: (this: HTMLHarkapAmbulanceLogEditorElement, ev: HarkapAmbulanceLogEditorCustomEvent<HTMLHarkapAmbulanceLogEditorElementEventMap[K]>) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | EventListenerOptions): void;
     }
     var HTMLHarkapAmbulanceLogEditorElement: {
         prototype: HTMLHarkapAmbulanceLogEditorElement;
         new (): HTMLHarkapAmbulanceLogEditorElement;
     };
+    interface HTMLHarkapAmbulanceLogListElementEventMap {
+        "log-clicked": string;
+    }
     interface HTMLHarkapAmbulanceLogListElement extends Components.HarkapAmbulanceLogList, HTMLStencilElement {
+        addEventListener<K extends keyof HTMLHarkapAmbulanceLogListElementEventMap>(type: K, listener: (this: HTMLHarkapAmbulanceLogListElement, ev: HarkapAmbulanceLogListCustomEvent<HTMLHarkapAmbulanceLogListElementEventMap[K]>) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLHarkapAmbulanceLogListElementEventMap>(type: K, listener: (this: HTMLHarkapAmbulanceLogListElement, ev: HarkapAmbulanceLogListCustomEvent<HTMLHarkapAmbulanceLogListElementEventMap[K]>) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | EventListenerOptions): void;
     }
     var HTMLHarkapAmbulanceLogListElement: {
         prototype: HTMLHarkapAmbulanceLogListElement;
@@ -98,10 +132,16 @@ declare global {
 }
 declare namespace LocalJSX {
     interface HarkapAmbulanceLogEditor {
+        "apiBase"?: string;
+        "basePath"?: string;
+        "entryId"?: string;
+        "logId"?: string;
+        "onLog-closed"?: (event: HarkapAmbulanceLogEditorCustomEvent<string>) => void;
     }
     interface HarkapAmbulanceLogList {
         "apiBase"?: string;
         "deviceId"?: string;
+        "onLog-clicked"?: (event: HarkapAmbulanceLogListCustomEvent<string>) => void;
     }
     interface HarkapAmbulanceWlApp {
         "ambulanceId"?: string;

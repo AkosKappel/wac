@@ -80,6 +80,12 @@ export interface DeviceListEntry {
     'price'?: number;
     /**
      * 
+     * @type {Array<DeviceLog>}
+     * @memberof DeviceListEntry
+     */
+    'logList'?: Array<DeviceLog>;
+    /**
+     * 
      * @type {Department}
      * @memberof DeviceListEntry
      */
@@ -559,6 +565,122 @@ export class AmbulanceDeviceListApi extends BaseAPI implements AmbulanceDeviceLi
 export const AmbulanceDeviceLogListApiAxiosParamCreator = function (configuration?: Configuration) {
     return {
         /**
+         * Use this method to create new device log
+         * @summary Saves new log into device log list
+         * @param {string} entryId pass the id of the particular entry in the device list
+         * @param {DeviceLog} deviceLog Device log to store
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        createDeviceLog: async (entryId: string, deviceLog: DeviceLog, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'entryId' is not null or undefined
+            assertParamExists('createDeviceLog', 'entryId', entryId)
+            // verify required parameter 'deviceLog' is not null or undefined
+            assertParamExists('createDeviceLog', 'deviceLog', deviceLog)
+            const localVarPath = `/device-list/entries/{entryId}/logs`
+                .replace(`{${"entryId"}}`, encodeURIComponent(String(entryId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(deviceLog, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * Use this method to delete the specific device log
+         * @summary Deletes specific device log
+         * @param {string} entryId pass the id of the particular entry in the device list
+         * @param {string} logId pass the id of the particular device log
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        deleteDeviceLog: async (entryId: string, logId: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'entryId' is not null or undefined
+            assertParamExists('deleteDeviceLog', 'entryId', entryId)
+            // verify required parameter 'logId' is not null or undefined
+            assertParamExists('deleteDeviceLog', 'logId', logId)
+            const localVarPath = `/device-list/entries/{entryId}/logs/{logId}`
+                .replace(`{${"entryId"}}`, encodeURIComponent(String(entryId)))
+                .replace(`{${"logId"}}`, encodeURIComponent(String(logId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'DELETE', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * By using entryId and logId you get details of particular device log
+         * @summary Provides details about device log
+         * @param {string} entryId pass the id of the particular entry in the device list
+         * @param {string} logId pass the id of the particular device log
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getDeviceLog: async (entryId: string, logId: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'entryId' is not null or undefined
+            assertParamExists('getDeviceLog', 'entryId', entryId)
+            // verify required parameter 'logId' is not null or undefined
+            assertParamExists('getDeviceLog', 'logId', logId)
+            const localVarPath = `/device-list/entries/{entryId}/logs/{logId}`
+                .replace(`{${"entryId"}}`, encodeURIComponent(String(entryId)))
+                .replace(`{${"logId"}}`, encodeURIComponent(String(logId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
          * By using entryId you get logs of a particular device
          * @summary Provides device logs list
          * @param {string} entryId pass the id of the particular entry in the device list
@@ -592,6 +714,50 @@ export const AmbulanceDeviceLogListApiAxiosParamCreator = function (configuratio
                 options: localVarRequestOptions,
             };
         },
+        /**
+         * Use this method to update content of the device log
+         * @summary Updates specific device log
+         * @param {string} entryId pass the id of the particular entry in the device list
+         * @param {string} logId pass the id of the particular device log
+         * @param {DeviceLog} deviceLog Device log entry to update
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        updateDeviceLog: async (entryId: string, logId: string, deviceLog: DeviceLog, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'entryId' is not null or undefined
+            assertParamExists('updateDeviceLog', 'entryId', entryId)
+            // verify required parameter 'logId' is not null or undefined
+            assertParamExists('updateDeviceLog', 'logId', logId)
+            // verify required parameter 'deviceLog' is not null or undefined
+            assertParamExists('updateDeviceLog', 'deviceLog', deviceLog)
+            const localVarPath = `/device-list/entries/{entryId}/logs/{logId}`
+                .replace(`{${"entryId"}}`, encodeURIComponent(String(entryId)))
+                .replace(`{${"logId"}}`, encodeURIComponent(String(logId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'PUT', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(deviceLog, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
     }
 };
 
@@ -603,6 +769,42 @@ export const AmbulanceDeviceLogListApiFp = function(configuration?: Configuratio
     const localVarAxiosParamCreator = AmbulanceDeviceLogListApiAxiosParamCreator(configuration)
     return {
         /**
+         * Use this method to create new device log
+         * @summary Saves new log into device log list
+         * @param {string} entryId pass the id of the particular entry in the device list
+         * @param {DeviceLog} deviceLog Device log to store
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async createDeviceLog(entryId: string, deviceLog: DeviceLog, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<DeviceLog>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.createDeviceLog(entryId, deviceLog, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * Use this method to delete the specific device log
+         * @summary Deletes specific device log
+         * @param {string} entryId pass the id of the particular entry in the device list
+         * @param {string} logId pass the id of the particular device log
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async deleteDeviceLog(entryId: string, logId: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.deleteDeviceLog(entryId, logId, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * By using entryId and logId you get details of particular device log
+         * @summary Provides details about device log
+         * @param {string} entryId pass the id of the particular entry in the device list
+         * @param {string} logId pass the id of the particular device log
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async getDeviceLog(entryId: string, logId: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<DeviceLog>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getDeviceLog(entryId, logId, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
          * By using entryId you get logs of a particular device
          * @summary Provides device logs list
          * @param {string} entryId pass the id of the particular entry in the device list
@@ -611,6 +813,19 @@ export const AmbulanceDeviceLogListApiFp = function(configuration?: Configuratio
          */
         async getDeviceLogs(entryId: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<DeviceLog>>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.getDeviceLogs(entryId, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * Use this method to update content of the device log
+         * @summary Updates specific device log
+         * @param {string} entryId pass the id of the particular entry in the device list
+         * @param {string} logId pass the id of the particular device log
+         * @param {DeviceLog} deviceLog Device log entry to update
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async updateDeviceLog(entryId: string, logId: string, deviceLog: DeviceLog, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<DeviceLog>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.updateDeviceLog(entryId, logId, deviceLog, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
     }
@@ -624,6 +839,39 @@ export const AmbulanceDeviceLogListApiFactory = function (configuration?: Config
     const localVarFp = AmbulanceDeviceLogListApiFp(configuration)
     return {
         /**
+         * Use this method to create new device log
+         * @summary Saves new log into device log list
+         * @param {string} entryId pass the id of the particular entry in the device list
+         * @param {DeviceLog} deviceLog Device log to store
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        createDeviceLog(entryId: string, deviceLog: DeviceLog, options?: any): AxiosPromise<DeviceLog> {
+            return localVarFp.createDeviceLog(entryId, deviceLog, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * Use this method to delete the specific device log
+         * @summary Deletes specific device log
+         * @param {string} entryId pass the id of the particular entry in the device list
+         * @param {string} logId pass the id of the particular device log
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        deleteDeviceLog(entryId: string, logId: string, options?: any): AxiosPromise<void> {
+            return localVarFp.deleteDeviceLog(entryId, logId, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * By using entryId and logId you get details of particular device log
+         * @summary Provides details about device log
+         * @param {string} entryId pass the id of the particular entry in the device list
+         * @param {string} logId pass the id of the particular device log
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getDeviceLog(entryId: string, logId: string, options?: any): AxiosPromise<DeviceLog> {
+            return localVarFp.getDeviceLog(entryId, logId, options).then((request) => request(axios, basePath));
+        },
+        /**
          * By using entryId you get logs of a particular device
          * @summary Provides device logs list
          * @param {string} entryId pass the id of the particular entry in the device list
@@ -632,6 +880,18 @@ export const AmbulanceDeviceLogListApiFactory = function (configuration?: Config
          */
         getDeviceLogs(entryId: string, options?: any): AxiosPromise<Array<DeviceLog>> {
             return localVarFp.getDeviceLogs(entryId, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * Use this method to update content of the device log
+         * @summary Updates specific device log
+         * @param {string} entryId pass the id of the particular entry in the device list
+         * @param {string} logId pass the id of the particular device log
+         * @param {DeviceLog} deviceLog Device log entry to update
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        updateDeviceLog(entryId: string, logId: string, deviceLog: DeviceLog, options?: any): AxiosPromise<DeviceLog> {
+            return localVarFp.updateDeviceLog(entryId, logId, deviceLog, options).then((request) => request(axios, basePath));
         },
     };
 };
@@ -643,6 +903,39 @@ export const AmbulanceDeviceLogListApiFactory = function (configuration?: Config
  */
 export interface AmbulanceDeviceLogListApiInterface {
     /**
+     * Use this method to create new device log
+     * @summary Saves new log into device log list
+     * @param {string} entryId pass the id of the particular entry in the device list
+     * @param {DeviceLog} deviceLog Device log to store
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof AmbulanceDeviceLogListApiInterface
+     */
+    createDeviceLog(entryId: string, deviceLog: DeviceLog, options?: AxiosRequestConfig): AxiosPromise<DeviceLog>;
+
+    /**
+     * Use this method to delete the specific device log
+     * @summary Deletes specific device log
+     * @param {string} entryId pass the id of the particular entry in the device list
+     * @param {string} logId pass the id of the particular device log
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof AmbulanceDeviceLogListApiInterface
+     */
+    deleteDeviceLog(entryId: string, logId: string, options?: AxiosRequestConfig): AxiosPromise<void>;
+
+    /**
+     * By using entryId and logId you get details of particular device log
+     * @summary Provides details about device log
+     * @param {string} entryId pass the id of the particular entry in the device list
+     * @param {string} logId pass the id of the particular device log
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof AmbulanceDeviceLogListApiInterface
+     */
+    getDeviceLog(entryId: string, logId: string, options?: AxiosRequestConfig): AxiosPromise<DeviceLog>;
+
+    /**
      * By using entryId you get logs of a particular device
      * @summary Provides device logs list
      * @param {string} entryId pass the id of the particular entry in the device list
@@ -651,6 +944,18 @@ export interface AmbulanceDeviceLogListApiInterface {
      * @memberof AmbulanceDeviceLogListApiInterface
      */
     getDeviceLogs(entryId: string, options?: AxiosRequestConfig): AxiosPromise<Array<DeviceLog>>;
+
+    /**
+     * Use this method to update content of the device log
+     * @summary Updates specific device log
+     * @param {string} entryId pass the id of the particular entry in the device list
+     * @param {string} logId pass the id of the particular device log
+     * @param {DeviceLog} deviceLog Device log entry to update
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof AmbulanceDeviceLogListApiInterface
+     */
+    updateDeviceLog(entryId: string, logId: string, deviceLog: DeviceLog, options?: AxiosRequestConfig): AxiosPromise<DeviceLog>;
 
 }
 
@@ -662,6 +967,45 @@ export interface AmbulanceDeviceLogListApiInterface {
  */
 export class AmbulanceDeviceLogListApi extends BaseAPI implements AmbulanceDeviceLogListApiInterface {
     /**
+     * Use this method to create new device log
+     * @summary Saves new log into device log list
+     * @param {string} entryId pass the id of the particular entry in the device list
+     * @param {DeviceLog} deviceLog Device log to store
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof AmbulanceDeviceLogListApi
+     */
+    public createDeviceLog(entryId: string, deviceLog: DeviceLog, options?: AxiosRequestConfig) {
+        return AmbulanceDeviceLogListApiFp(this.configuration).createDeviceLog(entryId, deviceLog, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Use this method to delete the specific device log
+     * @summary Deletes specific device log
+     * @param {string} entryId pass the id of the particular entry in the device list
+     * @param {string} logId pass the id of the particular device log
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof AmbulanceDeviceLogListApi
+     */
+    public deleteDeviceLog(entryId: string, logId: string, options?: AxiosRequestConfig) {
+        return AmbulanceDeviceLogListApiFp(this.configuration).deleteDeviceLog(entryId, logId, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * By using entryId and logId you get details of particular device log
+     * @summary Provides details about device log
+     * @param {string} entryId pass the id of the particular entry in the device list
+     * @param {string} logId pass the id of the particular device log
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof AmbulanceDeviceLogListApi
+     */
+    public getDeviceLog(entryId: string, logId: string, options?: AxiosRequestConfig) {
+        return AmbulanceDeviceLogListApiFp(this.configuration).getDeviceLog(entryId, logId, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
      * By using entryId you get logs of a particular device
      * @summary Provides device logs list
      * @param {string} entryId pass the id of the particular entry in the device list
@@ -671,6 +1015,20 @@ export class AmbulanceDeviceLogListApi extends BaseAPI implements AmbulanceDevic
      */
     public getDeviceLogs(entryId: string, options?: AxiosRequestConfig) {
         return AmbulanceDeviceLogListApiFp(this.configuration).getDeviceLogs(entryId, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Use this method to update content of the device log
+     * @summary Updates specific device log
+     * @param {string} entryId pass the id of the particular entry in the device list
+     * @param {string} logId pass the id of the particular device log
+     * @param {DeviceLog} deviceLog Device log entry to update
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof AmbulanceDeviceLogListApi
+     */
+    public updateDeviceLog(entryId: string, logId: string, deviceLog: DeviceLog, options?: AxiosRequestConfig) {
+        return AmbulanceDeviceLogListApiFp(this.configuration).updateDeviceLog(entryId, logId, deviceLog, options).then((request) => request(this.axios, this.basePath));
     }
 }
 

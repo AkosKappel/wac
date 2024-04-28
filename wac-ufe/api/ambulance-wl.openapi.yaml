@@ -187,6 +187,149 @@ paths:
                   $ref: '#/components/examples/DeviceLogListExample'
         '404':
           description: Device with such ID does not exist
+    post:
+      tags:
+        - ambulanceDeviceLogList
+      summary: Saves new log into device log list
+      operationId: createDeviceLog
+      parameters:
+        - in: path
+          name: entryId
+          description: pass the id of the particular entry in the device list
+          required: true
+          schema:
+            type: string
+      description: Use this method to create new device log
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DeviceLog'
+            examples:
+              request-sample:
+                $ref: '#/components/examples/DeviceLogExample'
+        description: Device log to store
+        required: true
+      responses:
+        '200':
+          description: >-
+            Value of the device log
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeviceLog'
+              examples:
+                updated-response:
+                  $ref: '#/components/examples/DeviceLogExample'
+        '400':
+          description: Missing mandatory properties of input object.
+        '404':
+          description: Device with such ID does not exists
+        '409':
+          description: Entry with the specified id already exists
+  '/device-list/entries/{entryId}/logs/{logId}':
+    get:
+      tags:
+        - ambulanceDeviceLogList
+      summary: Provides details about device log
+      operationId: getDeviceLog
+      description: >-
+        By using entryId and logId you get details of particular device log
+      parameters:
+        - in: path
+          name: entryId
+          description: pass the id of the particular entry in the device list
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: logId
+          description: pass the id of the particular device log
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: value of the device log
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeviceLog'
+              examples:
+                response:
+                  $ref: '#/components/examples/DeviceLogExample'
+        '404':
+          description: Log with such ID does not exists
+    put:
+      tags:
+        - ambulanceDeviceLogList
+      summary: Updates specific device log
+      operationId: updateDeviceLog
+      description: Use this method to update content of the device log
+      parameters:
+        - in: path
+          name: entryId
+          description: pass the id of the particular entry in the device list
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: logId
+          description: pass the id of the particular device log
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DeviceLog'
+            examples:
+              request:
+                $ref: '#/components/examples/DeviceLogExample'
+        description: Device log entry to update
+        required: true
+      responses:
+        '200':
+          description: >-
+            value of the device log
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeviceLog'
+              examples:
+                response:
+                  $ref: '#/components/examples/DeviceLogExample'
+        '403':
+          description: >-
+            Value of the entryID and the data id is mismatching. Details are
+            provided in the response body.
+        '404':
+          description: Log with such ID does not exists
+    delete:
+      tags:
+        - ambulanceDeviceLogList
+      summary: Deletes specific device log
+      operationId: deleteDeviceLog
+      description: Use this method to delete the specific device log
+      parameters:
+        - in: path
+          name: entryId
+          description: pass the id of the particular entry in the device list
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: logId
+          description: pass the id of the particular device log
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Log deleted
+        '404':
+          description: Log with such ID does not exists
 components:
   schemas:
     DeviceListEntry:
@@ -214,6 +357,10 @@ components:
           type: number
           example: 4.5
           description: Price of device
+        logList:
+          type: array
+          items:
+            $ref: '#/components/schemas/DeviceLog'
         department:
           $ref: '#/components/schemas/Department'
       example:
@@ -265,6 +412,19 @@ components:
         deviceId: 1-crp
         warrantyUntil: '2038-12-24T10:05:00.000Z'
         price: 4.5
+        logList:
+          - id: 1
+            text: zakupenie zariadenia
+            deviceId: 1-crp
+            createdAt: '2038-12-24T10:05:00.000Z'
+          - id: 2
+            text: nainstalovanie zariadenia
+            deviceId: 1-crp
+            createdAt: '2038-12-25T10:05:00.000Z'
+          - id: 3
+            text: testovanie zariadenia
+            deviceId: 1-crp
+            createdAt: '2038-12-30T10:05:00.000Z'
         department:
           name: Chirurgia
           code: chir
