@@ -103,6 +103,10 @@ export class HarkapAmbulanceWlEditor {
    }
     return (
       <Host>
+        {this.entryId !== "@new" ?
+        <h2>Zariadenie {this.entry?.name} - {this.entry?.deviceId}</h2>
+        : <h2>Nové zariadenie</h2>
+        }
         <form ref={el => this.formElement = el}>
           <md-filled-text-field
             required value={this.entry?.name}
@@ -200,18 +204,14 @@ export class HarkapAmbulanceWlEditor {
     );
   }
 
-  private handleInputEvent( ev: InputEvent): string {
-   const target = ev.target as HTMLInputElement;
-   // check validity of elements
-   this.isValid = true;
-   for (let i = 0; i < this.formElement.children.length; i++) {
-      const element = this.formElement.children[i]
-      if ("reportValidity" in element) {
-      const valid = (element as HTMLInputElement).reportValidity();
-      this.isValid &&= valid;
-      }
-   }
-   return target.value
+  private handleInputEvent(ev: InputEvent): string {
+    const target = ev.target as HTMLInputElement;
+
+    // Check validity of the current input element
+    const isValid = target.reportValidity();
+    this.isValid = isValid;
+
+    return target.value;
   }
 
   private handleDateInputEvent(ev: InputEvent): string {

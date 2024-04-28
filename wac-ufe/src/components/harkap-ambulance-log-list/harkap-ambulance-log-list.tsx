@@ -45,7 +45,7 @@ export class HarkapAmbulanceLogList {
             <md-elevated-button class="add-button" onclick={() => this.logClicked.emit("@new")}>
               <span>Pridať nový log</span>
             </md-elevated-button>
-            <md-list class="list">
+            {this.deviceLogs.length > 0 ? <md-list class="list">
               {this.deviceLogs.map((device) =>
                 <md-list-item class="list-item" onClick={ () => this.logClicked.emit(device.id)}>
                   <div slot="headline"><b>ID: </b>{device.id}</div>
@@ -53,7 +53,7 @@ export class HarkapAmbulanceLogList {
                   <div slot="supporting-text"><b>Čas: </b>{device.createdAt}</div>
                 </md-list-item>
               )}
-            </md-list>
+            </md-list> : <div class="empty">Zariadenie nemá žiadne logy</div>}
           </div>
         }
       </Host>

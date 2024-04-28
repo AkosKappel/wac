@@ -93,6 +93,7 @@ export class HarkapAmbulanceLogEditor {
    }
     return (
       <Host>
+        <h2>{ this.logId === '@new' ? "Nový log" : "Log č. " + this.logId }</h2>
         <form ref={el => this.formElement = el}>
           <md-filled-text-field
             required value={this.log?.text}
@@ -134,7 +135,7 @@ export class HarkapAmbulanceLogEditor {
           <span class="stretch-fill"></span>
           <md-outlined-button id="cancel"
             onClick={() => this.logClosed.emit("cancel")}>
-            Zrušiť
+            Späť na zoznam
           </md-outlined-button>
           <md-filled-button id="confirm" disabled={ !this.isValid }
             onClick={() => this.updateEntry() }
@@ -147,18 +148,14 @@ export class HarkapAmbulanceLogEditor {
     );
   }
 
-  private handleInputEvent( ev: InputEvent): string {
-   const target = ev.target as HTMLInputElement;
-   // check validity of elements
-   this.isValid = true;
-   for (let i = 0; i < this.formElement.children.length; i++) {
-      const element = this.formElement.children[i]
-      if ("reportValidity" in element) {
-      const valid = (element as HTMLInputElement).reportValidity();
-      this.isValid &&= valid;
-      }
-   }
-   return target.value
+  private handleInputEvent(ev: InputEvent): string {
+    const target = ev.target as HTMLInputElement;
+
+    // Check validity of the current input element
+    const isValid = target.reportValidity();
+    this.isValid = isValid;
+
+    return target.value;
   }
 
   private handleDateInputEvent(ev: InputEvent): string {

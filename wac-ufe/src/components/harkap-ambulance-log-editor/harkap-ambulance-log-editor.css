@@ -1,3 +1,51 @@
 :host {
-  display: block;
+  --_wl-editor_gap: var(--wl-gap, 0.5rem);
+
+  display: flex;
+  flex-direction: column;
+  gap: var(--_wl-editor_gap);
+}
+
+form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--_wl-editor_gap);
+  padding: var(--_wl-editor_gap);
+}
+
+.device-log {
+  margin-top: 50px;
+  border-top: 1px solid #ccc;
+}
+
+.duration-slider {
+  display: flex;
+  flex-direction: row;
+  align-content: space-around;
+  align-items: center;
+}
+
+.actions {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+  gap: 1rem;
+
+}
+
+h2 {
+  margin: 0;
+  padding: 0;
+  padding-bottom: 10px;
+  font-size: 20px;
+  font-weight: 500;
+  color: black;
+}
+
+.stretch-fill {
+  flex: 10 0 0;
+}
+
+md-divider {
+  margin-bottom: var(--_wl-editor_gap);
 }

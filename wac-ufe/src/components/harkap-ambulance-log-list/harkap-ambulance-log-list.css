@@ -1,3 +1,7 @@
 :host {
   display: block;
 }
+
+.add-button {
+  margin-bottom: 20px;
+}
