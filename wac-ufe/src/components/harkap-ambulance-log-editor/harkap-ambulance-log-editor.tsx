@@ -7,7 +7,6 @@ import { AmbulanceDeviceLogListApiFactory, DeviceLog } from '../../api/ambulance
   shadow: true,
 })
 export class HarkapAmbulanceLogEditor {
-  @State() private relativePath = "";
   @Prop() logId: string;
   @Prop() entryId: string;
   @Prop() basePath: string = "";
@@ -16,7 +15,6 @@ export class HarkapAmbulanceLogEditor {
   @State() errorMessage:string;
   @State() isValid: boolean;
 
-  private formElement: HTMLFormElement;
 
   private async getDeviceLogAsync(): Promise<DeviceLog> {
     if(this.logId === "@new") {
@@ -56,34 +54,11 @@ export class HarkapAmbulanceLogEditor {
 
   async componentWillLoad() {
     this.getDeviceLogAsync();
-
-    const baseUri = new URL(this.basePath, document.baseURI || "/").pathname;
-
-     const toRelative = (path: string) => {
-       if (path.startsWith(baseUri)) {
-         this.relativePath = path.slice(baseUri.length)
-       } else {
-         this.relativePath = ""
-       }
-     }
-
-     window.navigation?.addEventListener("navigate", (ev: Event) => {
-       if ((ev as any).canIntercept) { (ev as any).intercept(); }
-       let path = new URL((ev as any).destination.url).pathname;
-       toRelative(path);
-     });
-
-     toRelative(location.pathname)
    }
 
   @Event({eventName: "log-closed"}) logClosed: EventEmitter<string>;
 
   render() {
-    const navigate = (path:string) => {
-      const absolute = new URL(path, new URL(this.basePath, document.baseURI)).pathname;
-      window.navigation.navigate(absolute)
-    }
-
     if(this.errorMessage) {
       return (
       <Host>
@@ -94,7 +69,7 @@ export class HarkapAmbulanceLogEditor {
     return (
       <Host>
         <h2>{ this.logId === '@new' ? "Nový log" : "Log č. " + this.logId }</h2>
-        <form ref={el => this.formElement = el}>
+        <form>
           <md-filled-text-field
             required value={this.log?.text}
             oninput={ (ev: InputEvent) => {

@@ -15,8 +15,6 @@ export class HarkapAmbulanceWlEditor {
   @State() errorMessage:string;
   @State() isValid: boolean;
 
-  private formElement: HTMLFormElement;
-
   private async getDeviceEntryAsync(): Promise<DeviceListEntry> {
     if(this.entryId === "@new") {
       this.isValid = false;
@@ -107,7 +105,7 @@ export class HarkapAmbulanceWlEditor {
         <h2>Zariadenie {this.entry?.name} - {this.entry?.deviceId}</h2>
         : <h2>Nové zariadenie</h2>
         }
-        <form ref={el => this.formElement = el}>
+        <form>
           <md-filled-text-field
             required value={this.entry?.name}
             oninput={ (ev: InputEvent) => {
