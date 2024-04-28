@@ -1,0 +1,7 @@
+internal/ambulance_wl/README.md
+internal/ambulance_wl/api_ambulance_device_list.go
+internal/ambulance_wl/api_ambulance_device_log_list.go
+internal/ambulance_wl/model_department.go
+internal/ambulance_wl/model_device_list_entry.go
+internal/ambulance_wl/model_device_log.go
+internal/ambulance_wl/routers.go
