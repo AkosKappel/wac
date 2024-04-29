@@ -11,10 +11,10 @@ resources:
   - cd.kustomization.yaml
   - install.kustomization.yaml
   - git-repository.yaml
+  - wac-api.image-repository.yaml
+  - wac-api.image-policy.yaml
   - wac-project-ufe.image-repository.yaml
   - wac-project-ufe.image-policy.yaml
   - ufe-controller.image-repository.yaml
   - ufe-controller.image-policy.yaml
   - image-update-automation.yaml
-  - ambulance-webapi.image-repository.yaml
-  - ambulance-webapi.image-policy.yaml
