@@ -34,7 +34,7 @@ switch ($command) {
         mongo up
     }
     "docker" {
-       docker build -t patrikharmanos/wac-api:latest -f ${ProjectRoot}/build/docker/Dockerfile .
+       docker build -t xkappel/wac-api:latest -f ${ProjectRoot}/build/docker/Dockerfile .
     }
     default {
         throw "Unknown command: $command"

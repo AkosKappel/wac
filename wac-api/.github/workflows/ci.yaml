@@ -53,7 +53,7 @@ jobs:
       id: meta
       uses: docker/metadata-action@v4.6.0
       with:
-        images: patrikharmanos/wac-api
+        images: xkappel/wac-api
         tags: |
             type=schedule
             type=ref,event=branch
