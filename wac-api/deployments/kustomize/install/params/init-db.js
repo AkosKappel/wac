@@ -44,13 +44,39 @@ db[collection].createIndex({ id: 1 });
 //insert sample data
 let result = db[collection].insertMany([
   {
-    id: 'bobulova',
-    name: 'Dr.Bobulová',
-    roomNumber: '123',
-    predefinedConditions: [
-      { value: 'Nádcha', code: 'rhinitis' },
-      { value: 'Kontrola', code: 'checkup' },
+    id: 'x321ab3',
+    name: 'CRP',
+    deviceId: '1-crp',
+    warrantyUntil: new Date('2038-12-24T10:05:00.000Z'),
+    price: 4.5,
+    logList: [
+      {
+        id: 1,
+        text: 'zakupenie zariadenia',
+        deviceId: '1-crp',
+        createdAt: new Date('2020-12-24T10:05:00.000Z'),
+      },
+      {
+        id: 2,
+        text: 'nainstalovanie zariadenia',
+        deviceId: '1-crp',
+        createdAt: new Date('2020-12-25T10:05:00.000Z'),
+      },
+      {
+        id: 3,
+        text: 'testovanie zariadenia',
+        deviceId: '1-crp',
+        createdAt: new Date('2021-12-30T10:05:00.000Z'),
+      },
     ],
+  },
+  {
+    id: 'c421fu6',
+    name: 'EKG',
+    deviceId: '2-ekg',
+    warrantyUntil: new Date('2039-01-24T10:05:00.000Z'),
+    price: 1059.99,
+    logList: [],
   },
 ]);
 
