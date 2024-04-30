@@ -51,19 +51,19 @@ let result = db[collection].insertMany([
     price: 4.5,
     logList: [
       {
-        id: 1,
+        id: '1',
         text: 'zakupenie zariadenia',
         deviceId: '1-crp',
         createdAt: new Date('2020-12-24T10:05:00.000Z'),
       },
       {
-        id: 2,
+        id: '2',
         text: 'nainstalovanie zariadenia',
         deviceId: '1-crp',
         createdAt: new Date('2020-12-25T10:05:00.000Z'),
       },
       {
-        id: 3,
+        id: '3',
         text: 'testovanie zariadenia',
         deviceId: '1-crp',
         createdAt: new Date('2021-12-30T10:05:00.000Z'),
