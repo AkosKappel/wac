@@ -9,4 +9,4 @@ images:
     newTag: 1.7.3 # {"$imagepolicy": "wac-hospital:ufe-controller:tag"}
   - name: xkappel/wac-api
     newName: xkappel/wac-api # {"$imagepolicy":  "wac-hospital:ambulance-webapi:name"}
-    newTag: main.20240430.1456 # {"$imagepolicy": "wac-hospital:ambulance-webapi:tag"}
+    newTag: main.20240430.1510 # {"$imagepolicy": "wac-hospital:ambulance-webapi:tag"}
