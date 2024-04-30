@@ -81,7 +81,7 @@ func NewMongoService[DocType interface{}](config MongoServiceConfig) DbService[D
 	}
 
 	if svc.Collection == "" {
-		svc.Collection = enviro("AMBULANCE_API_MONGODB_COLLECTION", "device-list")
+		svc.Collection = enviro("AMBULANCE_API_MONGODB_COLLECTION", "ambulance")
 	}
 
 	if svc.Timeout == 0 {

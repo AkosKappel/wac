@@ -29,7 +29,7 @@ type DeviceListEntry struct {
 	WarrantyUntil time.Time `json:"warrantyUntil,omitempty"`
 
 	// Price of device
-	Price float32 `json:"price,omitempty"`
+	Price float64 `json:"price,omitempty"`
 
 	LogList []DeviceLog `json:"logList,omitempty"`
 
