@@ -41,13 +41,5 @@ db.createCollection(collection);
 // create indexes
 db[collection].createIndex({ id: 1 });
 
-//insert sample data
-// let result = db[collection].insertMany([]);
-
-// if (result.writeError) {
-//   console.error(result);
-//   print(`Error when writing the data: ${result.errmsg}`);
-// }
-
 // exit with success
 process.exit(0);
