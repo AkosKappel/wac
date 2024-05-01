@@ -3,10 +3,10 @@ kind: Component
 images:
   - name: xkappel/wac-project-ufe
     newName: xkappel/wac-project-ufe
-    newTag: 1.0.7 # aktuálna verzia docker obrazu, ktorú chcete aby používatelia - cvičiaci - videli nasadenú
+    newTag: 1.0.8 # aktuálna verzia ufe docker obrazu, ktorú chcete aby používatelia - cvičiaci - videli nasadenú
   - name: xkappel/wac-api
     newName: xkappel/wac-api
-    newTag: 1.0.2
+    newTag: 1.0.3 # aktuálna verzia api docker obrazu, ktorú chcete aby používatelia - cvičiaci - videli nasadenú
 
 replacements:
   - targets:
