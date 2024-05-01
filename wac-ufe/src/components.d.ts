@@ -17,7 +17,6 @@ export namespace Components {
         "deviceId": string;
     }
     interface HarkapAmbulanceWlApp {
-        "ambulanceId": string;
         "apiBase": string;
         "basePath": string;
     }
@@ -27,7 +26,6 @@ export namespace Components {
         "entryId": string;
     }
     interface HarkapAmbulanceWlList {
-        "ambulanceId": string;
         "apiBase": string;
     }
 }
@@ -144,7 +142,6 @@ declare namespace LocalJSX {
         "onLog-clicked"?: (event: HarkapAmbulanceLogListCustomEvent<string>) => void;
     }
     interface HarkapAmbulanceWlApp {
-        "ambulanceId"?: string;
         "apiBase"?: string;
         "basePath"?: string;
     }
@@ -155,7 +152,6 @@ declare namespace LocalJSX {
         "onEditor-closed"?: (event: HarkapAmbulanceWlEditorCustomEvent<string>) => void;
     }
     interface HarkapAmbulanceWlList {
-        "ambulanceId"?: string;
         "apiBase"?: string;
         "onEntry-clicked"?: (event: HarkapAmbulanceWlListCustomEvent<string>) => void;
     }

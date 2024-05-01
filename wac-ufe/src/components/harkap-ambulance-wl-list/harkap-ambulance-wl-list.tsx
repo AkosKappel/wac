@@ -9,14 +9,13 @@ import { AmbulanceDeviceListApiFactory, DeviceListEntry } from '../../api/ambula
 export class HarkapAmbulanceWlList {
   @Event({ eventName: 'entry-clicked' }) entryClicked: EventEmitter<string>;
   @Prop() apiBase: string;
-  @Prop() ambulanceId: string;
   @State() errorMessage: string;
 
   devices: DeviceListEntry[];
 
   private async getDevicesAsync() {
     try {
-      const response = await AmbulanceDeviceListApiFactory(undefined, this.apiBase).getDeviceListEntries(this.ambulanceId);
+      const response = await AmbulanceDeviceListApiFactory(undefined, this.apiBase).getDeviceListEntries();
       if (response.status < 299) {
         return response.data;
       } else {
