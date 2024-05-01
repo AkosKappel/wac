@@ -9,7 +9,7 @@ spec:
     - element: harkap-ambulance-wl-app # element, ktorý bude vložený na stránku pri navigácii na zoznam čakajúcich
       attributes:
         - name: api-base
-          value: http://localhost:30081/api # use absolute path on the same host
+          value: /harkap-api # use absolute path on the same host
         - name: ambulance-id
           value: bobulova
       path: harkap-ambulance-wl # cesta, ktora sa zobrazi v address bare v prehliadaci, ked bude tento mikroFE aktívny
