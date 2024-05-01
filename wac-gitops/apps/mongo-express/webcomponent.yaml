@@ -12,3 +12,6 @@ spec:
       attributes:
         - name: src
           value: /mongo-express
+      icon:
+        mime: 'image/png'
+        url: 'https://developer.asustor.com/uploadIcons/0020_999_1579585089_mongo-express-256.png'

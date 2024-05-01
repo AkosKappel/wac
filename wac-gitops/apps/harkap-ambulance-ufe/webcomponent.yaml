@@ -13,8 +13,11 @@ spec:
         - name: ambulance-id
           value: bobulova
       path: harkap-ambulance-wl # cesta, ktora sa zobrazi v address bare v prehliadaci, ked bude tento mikroFE aktívny
-      title: Harmaňoš, Kappel - Medical Equipment Tracking # názov mikro aplikácie
+      title: Medical Equipment Tracker (Harmaňoš, Kappel) # názov mikro aplikácie
       details: Management of hospital facilities with emphasis on registration and tracking of medical equipment
+      icon:
+        mime: 'image/png'
+        url: 'https://st2.depositphotos.com/1001439/6363/v/950/depositphotos_63636425-stock-illustration-vector-abstract-orange-circle-logo.jpg'
   preload: false # určuje, či má byť web komponent načítaný spolu s hlavnou stránkou
   proxy: true # pre komponenty v rámci klastra, neprístupné na verejnej sieti musí byť táto hodnota nastavená na true
   hash-suffix: v1alpha2
