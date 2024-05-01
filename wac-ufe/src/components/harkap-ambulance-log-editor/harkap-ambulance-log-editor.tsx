@@ -18,15 +18,15 @@ export class HarkapAmbulanceLogEditor {
   private async getDeviceLogAsync(): Promise<DeviceLog> {
     if (this.logId === '@new') {
       this.isValid = false;
-      let uniqueId = () => {
-        return Math.random().toString(36).substr(2, 9);
-      };
+      const uniqueId = () => Math.random().toString(36).substr(2, 9);
+
       this.log = {
         id: uniqueId(),
         deviceId: '',
         createdAt: new Date().toISOString(),
         text: '',
       };
+
       return this.log;
     }
 
