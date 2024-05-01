@@ -89,7 +89,7 @@ export class HarkapAmbulanceWlEditor {
 
   render() {
     let element = 'list';
-    let logId = '@new-log';
+    let logId = '@new';
 
     if (this.relativePath.includes('log/')) {
       element = 'editor';
@@ -108,6 +108,7 @@ export class HarkapAmbulanceWlEditor {
         </Host>
       );
     }
+
     return (
       <Host>
         {this.entryId !== '@new' ? (

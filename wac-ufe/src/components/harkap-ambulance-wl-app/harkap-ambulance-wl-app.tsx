@@ -55,7 +55,12 @@ export class HarkapAmbulanceWlApp {
     return (
       <Host>
         {element === 'editor' ? (
-          <harkap-ambulance-wl-editor entry-id={entryId} base-path="/ambulance-wl/" api-base={this.apiBase} oneditor-closed={() => navigate('./list')}></harkap-ambulance-wl-editor>
+          <harkap-ambulance-wl-editor
+            entry-id={entryId}
+            base-path={this.basePath}
+            api-base={this.apiBase}
+            oneditor-closed={() => navigate('./list')}
+          ></harkap-ambulance-wl-editor>
         ) : (
           <div>
             <harkap-ambulance-wl-list
