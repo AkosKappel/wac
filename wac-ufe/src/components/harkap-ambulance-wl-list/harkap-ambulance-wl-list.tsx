@@ -10,6 +10,7 @@ export class HarkapAmbulanceWlList {
   @Event({ eventName: 'entry-clicked' }) entryClicked: EventEmitter<string>;
   @Prop() apiBase: string;
   @State() errorMessage: string;
+  @State() searchText: string = '';
 
   devices: DeviceListEntry[];
 
@@ -31,6 +32,30 @@ export class HarkapAmbulanceWlList {
     this.devices = await this.getDevicesAsync();
   }
 
+  private filteredDevices(): DeviceListEntry[] {
+    const searchText = this.escapeRegExp(this.normalizeSearchText(this.searchText));
+    const searchRegex = new RegExp(searchText.split('').join('.*?'), 'i');
+
+    return this.devices?.filter((device: DeviceListEntry) => {
+      const deviceName = this.normalizeSearchText(device.name);
+      const departmentName = this.normalizeSearchText(device.department.name);
+      return searchRegex.test(deviceName) || searchRegex.test(departmentName);
+    });
+  }
+
+  private normalizeSearchText(text: string): string {
+    return text
+      .normalize('NFD') // Normalize diacritics
+      .replace(/[\u0300-\u036f]/g, '') // Remove accents
+      .replace(/\s+/g, ' ') // Replace multiple spaces with a single space
+      .toLowerCase() // Convert to lowercase
+      .trim(); // Remove leading and trailing spaces
+  }
+
+  private escapeRegExp(text: string): string {
+    return text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); // Escapes RegExp special characters
+  }
+
   render() {
     return (
       <Host>
@@ -39,12 +64,23 @@ export class HarkapAmbulanceWlList {
         ) : (
           <div class="container">
             <h1>Nemocnica HarKap - Zoznam zdravotníckeho vybavenia</h1>
-            <md-elevated-button class="add-button" onclick={() => this.entryClicked.emit('@new')}>
-              <span>Pridať nové zariadenie</span>
-            </md-elevated-button>
+            <div class="header">
+              <md-elevated-button class="add-button" onclick={() => this.entryClicked.emit('@new')}>
+                <md-icon slot="icon">add</md-icon>
+                <span>Pridať nové zariadenie</span>
+              </md-elevated-button>
+              <md-filled-text-field
+                class="search"
+                label="Filtrovať zariadenia"
+                onInput={(e: InputEvent) => (this.searchText = (e.target as HTMLInputElement).value)}
+                placeholder="Zadajte názov zariadenia alebo oddelenia"
+              >
+                <md-icon slot="leading-icon">search</md-icon>
+              </md-filled-text-field>
+            </div>
             {this.devices ? (
               <md-list class="list">
-                {this.devices?.map(device => (
+                {this.filteredDevices().map(device => (
                   <md-list-item class="list-item" onClick={() => this.entryClicked.emit(device.id)}>
                     <div slot="headline">{device.name}</div>
                     <div slot="supporting-text">{'Oddelenie: ' + device.department.name}</div>

@@ -161,7 +161,7 @@ export class HarkapAmbulanceWlEditor {
             }}
             label="Záruka do"
           >
-            <md-icon slot="leading-icon">watch_later</md-icon>
+            <md-icon slot="leading-icon">event</md-icon>
           </md-filled-text-field>
 
           <md-filled-select
@@ -169,7 +169,8 @@ export class HarkapAmbulanceWlEditor {
             value={this.entry?.department?.name}
             oninput={(ev: InputEvent) => {
               if (this.entry) {
-                this.entry.department.name = this.handleInputEvent(ev);
+                this.entry.department.code = this.handleInputEvent(ev);
+                this.entry.department.name = this.departments.find(d => d.value === this.entry.department.code).name;
                 this.isValid = this.isFormValid();
               }
             }}
@@ -214,6 +215,7 @@ export class HarkapAmbulanceWlEditor {
           </md-filled-tonal-button>
           <span class="stretch-fill"></span>
           <md-outlined-button id="cancel" onClick={() => this.editorClosed.emit('cancel')}>
+            <md-icon slot="icon">close</md-icon>
             Zrušiť
           </md-outlined-button>
           <md-filled-button id="confirm" disabled={!this.isValid} onClick={() => this.updateEntry()}>

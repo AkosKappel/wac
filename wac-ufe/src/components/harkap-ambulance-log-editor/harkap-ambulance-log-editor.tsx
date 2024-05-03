@@ -129,6 +129,7 @@ export class HarkapAmbulanceLogEditor {
           </md-filled-tonal-button>
           <span class="stretch-fill"></span>
           <md-outlined-button id="cancel" onClick={() => this.logClosed.emit('cancel')}>
+            <md-icon slot="icon">close</md-icon>
             Späť na zoznam
           </md-outlined-button>
           <md-filled-button id="confirm" disabled={!this.isValid} onClick={() => this.updateEntry()}>

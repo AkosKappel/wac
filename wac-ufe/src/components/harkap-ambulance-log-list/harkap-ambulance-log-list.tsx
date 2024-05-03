@@ -40,6 +40,7 @@ export class HarkapAmbulanceLogList {
         ) : (
           <div class="container">
             <md-elevated-button class="add-button" onclick={() => this.logClicked.emit('@new')}>
+              <md-icon slot="icon">add</md-icon>
               <span>Pridať nový log</span>
             </md-elevated-button>
             {this.deviceLogs.length > 0 ? (
