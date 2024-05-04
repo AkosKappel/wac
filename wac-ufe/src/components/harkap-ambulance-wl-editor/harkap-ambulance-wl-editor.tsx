@@ -207,7 +207,7 @@ export class HarkapAmbulanceWlEditor {
         <div class="actions">
           <md-filled-tonal-button
             id="delete"
-            disabled={!this.entry || this.entry?.id === '@new'}
+            disabled={!this.entry || this.entryId === '@new'}
             onClick={() => this.deleteEntry()}
           >
             <md-icon slot="icon">delete</md-icon>
