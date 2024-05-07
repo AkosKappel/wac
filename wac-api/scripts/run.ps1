@@ -2,17 +2,17 @@ param (
     $command
 )
 
-if (-not $command)  {
+if (-not $command) {
     $command = "start"
 }
 
 $ProjectRoot = "${PSScriptRoot}/.."
 
-$env:AMBULANCE_API_ENVIRONMENT="Development"
-$env:AMBULANCE_API_PORT="8080"
+$env:AMBULANCE_API_ENVIRONMENT = "Development"
+$env:AMBULANCE_API_PORT = "8080"
 
-$env:AMBULANCE_API_MONGODB_USERNAME="root"
-$env:AMBULANCE_API_MONGODB_PASSWORD="neUhaDnes"
+$env:AMBULANCE_API_MONGODB_USERNAME = "root"
+$env:AMBULANCE_API_MONGODB_PASSWORD = "neUhaDnes"
 
 function mongo {
     docker compose --file ${ProjectRoot}/deployments/docker-compose/compose.yaml $args
@@ -23,9 +23,13 @@ switch ($command) {
         try {
             mongo up --detach
             go run ${ProjectRoot}/cmd/ambulance-api-service
-        } finally {
+        }
+        finally {
             mongo down
         }
+    }
+    "test" {
+        go test -v ./...
     }
     "openapi" {
         docker run --rm -ti -v ${ProjectRoot}:/local openapitools/openapi-generator-cli generate -c /local/scripts/generator-cfg.yaml
@@ -34,7 +38,7 @@ switch ($command) {
         mongo up
     }
     "docker" {
-       docker build -t xkappel/wac-api:latest -f ${ProjectRoot}/build/docker/Dockerfile .
+        docker build -t xkappel/wac-api:latest -f ${ProjectRoot}/build/docker/Dockerfile .
     }
     default {
         throw "Unknown command: $command"
