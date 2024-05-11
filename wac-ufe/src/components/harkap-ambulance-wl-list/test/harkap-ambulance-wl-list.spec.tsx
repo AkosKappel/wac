@@ -1,61 +1,48 @@
-// import { newSpecPage } from '@stencil/core/testing';
-// import { HarkapAmbulanceWlList } from '../harkap-ambulance-wl-list';
-// import axios from "axios";
-// import MockAdapter from "axios-mock-adapter";
-// import { WaitingListEntry } from '../../../api/ambulance-wl';
+import { newSpecPage } from '@stencil/core/testing';
+import { HarkapAmbulanceWlList } from './../harkap-ambulance-wl-list';
 
 describe('harkap-ambulance-wl-list', () => {
-  // const sampleEntries: WaitingListEntry[] = [
-  // {
-  //   id: "entry-1",
-  //   patientId: "p-1",
-  //   name: "Juraj Prvý",
-  //   waitingSince: "20240203T12:00",
-  //   estimatedDurationMinutes: 20
-  // }, {
-  //   id: "entry-2",
-  //   patientId: "p-2",
-  //   name: "James Druhý",
-  //   waitingSince: "20240203T12:05",
-  //   estimatedDurationMinutes: 5
-  // }];
+  it('render', async () => {
+    const page = await newSpecPage({
+      components: [HarkapAmbulanceWlList],
+      html: `<harkap-ambulance-wl-list></harkap-ambulance-wl-list>`,
+    });
 
-  // let mock: MockAdapter;
+    const wlList = page.rootInstance as HarkapAmbulanceWlList;
+    const expectedPatients = wlList?.devices?.length
 
-  // beforeAll(() => { mock = new MockAdapter(axios); });
-  // afterEach(() => { mock.reset(); });
-
-  it('renders sample entries', async () => {
-    // mock.onGet().reply(200, sampleEntries);
-    // // set proper attributes
-    //  const page = await newSpecPage({
-    //    components: [HarkapAmbulanceWlList],
-    //    html: `<harkap-ambulance-wl-list ambulance-id="test-ambulance" api-base="http://test/api"></harkap-ambulance-wl-list>`,
-    //  });
-    //  const wlList = page.rootInstance as HarkapAmbulanceWlList;
-    //  const expectedPatients = wlList?.waitingPatients?.length;
-
-    //  const items = page.root.shadowRoot.querySelectorAll("md-list-item");
-    //  // use sample entries as expectation
-    //  expect(expectedPatients).toEqual(sampleEntries.length);
-    //  expect(items.length).toEqual(expectedPatients);
+    const items = page.root.shadowRoot.querySelectorAll("md-list-item");
+    expect(items.length).toEqual(expectedPatients);
   });
 
-  // it('renders error message on network issues', async () => {
-  //   mock.onGet().networkError();
-  //   const page = await newSpecPage({
-  //     components: [HarkapAmbulanceWlList],  //
-  //     html: `<harkap-ambulance-wl-list ambulance-id="test-ambulance" api-base="http://test/api"></harkap-ambulance-wl-list>`,  //
-  //   });
+  it('displays error message if errorMessage is set', async () => {
+    const page = await newSpecPage({
+      components: [HarkapAmbulanceWlList],
+      html: `<harkap-ambulance-wl-list error-message="Test error message"></harkap-ambulance-wl-list>`,
+    });
+    const errorElement = page.root.querySelector('.error');
+    expect(errorElement).not.toBeNull();
+    expect(errorElement.textContent).toContain('Test error message');
+  });
 
-  //   const wlList = page.rootInstance as HarkapAmbulanceWlList; //
-  //   const expectedPatients = wlList?.waitingPatients?.length
+  it('displays devices list', async () => {
+    const devices = [
+      { id: '1', name: 'Device 1', department: { name: 'Department 1' } },
+      { id: '2', name: 'Device 2', department: { name: 'Department 2' } },
+    ];
+    const page = await newSpecPage({
+      components: [HarkapAmbulanceWlList],
+      html: `<harkap-ambulance-wl-list></harkap-ambulance-wl-list>`,
+      supportsShadowDom: true,
+    });
+    page.rootInstance.devices = devices;
+    await page.waitForChanges();
 
-  //   const errorMessage =  page.root.shadowRoot.querySelectorAll(".error");
-  //   const items = page.root.shadowRoot.querySelectorAll("md-list-item");
+    const listItems = page.root.querySelectorAll('.list-item');
+    expect(listItems.length).toBe(2);
 
-  //   expect(errorMessage.length).toBeGreaterThanOrEqual(1)
-  //   expect(expectedPatients).toEqual(0);
-  //   expect(items.length).toEqual(expectedPatients);
-  // });
+    const firstItem = listItems[0];
+    expect(firstItem.querySelector('[slot="headline"]').textContent).toBe('Device 1');
+    expect(firstItem.querySelector('[slot="supporting-text"]').textContent).toContain('Department 1');
+  });
 });

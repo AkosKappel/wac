@@ -1,18 +1,33 @@
-// import { newSpecPage } from '@stencil/core/testing';
-// import { HarkapAmbulanceWlEditor } from '../harkap-ambulance-wl-editor';
+import { newSpecPage } from '@stencil/core/testing';
+import { HarkapAmbulanceWlEditor } from './../harkap-ambulance-wl-editor';
 
 describe('harkap-ambulance-wl-editor', () => {
-  it('buttons shall be of different type', async () => {
-  //   const page = await newSpecPage({
-  //     components: [HarkapAmbulanceWlEditor],
-  //     html: `<harkap-ambulance-wl-editor entry-id="@new"></harkap-ambulance-wl-editor>`,
-  //   });
-  //   let items: any = await page.root.shadowRoot.querySelectorAll("md-filled-button");
-  //   expect(items.length).toEqual(1);
-  //   items = await page.root.shadowRoot.querySelectorAll("md-outlined-button");
-  //   expect(items.length).toEqual(1);
-
-  //   items = await page.root.shadowRoot.querySelectorAll("md-filled-tonal-button");
-  //   expect(items.length).toEqual(1);
+  it('renders correctly when entryId is @new', async () => {
+    const page = await newSpecPage({
+      components: [HarkapAmbulanceWlEditor],
+      html: `<harkap-ambulance-wl-editor entryId="@new" apiBase="example.com/api" basePath="/" />`,
+    });
+    expect(page.root).toMatchSnapshot();
   });
+
+  it('renders correctly when entryId is not @new', async () => {
+    const page = await newSpecPage({
+      components: [HarkapAmbulanceWlEditor],
+      html: `<harkap-ambulance-wl-editor entryId="someId" apiBase="example.com/api" basePath="/" />`,
+    });
+    expect(page.root).toMatchSnapshot();
+  });
+
+  it('updates entry on input', async () => {
+    const page = await newSpecPage({
+      components: [HarkapAmbulanceWlEditor],
+      html: `<harkap-ambulance-wl-editor entryId="@new" apiBase="example.com/api" basePath="/" />`,
+    });
+    const input = page.root.querySelector('md-filled-text-field[label="Názov zariadenia"] input') as HTMLInputElement;
+    input.value = 'Test device';
+    input.dispatchEvent(new Event('input'));
+    await page.waitForChanges();
+    expect(page.root.entry.name).toEqual('Test device');
+  });
+
 });
