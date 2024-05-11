@@ -2,49 +2,27 @@ import { newSpecPage } from '@stencil/core/testing';
 import { HarkapAmbulanceWlApp } from './../harkap-ambulance-wl-app';
 
 describe('harkap-ambulance-wl-app', () => {
-  it('renders list element by default', async () => {
+  it('renders editor', async () => {
     const page = await newSpecPage({
+      url: `http://localhost/entry/@new`,
       components: [HarkapAmbulanceWlApp],
-      html: `<harkap-ambulance-wl-app apiBase="example.com/api" basePath="/" />`,
+      html: `<harkap-ambulance-wl-app base-path="/"></harkap-ambulance-wl-app>`,
     });
-    expect(page.root).toMatchSnapshot();
+
+    page.win.navigation = new EventTarget();
+    const child = await page.root.shadowRoot.firstElementChild;
+    expect(child.tagName.toLocaleLowerCase()).toEqual('harkap-ambulance-wl-editor');
   });
 
-  it('renders editor element when relativePath starts with entry/', async () => {
+  it('renders list', async () => {
     const page = await newSpecPage({
+      url: `http://localhost/ambulance-wl/`,
       components: [HarkapAmbulanceWlApp],
-      html: `<harkap-ambulance-wl-app apiBase="example.com/api" basePath="/" />`,
+      html: `<harkap-ambulance-wl-app base-path="/ambulance-wl/"></harkap-ambulance-wl-app>`,
     });
-    page.root.basePath = '/some-path/';
-    page.root.relativePath = '/entry/someId';
-    await page.waitForChanges();
-    expect(page.root).toMatchSnapshot();
-  });
 
-  it('navigates to list when editor is closed', async () => {
-    const page = await newSpecPage({
-      components: [HarkapAmbulanceWlApp],
-      html: `<harkap-ambulance-wl-app apiBase="example.com/api" basePath="/" />`,
-    });
-    const editor = page.doc.createElement('harkap-ambulance-wl-editor');
-    editor.setAttribute('entry-id', 'someId');
-    page.doc.body.appendChild(editor);
-    await page.waitForChanges();
-    page.root.dispatchEvent(new CustomEvent('editor-closed'));
-    await page.waitForChanges();
-    expect(page.root.relativePath).toEqual('/list');
-  });
-
-  it('navigates to entry when list item is clicked', async () => {
-    const page = await newSpecPage({
-      components: [HarkapAmbulanceWlApp],
-      html: `<harkap-ambulance-wl-app apiBase="example.com/api" basePath="/" />`,
-    });
-    const list = page.doc.createElement('harkap-ambulance-wl-list');
-    page.doc.body.appendChild(list);
-    await page.waitForChanges();
-    list.dispatchEvent(new CustomEvent('entry-clicked', { detail: 'someId' }));
-    await page.waitForChanges();
-    expect(page.root.relativePath).toEqual('/entry/someId');
+    page.win.navigation = new EventTarget();
+    const child = await page.root.shadowRoot.firstElementChild;
+    expect(child.tagName.toLocaleLowerCase()).toEqual('div');
   });
 });

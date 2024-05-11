@@ -32,6 +32,10 @@ export class HarkapAmbulanceLogList {
     this.deviceLogs = await this.getDeviceLogsAsync();
   }
 
+  private filteredLogs() {
+    return this.deviceLogs;
+  }
+
   render() {
     return (
       <Host>

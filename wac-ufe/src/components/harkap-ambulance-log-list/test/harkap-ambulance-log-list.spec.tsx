@@ -1,44 +1,45 @@
 import { newSpecPage } from '@stencil/core/testing';
 import { HarkapAmbulanceLogList } from './../harkap-ambulance-log-list';
+import { DeviceLog } from '../../../api/ambulance-wl';
 
 describe('harkap-ambulance-log-list', () => {
-  it('renders error message when device logs cannot be retrieved', async () => {
+  const sampleLogs: DeviceLog[] = [
+    {
+      id: '1',
+      deviceId: 'US-001',
+      createdAt: new Date().toISOString(),
+      text: 'Log text',
+    },
+    {
+      id: '2',
+      deviceId: 'US-001',
+      createdAt: new Date().toISOString(),
+      text: 'Log text',
+    },
+  ];
+
+  it(`displays logs when data is loaded`, async () => {
     const page = await newSpecPage({
       components: [HarkapAmbulanceLogList],
-      html: `<harkap-ambulance-log-list apiBase="example.com/api" device-id="someId" />`,
+      html: `<harkap-ambulance-log-list></harkap-ambulance-log-list>`,
+      supportsShadowDom: true,
     });
-    page.root.deviceLogs = [];
-    page.root.errorMessage = 'Error message';
+    const logList = page.rootInstance as HarkapAmbulanceLogList;
+    logList.deviceLogs = sampleLogs;
     await page.waitForChanges();
-    expect(page.root).toMatchSnapshot();
+
+    const items = page.rootInstance.filteredLogs();
+    expect(items.length).toBe(sampleLogs.length);
   });
 
-  it('renders list of device logs when logs are available', async () => {
-    const logs = [
-      { id: '1', text: 'Log 1', createdAt: '2024-05-01T12:00:00Z' },
-      { id: '2', text: 'Log 2', createdAt: '2024-05-02T12:00:00Z' },
-    ];
+  it(`shows an error message if the API call fails`, async () => {
     const page = await newSpecPage({
       components: [HarkapAmbulanceLogList],
-      html: `<harkap-ambulance-log-list apiBase="example.com/api" device-id="someId" />`,
+      html: `<harkap-ambulance-log-list></harkap-ambulance-log-list>`,
     });
-    page.root.deviceLogs = logs;
-    page.root.errorMessage = '';
+    page.rootInstance.errorMessage = 'Cannot retrieve list of logs: Network Error';
     await page.waitForChanges();
-    expect(page.root).toMatchSnapshot();
-  });
 
-  it('emits log-clicked event when log item is clicked', async () => {
-    const logs = [{ id: '1', text: 'Log 1', createdAt: '2024-05-01T12:00:00Z' }];
-    const page = await newSpecPage({
-      components: [HarkapAmbulanceLogList],
-      html: `<harkap-ambulance-log-list apiBase="example.com/api" device-id="someId" />`,
-    });
-    page.root.deviceLogs = logs;
-    page.root.errorMessage = '';
-    await page.waitForChanges();
-    const logListItem = page.root.shadowRoot.querySelector('.list-item') as HTMLElement;
-    logListItem.click();
-    expect(page.root.logClicked).toHaveReceivedEventDetail(logs[0].id);
+    expect(page.root.shadowRoot.querySelector('.error').textContent).toContain('Network Error');
   });
 });

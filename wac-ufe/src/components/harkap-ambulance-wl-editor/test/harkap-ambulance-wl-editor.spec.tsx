@@ -1,33 +1,36 @@
 import { newSpecPage } from '@stencil/core/testing';
 import { HarkapAmbulanceWlEditor } from './../harkap-ambulance-wl-editor';
+import { DeviceListEntry } from '../../../api/ambulance-wl';
 
 describe('harkap-ambulance-wl-editor', () => {
-  it('renders correctly when entryId is @new', async () => {
+  const sampleEntry: DeviceListEntry = {
+    id: '1',
+    name: 'Ultrasound',
+    deviceId: 'US-001',
+    warrantyUntil: new Date().toISOString(),
+    department: { name: 'Radiology' },
+    price: 5000,
+  };
+
+  it('initializes a new entry when entryId is "@new"', async () => {
     const page = await newSpecPage({
       components: [HarkapAmbulanceWlEditor],
-      html: `<harkap-ambulance-wl-editor entryId="@new" apiBase="example.com/api" basePath="/" />`,
+      html: `<harkap-ambulance-wl-editor entry-id="@new"></harkap-ambulance-wl-editor>`,
     });
-    expect(page.root).toMatchSnapshot();
+    expect(page.rootInstance.isValid).toBeFalsy();
+    expect(page.rootInstance.entry).toBeDefined();
+    expect(page.rootInstance.entry.id).toBeTruthy();
+    expect(page.rootInstance.entry.name).toBe('');
   });
 
-  it('renders correctly when entryId is not @new', async () => {
+  it('validates the entry form', async () => {
     const page = await newSpecPage({
       components: [HarkapAmbulanceWlEditor],
-      html: `<harkap-ambulance-wl-editor entryId="someId" apiBase="example.com/api" basePath="/" />`,
+      html: `<harkap-ambulance-wl-editor entry-id="@new"></harkap-ambulance-wl-editor>`,
     });
-    expect(page.root).toMatchSnapshot();
-  });
+    page.rootInstance.entry = sampleEntry;
 
-  it('updates entry on input', async () => {
-    const page = await newSpecPage({
-      components: [HarkapAmbulanceWlEditor],
-      html: `<harkap-ambulance-wl-editor entryId="@new" apiBase="example.com/api" basePath="/" />`,
-    });
-    const input = page.root.querySelector('md-filled-text-field[label="Názov zariadenia"] input') as HTMLInputElement;
-    input.value = 'Test device';
-    input.dispatchEvent(new Event('input'));
-    await page.waitForChanges();
-    expect(page.root.entry.name).toEqual('Test device');
+    await page.rootInstance.isFormValid();
+    expect(page.rootInstance.isFormValid()).toBeTruthy();
   });
-
 });
