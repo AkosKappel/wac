@@ -6,7 +6,7 @@ images:
     newTag: 1.0.9 # aktuálna verzia ufe docker obrazu, ktorú chcete aby používatelia - cvičiaci - videli nasadenú
   - name: xkappel/wac-api
     newName: xkappel/wac-api
-    newTag: 1.0.3 # aktuálna verzia api docker obrazu, ktorú chcete aby používatelia - cvičiaci - videli nasadenú
+    newTag: 1.0.5 # aktuálna verzia api docker obrazu, ktorú chcete aby používatelia - cvičiaci - videli nasadenú
 
 replacements:
   - targets:
