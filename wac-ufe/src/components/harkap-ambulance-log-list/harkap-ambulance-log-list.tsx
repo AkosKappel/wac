@@ -49,7 +49,7 @@ export class HarkapAmbulanceLogList {
             </md-elevated-button>
             {this.deviceLogs.length > 0 ? (
               <md-list class="list">
-                {this.deviceLogs.map(device => (
+                {this.filteredLogs().map(device => (
                   <md-list-item class="list-item" onClick={() => this.logClicked.emit(device.id)}>
                     <div slot="headline">
                       <b>ID: </b>
