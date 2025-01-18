@@ -1,4 +1,4 @@
-module github.com/AkosKappel/wac-api
+module github.com/AkosKappel/wac/wac-api
 
 go 1.23
 

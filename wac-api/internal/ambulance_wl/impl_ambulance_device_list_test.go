@@ -7,7 +7,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/AkosKappel/wac-api/internal/db_service"
+	"github.com/AkosKappel/wac/wac-api/internal/db_service"
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/suite"

@@ -3,7 +3,7 @@ package ambulance_wl
 import (
 	"net/http"
 
-	"github.com/AkosKappel/wac-api/internal/db_service"
+	"github.com/AkosKappel/wac/wac-api/internal/db_service"
 	"github.com/gin-gonic/gin"
 )
 

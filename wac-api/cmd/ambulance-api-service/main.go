@@ -8,9 +8,9 @@ import (
 	"context"
 	"time"
 
-	"github.com/AkosKappel/wac-api/api"
-	"github.com/AkosKappel/wac-api/internal/ambulance_wl"
-	"github.com/AkosKappel/wac-api/internal/db_service"
+	"github.com/AkosKappel/wac/wac-api/api"
+	"github.com/AkosKappel/wac/wac-api/internal/ambulance_wl"
+	"github.com/AkosKappel/wac/wac-api/internal/db_service"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 )
