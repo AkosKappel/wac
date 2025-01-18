@@ -17,8 +17,9 @@ export class HarkapAmbulanceWlEditor {
 
   private departments = [
     { value: 'chir', name: 'Chirurgia' },
-    { value: 'gyn', name: 'Gynekológia' },
     { value: 'dets', name: 'Detské' },
+    { value: 'ort', name: 'Ortopedické' },
+    { value: 'ped', name: 'Pediatrické' },
     { value: 'int', name: 'Interné' },
   ];
 
@@ -166,11 +167,12 @@ export class HarkapAmbulanceWlEditor {
 
           <md-filled-select
             required
-            value={this.entry?.department?.name}
+            value={this.entry?.department?.code}
             oninput={(ev: InputEvent) => {
+              const selectedValue = (ev.target as HTMLSelectElement).value;
               if (this.entry) {
-                this.entry.department.code = this.handleInputEvent(ev);
-                this.entry.department.name = this.departments.find(d => d.value === this.entry.department.code).name;
+                this.entry.department.code = selectedValue;
+                this.entry.department.name = this.departments.find(d => d.value === selectedValue)?.name || '';
                 this.isValid = this.isFormValid();
               }
             }}
@@ -186,10 +188,11 @@ export class HarkapAmbulanceWlEditor {
 
           <md-filled-text-field
             required
-            value={this.entry?.price?.toString()}
+            value={this.entry?.price?.toFixed(2)}
             oninput={(ev: InputEvent) => {
               if (this.entry) {
-                this.entry.price = parseFloat(this.handleInputEvent(ev));
+                const inputValue = parseFloat(this.handleInputEvent(ev));
+                this.entry.price = isNaN(inputValue) ? 0 : parseFloat(inputValue.toFixed(2));
                 this.isValid = this.isFormValid();
               }
             }}
@@ -216,7 +219,7 @@ export class HarkapAmbulanceWlEditor {
           <span class="stretch-fill"></span>
           <md-outlined-button id="cancel" onClick={() => this.editorClosed.emit('cancel')}>
             <md-icon slot="icon">close</md-icon>
-            Zrušiť
+            Späť
           </md-outlined-button>
           <md-filled-button id="confirm" disabled={!this.isValid} onClick={() => this.updateEntry()}>
             <md-icon slot="icon">save</md-icon>

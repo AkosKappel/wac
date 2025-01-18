@@ -130,7 +130,7 @@ export class HarkapAmbulanceLogEditor {
           <span class="stretch-fill"></span>
           <md-outlined-button id="cancel" onClick={() => this.logClosed.emit('cancel')}>
             <md-icon slot="icon">close</md-icon>
-            Späť na zoznam
+            Zrušiť
           </md-outlined-button>
           <md-filled-button id="confirm" disabled={!this.isValid} onClick={() => this.updateEntry()}>
             <md-icon slot="icon">save</md-icon>
