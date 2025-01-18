@@ -1,0 +1,483 @@
+openapi: 3.0.0
+servers:
+  - description: Cluster Endpoint
+    url: /api
+info:
+  description: Ambulance Device List management for Web-In-Cloud system
+  version: '1.0.0'
+  title: Device List Api
+  contact:
+    email: <your_email>
+  license:
+    name: CC BY 4.0
+    url: 'https://creativecommons.org/licenses/by/4.0/'
+tags:
+  - name: ambulanceDeviceList
+    description: Ambulance Device List API
+  - name: ambulanceDeviceLogList
+    description: Ambulance Device Log API
+paths:
+  '/device-list/entries':
+    get:
+      tags:
+        - ambulanceDeviceList
+      summary: Provides the ambulance device list
+      operationId: getDeviceListEntries
+      description: Get list of devices in ambulance
+      responses:
+        '200':
+          description: value of the device list entries
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/DeviceListEntry'
+              examples:
+                response:
+                  $ref: '#/components/examples/DeviceListEntriesExample'
+        '404':
+          description: Devices not found
+    post:
+      tags:
+        - ambulanceDeviceList
+      summary: Saves new entry into device list
+      operationId: createDeviceListEntry
+      description: Use this method to store new entry into the device list.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DeviceListEntry'
+            examples:
+              request-sample:
+                $ref: '#/components/examples/DeviceListEntryExample'
+        description: Device list entry to store
+        required: true
+      responses:
+        '200':
+          description: >-
+            Value of the device list entry with re-computed estimated time of
+            ambulance entry
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeviceListEntry'
+              examples:
+                updated-response:
+                  $ref: '#/components/examples/DeviceListEntryExample'
+        '400':
+          description: Missing mandatory properties of input object.
+        '404':
+          description: Device with such ID does not exists
+        '409':
+          description: Entry with the specified id already exists
+  '/device-list/entries/{entryId}':
+    get:
+      tags:
+        - ambulanceDeviceList
+      summary: Provides details about device list entry
+      operationId: getDeviceListEntry
+      description: >-
+        By using entryId you get details of particular device
+      parameters:
+        - in: path
+          name: entryId
+          description: pass the id of the particular entry in the device list
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: value of the device list entries
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeviceListEntry'
+              examples:
+                response:
+                  $ref: '#/components/examples/DeviceListEntryExample'
+        '404':
+          description: Device with such ID does not exists
+    put:
+      tags:
+        - ambulanceDeviceList
+      summary: Updates specific entry
+      operationId: updateDeviceListEntry
+      description: Use this method to update content of the device list entry.
+      parameters:
+        - in: path
+          name: entryId
+          description: pass the id of the particular entry in the device list
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DeviceListEntry'
+            examples:
+              request:
+                $ref: '#/components/examples/DeviceListEntryExample'
+        description: Device list entry to update
+        required: true
+      responses:
+        '200':
+          description: >-
+            value of the device list entry with re-computed estimated time of
+            ambulance entry
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeviceListEntry'
+              examples:
+                response:
+                  $ref: '#/components/examples/DeviceListEntryExample'
+        '403':
+          description: >-
+            Value of the entryID and the data id is mismatching. Details are
+            provided in the response body.
+        '404':
+          description: Entry with such ID does not exists
+    delete:
+      tags:
+        - ambulanceDeviceList
+      summary: Deletes specific entry
+      operationId: deleteDeviceListEntry
+      description: Use this method to delete the specific entry from the device list.
+      parameters:
+        - in: path
+          name: entryId
+          description: pass the id of the particular entry in the device list
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Item deleted
+        '404':
+          description: Entry with such ID does not exists
+  '/device-list/entries/{entryId}/logs':
+    get:
+      tags:
+        - ambulanceDeviceLogList
+      summary: Provides device logs list
+      operationId: getDeviceLogs
+      description: >-
+        By using entryId you get logs of a particular device
+      parameters:
+        - in: path
+          name: entryId
+          description: pass the id of the particular entry in the device list
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: value of the device logs
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/DeviceLog'
+              examples:
+                response:
+                  $ref: '#/components/examples/DeviceLogListExample'
+        '404':
+          description: Device with such ID does not exist
+    post:
+      tags:
+        - ambulanceDeviceLogList
+      summary: Saves new log into device log list
+      operationId: createDeviceLog
+      parameters:
+        - in: path
+          name: entryId
+          description: pass the id of the particular entry in the device list
+          required: true
+          schema:
+            type: string
+      description: Use this method to create new device log
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DeviceLog'
+            examples:
+              request-sample:
+                $ref: '#/components/examples/DeviceLogExample'
+        description: Device log to store
+        required: true
+      responses:
+        '200':
+          description: >-
+            Value of the device log
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeviceLog'
+              examples:
+                updated-response:
+                  $ref: '#/components/examples/DeviceLogExample'
+        '400':
+          description: Missing mandatory properties of input object.
+        '404':
+          description: Device with such ID does not exists
+        '409':
+          description: Entry with the specified id already exists
+  '/device-list/entries/{entryId}/logs/{logId}':
+    get:
+      tags:
+        - ambulanceDeviceLogList
+      summary: Provides details about device log
+      operationId: getDeviceLog
+      description: >-
+        By using entryId and logId you get details of particular device log
+      parameters:
+        - in: path
+          name: entryId
+          description: pass the id of the particular entry in the device list
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: logId
+          description: pass the id of the particular device log
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: value of the device log
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeviceLog'
+              examples:
+                response:
+                  $ref: '#/components/examples/DeviceLogExample'
+        '404':
+          description: Log with such ID does not exists
+    put:
+      tags:
+        - ambulanceDeviceLogList
+      summary: Updates specific device log
+      operationId: updateDeviceLog
+      description: Use this method to update content of the device log
+      parameters:
+        - in: path
+          name: entryId
+          description: pass the id of the particular entry in the device list
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: logId
+          description: pass the id of the particular device log
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DeviceLog'
+            examples:
+              request:
+                $ref: '#/components/examples/DeviceLogExample'
+        description: Device log entry to update
+        required: true
+      responses:
+        '200':
+          description: >-
+            value of the device log
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeviceLog'
+              examples:
+                response:
+                  $ref: '#/components/examples/DeviceLogExample'
+        '403':
+          description: >-
+            Value of the entryID and the data id is mismatching. Details are
+            provided in the response body.
+        '404':
+          description: Log with such ID does not exists
+    delete:
+      tags:
+        - ambulanceDeviceLogList
+      summary: Deletes specific device log
+      operationId: deleteDeviceLog
+      description: Use this method to delete the specific device log
+      parameters:
+        - in: path
+          name: entryId
+          description: pass the id of the particular entry in the device list
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: logId
+          description: pass the id of the particular device log
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Log deleted
+        '404':
+          description: Log with such ID does not exists
+components:
+  schemas:
+    DeviceListEntry:
+      type: object
+      required: [id, name, deviceId]
+      properties:
+        id:
+          type: string
+          example: x321ab3
+          description: Unique id of the entry in this waiting list
+        name:
+          type: string
+          example: Jožko Púčik
+          description: Name of patient in waiting list
+        deviceId:
+          type: string
+          example: 1-crp
+          description: Unique identifier of the patient known to Web-In-Cloud system
+        warrantyUntil:
+          type: string
+          format: date-time
+          example: '2038-12-24T10:05:00Z'
+          description: Timestamp since when the patient entered the waiting list
+        price:
+          type: number
+          example: 4.5
+          description: Price of device
+        logList:
+          type: array
+          items:
+            $ref: '#/components/schemas/DeviceLog'
+        department:
+          $ref: '#/components/schemas/Department'
+      example:
+        $ref: '#/components/examples/DeviceListEntryExample'
+    Department:
+      description: 'Department of the hospital'
+      required:
+        - name
+      properties:
+        name:
+          type: string
+          example: Chirurgia
+        code:
+          type: string
+          example: chir
+      example:
+        $ref: '#/components/examples/DepartmentExample'
+    DeviceLog:
+      type: object
+      required: [id, text, deviceId]
+      properties:
+        id:
+          type: string
+          example: x321ab3
+          description: Unique id of the log
+        text:
+          type: string
+          example:
+          description: Text of log operation
+        deviceId:
+          type: string
+          example: 1-crp
+          description: Unique identifier of the device
+        createdAt:
+          type: string
+          format: date-time
+          example: '2038-12-24T10:05:00Z'
+          description: Timestamp since when the patient entered the waiting list
+      example:
+        $ref: '#/components/examples/DeviceLogExample'
+  examples:
+    DeviceListEntryExample:
+      summary: CRP device
+      description: |
+        Entry represents a device in the ambulance
+      value:
+        id: x321ab3
+        name: CRP
+        deviceId: 1-crp
+        warrantyUntil: '2038-12-24T10:05:00.000Z'
+        price: 4.5
+        logList:
+          - id: 1
+            text: zakupenie zariadenia
+            deviceId: 1-crp
+            createdAt: '2038-12-24T10:05:00.000Z'
+          - id: 2
+            text: nainstalovanie zariadenia
+            deviceId: 1-crp
+            createdAt: '2038-12-25T10:05:00.000Z'
+          - id: 3
+            text: testovanie zariadenia
+            deviceId: 1-crp
+            createdAt: '2038-12-30T10:05:00.000Z'
+        department:
+          name: Chirurgia
+          code: chir
+    DepartmentExample:
+      summary: Department of hospital
+      description: info about department
+      value:
+        name: Chirurgia
+        code: chir
+    DeviceListEntriesExample:
+      summary: List of devices
+      description: |
+        Example device list containing 2 devices
+      value:
+        - id: x321ab3
+          name: CRP
+          deviceId: 1-crp
+          warrantyUntil: '2038-12-24T10:05:00.000Z'
+          price: 4.5
+          department:
+            name: Chirurgia
+            code: chir
+        - id: x321ac4
+          name: Rontgen
+          deviceId: 1-rtg
+          warrantyUntil: '2038-12-24T10:05:00.000Z'
+          price: 1500.99
+          department:
+            name: Imunologia
+            code: imun
+    DeviceLogExample:
+      summary: Device log
+      description: |
+        Entry represents a device log
+      value:
+        id: 1
+        text: zakupenie zariadenia
+        deviceId: 1-crp
+        createdAt: '2038-12-24T10:05:00.000Z'
+    DeviceLogListExample:
+      summary: List of device logs
+      description: |
+        Example device log list
+      value:
+        - id: 1
+          text: zakupenie zariadenia
+          deviceId: 1-crp
+          createdAt: '2038-12-24T10:05:00.000Z'
+        - id: 2
+          text: nainstalovanie zariadenia
+          deviceId: 1-crp
+          createdAt: '2038-12-25T10:05:00.000Z'
+        - id: 3
+          text: testovanie zariadenia
+          deviceId: 1-crp
+          createdAt: '2038-12-30T10:05:00.000Z'
