@@ -5,6 +5,23 @@
 <!-- Auto Generated Below -->
 
 
+## Properties
+
+| Property   | Attribute   | Description | Type     | Default     |
+| ---------- | ----------- | ----------- | -------- | ----------- |
+| `apiBase`  | `api-base`  |             | `string` | `undefined` |
+| `basePath` | `base-path` |             | `string` | `''`        |
+| `entryId`  | `entry-id`  |             | `string` | `undefined` |
+| `logId`    | `log-id`    |             | `string` | `undefined` |
+
+
+## Events
+
+| Event        | Description | Type                  |
+| ------------ | ----------- | --------------------- |
+| `log-closed` |             | `CustomEvent<string>` |
+
+
 ## Dependencies
 
 ### Used by

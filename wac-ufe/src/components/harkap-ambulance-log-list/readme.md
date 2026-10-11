@@ -5,6 +5,21 @@
 <!-- Auto Generated Below -->
 
 
+## Properties
+
+| Property   | Attribute   | Description | Type     | Default     |
+| ---------- | ----------- | ----------- | -------- | ----------- |
+| `apiBase`  | `api-base`  |             | `string` | `undefined` |
+| `deviceId` | `device-id` |             | `string` | `undefined` |
+
+
+## Events
+
+| Event         | Description | Type                  |
+| ------------- | ----------- | --------------------- |
+| `log-clicked` |             | `CustomEvent<string>` |
+
+
 ## Dependencies
 
 ### Used by

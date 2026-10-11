@@ -9,7 +9,8 @@
 
 | Property   | Attribute   | Description | Type     | Default     |
 | ---------- | ----------- | ----------- | -------- | ----------- |
-| `basePath` | `base-path` |             | `string` | `""`        |
+| `apiBase`  | `api-base`  |             | `string` | `undefined` |
+| `basePath` | `base-path` |             | `string` | `''`        |
 | `entryId`  | `entry-id`  |             | `string` | `undefined` |
 
 
