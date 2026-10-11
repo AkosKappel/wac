@@ -1,0 +1,25 @@
+apiVersion: fe.milung.eu/v1
+kind: WebComponent
+metadata:
+  name: harkap-ambulance-ufe
+spec:
+  module-uri: http://harkap-ambulance-ufe.wac-hospital/build/ambulance-ufe.esm.js
+    # module web komponentu pre tento mikroFE - umiestnený v namespace wac-hospital
+  navigation:
+    - element: harkap-ambulance-wl-app # element, ktorý bude vložený na stránku pri navigácii na zoznam čakajúcich
+      attributes:
+        - name: api-base
+          value: /harkap-api # use absolute path on the same host
+        - name: ambulance-id
+          value: bobulova
+      path: harkap-ambulance-wl # cesta, ktora sa zobrazi v address bare v prehliadaci, ked bude tento mikroFE aktívny
+      title: Medical Equipment Tracker (Harmaňoš, Kappel) # názov mikro aplikácie
+      details: Management of hospital facilities with emphasis on registration and tracking of medical equipment
+      icon:
+        mime: 'image/png'
+        url: 'https://st2.depositphotos.com/1001439/6363/v/950/depositphotos_63636425-stock-illustration-vector-abstract-orange-circle-logo.jpg'
+  preload: false # určuje, či má byť web komponent načítaný spolu s hlavnou stránkou
+  proxy: true # pre komponenty v rámci klastra, neprístupné na verejnej sieti musí byť táto hodnota nastavená na true
+  hash-suffix: v1alpha2
+    # voliteľný suffix pre načítanie modulu web komponentu - jeho zmenou
+    # sa mení názov URL pre modul a tým je možné predísť problémom s verziami vo vyrovnávacích pamätiach

@@ -1,0 +1,17 @@
+apiVersion: fe.milung.eu/v1
+kind: WebComponent
+metadata:
+  name: mongo-express
+spec:
+  module-uri: built-in
+  navigation:
+    - element: ufe-frame
+      path: mongo-express
+      title: Mongo Express
+      details: UI Access to local Mongo DB
+      attributes:
+        - name: src
+          value: /mongo-express
+      icon:
+        mime: 'image/png'
+        url: 'https://developer.asustor.com/uploadIcons/0020_999_1579585089_mongo-express-256.png'
