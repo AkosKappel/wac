@@ -69,11 +69,11 @@ func NewMongoService[DocType interface{}](config MongoServiceConfig) DbService[D
 	}
 
 	if svc.UserName == "" {
-		svc.UserName = enviro("AMBULANCE_API_MONGODB_USERNAME", "")
+		svc.UserName = enviro("AMBULANCE_API_MONGODB_USERNAME", "root")
 	}
 
 	if svc.Password == "" {
-		svc.Password = enviro("AMBULANCE_API_MONGODB_PASSWORD", "")
+		svc.Password = enviro("AMBULANCE_API_MONGODB_PASSWORD", "neUhaDnes")
 	}
 
 	if svc.DbName == "" {

@@ -1,5 +1,5 @@
 # use specific versions of images
-FROM openapitools/openapi-generator-cli:v7.0.1 as api
+FROM openapitools/openapi-generator-cli:v7.0.1 AS api
 
 WORKDIR /local
 
@@ -56,7 +56,7 @@ ENV AMBULANCE_API_MONGODB_PORT=27017
 ENV AMBULANCE_API_MONGODB_DATABASE=harkap-ambulance
 ENV AMBULANCE_API_MONGODB_COLLECTION=ambulance
 ENV AMBULANCE_API_MONGODB_USERNAME=root
-ENV AMBULANCE_API_MONGODB_PASSWORD=
+ENV AMBULANCE_API_MONGODB_PASSWORD=neUhaDnes
 ENV AMBULANCE_API_MONGODB_TIMEOUT_SECONDS=5
 
 COPY --from=build /app/ambulance-webapi-srv ./

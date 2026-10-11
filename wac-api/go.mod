@@ -1,6 +1,6 @@
-module github.com/PatrikHarmanos/wac-api
+module github.com/AkosKappel/wac/wac-api
 
-go 1.22.1
+go 1.23
 
 require (
 	github.com/gin-contrib/cors v1.7.1
