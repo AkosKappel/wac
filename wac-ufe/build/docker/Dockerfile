@@ -11,7 +11,7 @@ COPY . .
 RUN npm run build
 
 ### prepare go embedding of SPA server
-FROM milung/spa-server as spa-build
+FROM milung/spa-server AS spa-build
 
 COPY --from=build /build/www public
 RUN ./build.sh
