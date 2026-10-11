@@ -13,7 +13,7 @@ resources:
 
 components:
   - ../../../components/version-developers
-  - https://github.com/PatrikHarmanos/wac-api//deployments/kustomize/components/mongodb
+  - https://github.com/AkosKappel/wac/wac-api//deployments/kustomize/components/mongodb
 
 patches:
   - path: patches/ambulance-webapi.service.yaml
