@@ -9,3 +9,4 @@ wac-gitops
 wac-ufe/www
 wac-ufe/dist
 wac-ufe/loader
+.worktrees
