@@ -1,1 +1,6 @@
 .env
+tmp/
+
+# Tailscale sidecar secrets and state
+docker/tailscale/ts.env
+docker/tailscale/state/

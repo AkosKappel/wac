@@ -1,0 +1,11 @@
+# Secrets and local folders must not end up in image layers.
+.env
+.env.*
+docker/tailscale/
+.git
+tmp
+wac-gitops
+**/node_modules
+wac-ufe/www
+wac-ufe/dist
+wac-ufe/loader

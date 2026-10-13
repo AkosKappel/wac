@@ -1,60 +1,122 @@
+# Container output is kept in at most 3 files of 10 MB each.
+x-logging: &logging
+  driver: json-file
+  options:
+    max-size: "10m"
+    max-file: "3"
+
+x-mongo-env: &mongo-env
+  AMBULANCE_API_MONGODB_DATABASE: ${AMBULANCE_API_MONGODB_DATABASE:-harkap-ambulance}
+  AMBULANCE_API_MONGODB_COLLECTION: ${AMBULANCE_API_MONGODB_COLLECTION:-ambulance}
+
 services:
-    frontend:
-        build:
-            context: ./wac-ufe
-            dockerfile: build/docker/Dockerfile
-        ports:
-            - "8083:8080"
-        environment:
-            - CSP_HEADER=false
-        depends_on:
-            - backend
-    
-    backend:
-        build:
-            context: ./wac-api
-            dockerfile: build/docker/Dockerfile
-        ports:
-            - "8084:8080"
-        environment:
-            AMBULANCE_API_ENVIRONMENT: ${AMBULANCE_API_ENVIRONMENT}
-            AMBULANCE_API_PORT: ${AMBULANCE_API_PORT}
-            AMBULANCE_API_MONGODB_HOST: ${AMBULANCE_API_MONGODB_HOST}
-            AMBULANCE_API_MONGODB_PORT: ${AMBULANCE_API_MONGODB_PORT}
-            AMBULANCE_API_MONGODB_DATABASE: ${AMBULANCE_API_MONGODB_DATABASE}
-            AMBULANCE_API_MONGODB_COLLECTION: ${AMBULANCE_API_MONGODB_COLLECTION}
-            AMBULANCE_API_MONGODB_USERNAME: ${AMBULANCE_API_MONGODB_USERNAME}
-            AMBULANCE_API_MONGODB_PASSWORD: ${AMBULANCE_API_MONGODB_PASSWORD}
-            AMBULANCE_API_MONGODB_TIMEOUT_SECONDS: ${AMBULANCE_API_MONGODB_TIMEOUT_SECONDS}
-        depends_on:
-            - mongo_db
+  mongo:
+    image: mongo:7.0
+    container_name: ${CONTAINER_PREFIX:-ambulance}-mongo
+    restart: unless-stopped
+    logging: *logging
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+    command: ["--wiredTigerCacheSizeGB", "0.25"]
+    environment:
+      <<: *mongo-env
+      MONGO_INITDB_ROOT_USERNAME: ${AMBULANCE_API_MONGODB_USERNAME:-root}
+      MONGO_INITDB_ROOT_PASSWORD: ${AMBULANCE_API_MONGODB_PASSWORD:?set AMBULANCE_API_MONGODB_PASSWORD in .env}
+    volumes:
+      - mongodata:/data/db
+      - ./docker/mongo/seed.js:/docker-entrypoint-initdb.d/seed.js:ro
+    ports:
+      - "127.0.0.1:${DB_HOST_PORT:-27019}:27017"
+    healthcheck:
+      test: ["CMD", "mongosh", "--quiet", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+      start_interval: 2s
+    networks:
+      - app-network
 
-    mongo_db:
-        image: mongo:7.0
-        container_name: mongo_db
-        restart: always
-        ports:
-            - 27017:27017
-        volumes:
-            - db_data:/data/db
-        environment:
-            MONGO_INITDB_ROOT_USERNAME: ${AMBULANCE_API_MONGODB_USERNAME}
-            MONGO_INITDB_ROOT_PASSWORD: ${AMBULANCE_API_MONGODB_PASSWORD}
+  api:
+    build:
+      context: ./wac-api
+      dockerfile: build/docker/Dockerfile
+    image: ambulance-api
+    container_name: ${CONTAINER_PREFIX:-ambulance}-api
+    restart: unless-stopped
+    logging: *logging
+    deploy:
+      resources:
+        limits:
+          memory: 128M
+    environment:
+      <<: *mongo-env
+      AMBULANCE_API_ENVIRONMENT: production
+      GIN_MODE: release
+      AMBULANCE_API_PORT: "8080"
+      AMBULANCE_API_MONGODB_HOST: mongo
+      AMBULANCE_API_MONGODB_PORT: "27017"
+      AMBULANCE_API_MONGODB_USERNAME: ${AMBULANCE_API_MONGODB_USERNAME:-root}
+      AMBULANCE_API_MONGODB_PASSWORD: ${AMBULANCE_API_MONGODB_PASSWORD}
+      AMBULANCE_API_MONGODB_TIMEOUT_SECONDS: "5"
+    networks:
+      - app-network
+    depends_on:
+      mongo:
+        condition: service_healthy
 
-    mongo_express:
-        image: mongo-express
-        container_name: mongo_express
-        restart: always
-        ports:
-            - 8081:8081
-        environment:
-            ME_CONFIG_MONGODB_ADMINUSERNAME: ${AMBULANCE_API_MONGODB_USERNAME}
-            ME_CONFIG_MONGODB_ADMINPASSWORD: ${AMBULANCE_API_MONGODB_PASSWORD}
-            ME_CONFIG_MONGODB_SERVER: mongo_db
-            ME_CONFIG_BASICAUTH_USERNAME: mexpress
-            ME_CONFIG_BASICAUTH_PASSWORD: mexpress
-        links:
-            - mongo_db
+  # restores the demo data every night
+  reset:
+    image: mongo:7.0
+    container_name: ${CONTAINER_PREFIX:-ambulance}-reset
+    restart: unless-stopped
+    logging: *logging
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+    entrypoint: ["/bin/sh", "/seed/reset.sh"]
+    environment:
+      <<: *mongo-env
+      MONGO_USERNAME: ${AMBULANCE_API_MONGODB_USERNAME:-root}
+      MONGO_PASSWORD: ${AMBULANCE_API_MONGODB_PASSWORD}
+      DEMO_RESET_TIME: ${DEMO_RESET_TIME:-03:00}
+      TZ: ${DEMO_RESET_TIMEZONE:-Europe/Bratislava}
+    volumes:
+      - ./docker/mongo:/seed:ro
+    networks:
+      - app-network
+    depends_on:
+      mongo:
+        condition: service_healthy
+
+  nginx:
+    build:
+      context: .
+      dockerfile: docker/nginx/Dockerfile
+    image: ambulance-web
+    container_name: ${CONTAINER_PREFIX:-ambulance}-nginx
+    restart: unless-stopped
+    logging: *logging
+    deploy:
+      resources:
+        limits:
+          memory: 128M
+    ports:
+      - "${APP_BIND:-127.0.0.1}:${APP_PORT:-8084}:80"
+    volumes:
+      - ./docker/nginx/nginx.conf:/etc/nginx/conf.d/default.conf:ro
+      - ${ACCESS_LOG_DIR:-./tmp/nginx}:/var/log/nginx/shared
+    networks:
+      - app-network
+    depends_on:
+      - api
+
+networks:
+  app-network:
+    driver: bridge
 
 volumes:
-    db_data: {}
+  mongodata:
