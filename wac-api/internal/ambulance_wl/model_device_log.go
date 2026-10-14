@@ -17,14 +17,14 @@ import (
 type DeviceLog struct {
 
 	// Unique id of the log
-	Id string `json:"id"`
+	Id string `json:"id" bson:"id"`
 
 	// Text of log operation
-	Text string `json:"text"`
+	Text string `json:"text" bson:"text"`
 
 	// Unique identifier of the device
-	DeviceId string `json:"deviceId"`
+	DeviceId string `json:"deviceId" bson:"deviceId"`
 
 	// Timestamp since when the patient entered the waiting list
-	CreatedAt time.Time `json:"createdAt,omitempty"`
+	CreatedAt time.Time `json:"createdAt,omitempty" bson:"createdAt,omitempty"`
 }

@@ -13,7 +13,7 @@ package ambulance_wl
 // Department - Department of the hospital
 type Department struct {
 
-	Name string `json:"name"`
+	Name string `json:"name" bson:"name"`
 
-	Code string `json:"code,omitempty"`
+	Code string `json:"code,omitempty" bson:"code,omitempty"`
 }

@@ -17,21 +17,21 @@ import (
 type DeviceListEntry struct {
 
 	// Unique id of the entry in this waiting list
-	Id string `json:"id"`
+	Id string `json:"id" bson:"id"`
 
 	// Name of patient in waiting list
-	Name string `json:"name"`
+	Name string `json:"name" bson:"name"`
 
 	// Unique identifier of the patient known to Web-In-Cloud system
-	DeviceId string `json:"deviceId"`
+	DeviceId string `json:"deviceId" bson:"deviceId"`
 
 	// Timestamp since when the patient entered the waiting list
-	WarrantyUntil time.Time `json:"warrantyUntil,omitempty"`
+	WarrantyUntil time.Time `json:"warrantyUntil,omitempty" bson:"warrantyUntil,omitempty"`
 
 	// Price of device
-	Price float64 `json:"price,omitempty"`
+	Price float64 `json:"price,omitempty" bson:"price,omitempty"`
 
-	LogList []DeviceLog `json:"logList,omitempty"`
+	LogList []DeviceLog `json:"logList,omitempty" bson:"logList,omitempty"`
 
-	Department Department `json:"department,omitempty"`
+	Department Department `json:"department,omitempty" bson:"department,omitempty"`
 }

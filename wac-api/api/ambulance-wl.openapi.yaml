@@ -355,6 +355,7 @@ components:
           description: Timestamp since when the patient entered the waiting list
         price:
           type: number
+          format: double
           example: 4.5
           description: Price of device
         logList:
