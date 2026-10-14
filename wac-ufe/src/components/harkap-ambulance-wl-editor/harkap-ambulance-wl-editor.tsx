@@ -1,9 +1,12 @@
 import { Component, Host, Prop, State, h, EventEmitter, Event } from '@stencil/core';
 import { AmbulanceDeviceListApiFactory, DeviceListEntry } from '../../api/ambulance-wl';
+import { ErrorPage } from '../../utils/error-page';
+import { ConfirmDialog } from '../../utils/confirm-dialog';
+import { navigateTo, watchRelativePath, validateOnBlur } from '../../utils/utils';
 
 @Component({
   tag: 'harkap-ambulance-wl-editor',
-  styleUrl: 'harkap-ambulance-wl-editor.css',
+  styleUrls: ['harkap-ambulance-wl-editor.css', '../../utils/shared.css'],
   shadow: true,
 })
 export class HarkapAmbulanceWlEditor {
@@ -13,7 +16,13 @@ export class HarkapAmbulanceWlEditor {
   @Prop() apiBase: string;
   @State() entry: DeviceListEntry;
   @State() errorMessage: string;
+  @State() errorStatus: number;
   @State() isValid: boolean;
+  @State() actionError: string;
+  @State() busy = false;
+  @State() confirmDelete = false;
+
+  private unwatch: () => void;
 
   private departments = [
     { value: 'chir', name: 'Chirurgia' },
@@ -53,40 +62,37 @@ export class HarkapAmbulanceWlEditor {
         this.entry = response.data;
         this.isValid = true;
       } else {
-        this.errorMessage = `Cannot retrieve list of devices: ${response.statusText}`;
+        this.errorMessage = `Nepodarilo sa načítať zariadenie: ${response.statusText}`;
       }
     } catch (err: any) {
-      this.errorMessage = `Cannot retrieve list of devices: ${err.message || 'unknown'}`;
+      this.errorStatus = err.response?.status;
+      this.errorMessage = `Nepodarilo sa načítať zariadenie: ${err.message || 'neznáma chyba'}`;
     }
 
     return undefined;
   }
 
-  async componentWillLoad() {
+  componentWillLoad() {
     this.getDeviceEntryAsync();
+  }
 
-    const baseUri = new URL(this.basePath, document.baseURI || '/').pathname;
+  connectedCallback() {
+    this.unwatch = watchRelativePath(this.basePath, path => (this.relativePath = path));
+  }
 
-    const toRelative = (path: string) => {
-      if (path.startsWith(baseUri)) {
-        this.relativePath = path.slice(baseUri.length);
-      } else {
-        this.relativePath = '';
-      }
-    };
-
-    window.navigation?.addEventListener('navigate', (ev: Event) => {
-      if ((ev as any).canIntercept) {
-        (ev as any).intercept();
-      }
-      let path = new URL((ev as any).destination.url).pathname;
-      toRelative(path);
-    });
-
-    toRelative(location.pathname);
+  disconnectedCallback() {
+    this.unwatch?.();
   }
 
   @Event({ eventName: 'editor-closed' }) editorClosed: EventEmitter<string>;
+
+  // includes the entry's own department when it is not in the predefined list
+  private departmentOptions() {
+    const current = this.entry?.department;
+    return current?.code && !this.departments.some(d => d.value === current.code)
+      ? [...this.departments, { value: current.code, name: current.name }]
+      : this.departments;
+  }
 
   render() {
     let element = 'list';
@@ -97,143 +103,155 @@ export class HarkapAmbulanceWlEditor {
       logId = this.relativePath.split('/')[3];
     }
 
-    const navigate = (path: string) => {
-      const absolute = new URL(path, new URL(this.basePath, document.baseURI)).pathname;
-      window.navigation.navigate(absolute);
-    };
+    const navigate = (path: string) => navigateTo(this.basePath, path);
 
     if (this.errorMessage) {
       return (
         <Host>
-          <div class="error">{this.errorMessage}</div>
+          <ErrorPage status={this.errorStatus} message={this.errorMessage} onBack={() => this.editorClosed.emit('cancel')} />
         </Host>
       );
     }
 
     return (
       <Host>
+        <header class="page-header">
+          <md-icon-button aria-label="Späť na zoznam" onClick={() => this.editorClosed.emit('cancel')}>
+            <md-icon>arrow_back</md-icon>
+          </md-icon-button>
+          <div>
+            <p class="eyebrow">{this.entryId === '@new' ? 'Nové zariadenie' : 'Detail zariadenia'}</p>
+            <h1>{this.entryId === '@new' ? 'Pridať zariadenie' : this.entry?.name || '…'}</h1>
+          </div>
+        </header>
+        <section class="card">
+          {!this.entry ? (
+            <div class="form-skeleton" aria-busy="true" aria-label="Načítava sa">
+              {[1, 2, 3, 4, 5].map(() => (
+                <span class="skeleton"></span>
+              ))}
+            </div>
+          ) : (
+            <form onFocusout={validateOnBlur}>
+              <md-outlined-text-field
+                required
+                value={this.entry.name}
+                oninput={(ev: InputEvent) => {
+                  this.entry.name = this.inputValue(ev);
+                  this.isValid = this.isFormValid();
+                }}
+                label="Názov zariadenia"
+              >
+                <md-icon slot="leading-icon">devices</md-icon>
+              </md-outlined-text-field>
+
+              <md-outlined-text-field
+                required
+                value={this.entry.deviceId}
+                oninput={(ev: InputEvent) => {
+                  this.entry.deviceId = this.inputValue(ev);
+                  this.isValid = this.isFormValid();
+                }}
+                label="Registračné číslo zariadenia"
+              >
+                <md-icon slot="leading-icon">pin</md-icon>
+              </md-outlined-text-field>
+
+              <md-outlined-text-field
+                type="date"
+                required
+                value={(this.entry.warrantyUntil ? new Date(this.entry.warrantyUntil) : new Date())
+                  .toISOString()
+                  .substring(0, 10)}
+                oninput={(ev: InputEvent) => {
+                  const date = new Date(this.inputValue(ev));
+                  if (!isNaN(date.getTime())) {
+                    this.entry.warrantyUntil = date.toISOString();
+                  }
+                  this.isValid = this.isFormValid();
+                }}
+                label="Záruka do"
+              >
+                <md-icon slot="leading-icon">event</md-icon>
+              </md-outlined-text-field>
+
+              <md-outlined-select
+                required
+                value={this.entry.department?.code}
+                oninput={(ev: InputEvent) => {
+                  const selectedValue = (ev.target as HTMLSelectElement).value;
+                  this.entry.department = {
+                    code: selectedValue,
+                    name: this.departmentOptions().find(d => d.value === selectedValue)?.name || '',
+                  };
+                  this.isValid = this.isFormValid();
+                }}
+                label="Oddelenie"
+              >
+                <md-icon slot="leading-icon">local_hospital</md-icon>
+                {this.departmentOptions().map(department => (
+                  <md-select-option value={department.value}>
+                    <div slot="headline">{department.name}</div>
+                  </md-select-option>
+                ))}
+              </md-outlined-select>
+
+              <md-outlined-text-field
+                required
+                value={this.entry.price?.toFixed(2)}
+                oninput={(ev: InputEvent) => {
+                  const inputValue = parseFloat(this.inputValue(ev));
+                  this.entry.price = isNaN(inputValue) ? 0 : parseFloat(inputValue.toFixed(2));
+                  this.isValid = this.isFormValid();
+                }}
+                label="Cena zariadenia"
+                type="number"
+                min="0.00"
+                step="0.01"
+                placeholder="0.00"
+              >
+                <md-icon slot="leading-icon">euro</md-icon>
+              </md-outlined-text-field>
+            </form>
+          )}
+
+          {this.actionError && (
+            <div class="banner" role="alert">
+              <md-icon>error</md-icon>
+              <span>{this.actionError}</span>
+            </div>
+          )}
+
+          <div class="actions">
+            <md-text-button
+              id="delete"
+              disabled={!this.entry || this.entryId === '@new' || this.busy}
+              onClick={() => (this.confirmDelete = true)}
+            >
+              <md-icon slot="icon">delete</md-icon>
+              Zmazať
+            </md-text-button>
+            <span class="stretch-fill"></span>
+            <md-outlined-button id="cancel" onClick={() => this.editorClosed.emit('cancel')}>
+              <md-icon slot="icon">close</md-icon>
+              Späť
+            </md-outlined-button>
+            <md-filled-button id="confirm" disabled={!this.isValid || this.busy} onClick={() => this.updateEntry()}>
+              <md-icon slot="icon">save</md-icon>
+              {this.busy ? 'Ukladá sa…' : 'Uložiť'}
+            </md-filled-button>
+          </div>
+        </section>
         {this.entryId !== '@new' ? (
-          <h2>
-            Zariadenie {this.entry?.name} - {this.entry?.deviceId}
-          </h2>
-        ) : (
-          <h2>Nové zariadenie</h2>
-        )}
-        <form>
-          <md-filled-text-field
-            required
-            value={this.entry?.name}
-            oninput={(ev: InputEvent) => {
-              if (this.entry) {
-                this.entry.name = this.handleInputEvent(ev);
-                this.isValid = this.isFormValid();
-              }
-            }}
-            label="Názov zariadenia"
-          >
-            <md-icon slot="leading-icon">devices</md-icon>
-          </md-filled-text-field>
-
-          <md-filled-text-field
-            required
-            value={this.entry?.deviceId}
-            oninput={(ev: InputEvent) => {
-              if (this.entry) {
-                this.entry.deviceId = this.handleInputEvent(ev);
-                this.isValid = this.isFormValid();
-              }
-            }}
-            label="Registračné číslo zariadenia"
-          >
-            <md-icon slot="leading-icon">pin</md-icon>
-          </md-filled-text-field>
-
-          <md-filled-text-field
-            type="date"
-            required
-            value={(this.entry?.warrantyUntil ? new Date(this.entry?.warrantyUntil) : new Date())
-              .toISOString()
-              .substring(0, 10)}
-            oninput={(ev: InputEvent) => {
-              if (this.entry) {
-                this.entry.warrantyUntil = this.handleDateInputEvent(ev);
-                this.isValid = this.isFormValid();
-              }
-            }}
-            label="Záruka do"
-          >
-            <md-icon slot="leading-icon">event</md-icon>
-          </md-filled-text-field>
-
-          <md-filled-select
-            required
-            value={this.entry?.department?.code}
-            oninput={(ev: InputEvent) => {
-              const selectedValue = (ev.target as HTMLSelectElement).value;
-              if (this.entry) {
-                this.entry.department.code = selectedValue;
-                this.entry.department.name = this.departments.find(d => d.value === selectedValue)?.name || '';
-                this.isValid = this.isFormValid();
-              }
-            }}
-            label="Oddelenie"
-          >
-            <md-icon slot="leading-icon">local_hospital</md-icon>
-            {this.departments.map(department => (
-              <md-select-option value={department.value}>
-                <div slot="headline">{department.name}</div>
-              </md-select-option>
-            ))}
-          </md-filled-select>
-
-          <md-filled-text-field
-            required
-            value={this.entry?.price?.toFixed(2)}
-            oninput={(ev: InputEvent) => {
-              if (this.entry) {
-                const inputValue = parseFloat(this.handleInputEvent(ev));
-                this.entry.price = isNaN(inputValue) ? 0 : parseFloat(inputValue.toFixed(2));
-                this.isValid = this.isFormValid();
-              }
-            }}
-            label="Cena zariadenia"
-            type="number"
-            min="0.00"
-            step="0.01"
-            placeholder="0.00"
-          >
-            <md-icon slot="leading-icon">euro</md-icon>
-          </md-filled-text-field>
-        </form>
-
-        <md-divider></md-divider>
-        <div class="actions">
-          <md-filled-tonal-button
-            id="delete"
-            disabled={!this.entry || this.entryId === '@new'}
-            onClick={() => this.deleteEntry()}
-          >
-            <md-icon slot="icon">delete</md-icon>
-            Zmazať
-          </md-filled-tonal-button>
-          <span class="stretch-fill"></span>
-          <md-outlined-button id="cancel" onClick={() => this.editorClosed.emit('cancel')}>
-            <md-icon slot="icon">close</md-icon>
-            Späť
-          </md-outlined-button>
-          <md-filled-button id="confirm" disabled={!this.isValid} onClick={() => this.updateEntry()}>
-            <md-icon slot="icon">save</md-icon>
-            Uložiť
-          </md-filled-button>
-        </div>
-        {this.entryId !== '@new' ? (
-          <div class="device-log">
-            <h2>Prevádzkový log zariadenia {this.entry?.name || '...'}</h2>
+          <section class="card device-log">
+            <h2>
+              <md-icon>history</md-icon>
+              Prevádzkový log
+            </h2>
             {element === 'editor' ? (
               <harkap-ambulance-log-editor
                 entry-id={this.entryId}
                 log-id={logId}
-                base-path="/ambulance-wl/"
                 api-base={this.apiBase}
                 onlog-closed={() => navigate('./entry/' + this.entryId)}
               ></harkap-ambulance-log-editor>
@@ -246,8 +264,18 @@ export class HarkapAmbulanceWlEditor {
                 ></harkap-ambulance-log-list>
               </div>
             )}
-          </div>
+          </section>
         ) : null}
+        <ConfirmDialog
+          open={this.confirmDelete}
+          headline="Zmazať zariadenie?"
+          text={`${this.entry?.name ? `Zariadenie „${this.entry.name}“` : 'Toto zariadenie'} a jeho záznamy budú natrvalo odstránené.`}
+          onCancel={() => (this.confirmDelete = false)}
+          onConfirm={() => {
+            this.confirmDelete = false;
+            this.deleteEntry();
+          }}
+        />
       </Host>
     );
   }
@@ -263,30 +291,13 @@ export class HarkapAmbulanceWlEditor {
     );
   }
 
-  private handleInputEvent(ev: InputEvent): string {
-    const target = ev.target as HTMLInputElement;
-
-    // Check validity of the current input element
-    const isValid = target.reportValidity();
-    this.isValid = isValid;
-
-    return target.value;
-  }
-
-  private handleDateInputEvent(ev: InputEvent): string {
-    const target = ev.target as HTMLInputElement;
-    const date = new Date(target.value);
-
-    if (isNaN(date.getTime())) {
-      target.setCustomValidity('Invalid date format');
-    } else {
-      target.setCustomValidity('');
-    }
-
-    return date.toISOString();
+  private inputValue(ev: InputEvent): string {
+    return (ev.target as HTMLInputElement).value;
   }
 
   private async updateEntry() {
+    this.busy = true;
+    this.actionError = undefined;
     try {
       const api = AmbulanceDeviceListApiFactory(undefined, this.apiBase);
       const response =
@@ -296,23 +307,29 @@ export class HarkapAmbulanceWlEditor {
       if (response.status < 299) {
         this.editorClosed.emit('store');
       } else {
-        this.errorMessage = `Cannot store entry: ${response.statusText}`;
+        this.actionError = `Zariadenie sa nepodarilo uložiť: ${response.statusText}`;
       }
     } catch (err: any) {
-      this.errorMessage = `Cannot store entry: ${err.message || 'unknown'}`;
+      this.actionError = `Zariadenie sa nepodarilo uložiť: ${err.message || 'neznáma chyba'}`;
+    } finally {
+      this.busy = false;
     }
   }
 
   private async deleteEntry() {
+    this.busy = true;
+    this.actionError = undefined;
     try {
       const response = await AmbulanceDeviceListApiFactory(undefined, this.apiBase).deleteDeviceListEntry(this.entryId);
       if (response.status < 299) {
         this.editorClosed.emit('delete');
       } else {
-        this.errorMessage = `Cannot delete entry: ${response.statusText}`;
+        this.actionError = `Zariadenie sa nepodarilo zmazať: ${response.statusText}`;
       }
     } catch (err: any) {
-      this.errorMessage = `Cannot delete entry: ${err.message || 'unknown'}`;
+      this.actionError = `Zariadenie sa nepodarilo zmazať: ${err.message || 'neznáma chyba'}`;
+    } finally {
+      this.busy = false;
     }
   }
 }

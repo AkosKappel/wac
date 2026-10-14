@@ -8,7 +8,6 @@ import { HTMLStencilElement, JSXBase } from "@stencil/core/internal";
 export namespace Components {
     interface HarkapAmbulanceLogEditor {
         "apiBase": string;
-        "basePath": string;
         "entryId": string;
         "logId": string;
     }
@@ -131,7 +130,6 @@ declare global {
 declare namespace LocalJSX {
     interface HarkapAmbulanceLogEditor {
         "apiBase"?: string;
-        "basePath"?: string;
         "entryId"?: string;
         "logId"?: string;
         "onLog-closed"?: (event: HarkapAmbulanceLogEditorCustomEvent<string>) => void;

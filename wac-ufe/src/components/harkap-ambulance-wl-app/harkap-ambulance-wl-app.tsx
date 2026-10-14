@@ -1,4 +1,6 @@
 import { Component, Host, Prop, State, h } from '@stencil/core';
+import { ErrorPage } from '../../utils/error-page';
+import { navigateTo, watchRelativePath } from '../../utils/utils';
 
 declare global {
   interface Window {
@@ -8,7 +10,7 @@ declare global {
 
 @Component({
   tag: 'harkap-ambulance-wl-app',
-  styleUrl: 'harkap-ambulance-wl-app.css',
+  styleUrls: ['harkap-ambulance-wl-app.css', '../../utils/shared.css'],
   shadow: true,
 })
 export class HarkapAmbulanceWlApp {
@@ -16,26 +18,14 @@ export class HarkapAmbulanceWlApp {
   @Prop() basePath: string = '';
   @Prop() apiBase: string;
 
-  componentWillLoad() {
-    const baseUri = new URL(this.basePath, document.baseURI || '/').pathname;
+  private unwatch: () => void;
 
-    const toRelative = (path: string) => {
-      if (path.startsWith(baseUri)) {
-        this.relativePath = path.slice(baseUri.length);
-      } else {
-        this.relativePath = '';
-      }
-    };
+  connectedCallback() {
+    this.unwatch = watchRelativePath(this.basePath, path => (this.relativePath = path));
+  }
 
-    window.navigation?.addEventListener('navigate', (ev: Event) => {
-      if ((ev as any).canIntercept) {
-        (ev as any).intercept();
-      }
-      let path = new URL((ev as any).destination.url).pathname;
-      toRelative(path);
-    });
-
-    toRelative(location.pathname);
+  disconnectedCallback() {
+    this.unwatch?.();
   }
 
   render() {
@@ -45,16 +35,17 @@ export class HarkapAmbulanceWlApp {
     if (this.relativePath.startsWith('entry/')) {
       element = 'editor';
       entryId = this.relativePath.split('/')[1];
+    } else if (!['', 'list', 'list/'].includes(this.relativePath)) {
+      element = 'not-found';
     }
 
-    const navigate = (path: string) => {
-      const absolute = new URL(path, new URL(this.basePath, document.baseURI)).pathname;
-      window.navigation.navigate(absolute);
-    };
+    const navigate = (path: string) => navigateTo(this.basePath, path);
 
     return (
       <Host>
-        {element === 'editor' ? (
+        {element === 'not-found' ? (
+          <ErrorPage status={404} onBack={() => navigate('./list')} />
+        ) : element === 'editor' ? (
           <harkap-ambulance-wl-editor
             entry-id={entryId}
             base-path={this.basePath}

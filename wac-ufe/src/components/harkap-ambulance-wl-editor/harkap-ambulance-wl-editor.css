@@ -1,43 +1,93 @@
 :host {
-  --_wl-editor_gap: var(--wl-gap, 0.5rem);
-
   display: flex;
   flex-direction: column;
-  gap: var(--_wl-editor_gap);
-  padding: 20px 50px;
+  gap: 24px;
+  max-width: 1040px;
+  margin: 0 auto;
+  padding: 40px 24px 64px;
+}
+
+.page-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.eyebrow {
+  margin: 0 0 2px;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--md-sys-color-primary);
+}
+
+h1 {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 650;
+  letter-spacing: -0.01em;
+}
+
+h2 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 16px;
+  font-size: 1.125rem;
+  font-weight: 600;
+}
+
+h2 md-icon {
+  color: var(--md-sys-color-primary);
+}
+
+.card {
+  background: var(--md-sys-color-surface);
+  border: 1px solid var(--md-sys-color-outline-variant);
+  border-radius: 16px;
+  box-shadow: 0 1px 2px rgb(16 40 48 / 0.04), 0 4px 16px rgb(16 40 48 / 0.04);
+  padding: 24px;
 }
 
 form {
-  display: flex;
-  flex-direction: column;
-  gap: var(--_wl-editor_gap);
-  padding: var(--_wl-editor_gap);
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 20px;
 }
 
-.device-log {
-  margin-top: 50px;
-  border-top: 1px solid #ccc;
-}
-
-.duration-slider {
-  display: flex;
-  flex-direction: row;
-  align-content: space-around;
-  align-items: center;
+form > :first-child {
+  grid-column: 1 / -1;
 }
 
 .actions {
   display: flex;
-  flex-direction: row;
-  justify-content: flex-end;
-  gap: 1rem;
+  align-items: center;
+  gap: 12px;
+  margin-top: 24px;
+  padding-top: 20px;
+  border-top: 1px solid var(--md-sys-color-outline-variant);
+}
 
+#delete {
+  --md-text-button-label-text-color: var(--md-sys-color-error);
+  --md-text-button-icon-color: var(--md-sys-color-error);
 }
 
 .stretch-fill {
-  flex: 10 0 0;
+  flex: 1;
 }
 
-md-divider {
-  margin-bottom: var(--_wl-editor_gap);
+.form-skeleton {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 20px;
+}
+
+.form-skeleton .skeleton {
+  height: 56px;
+}
+
+.form-skeleton .skeleton:first-child {
+  grid-column: 1 / -1;
 }

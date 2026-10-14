@@ -1,3 +1,34 @@
+/* Material 3 theme tokens; custom properties inherit into child shadow roots */
 :host {
+  --md-sys-color-primary: #0f6c81;
+  --md-sys-color-on-primary: #ffffff;
+  --md-sys-color-primary-container: #d3f0f7;
+  --md-sys-color-on-primary-container: #003642;
+  --md-sys-color-secondary-container: #e1ecef;
+  --md-sys-color-on-secondary-container: #1c3238;
+  --md-sys-color-error: #b3261e;
+  --md-sys-color-error-container: #fbe3e1;
+  --md-sys-color-on-error-container: #5c0f0b;
+  --md-sys-color-surface: #ffffff;
+  --md-sys-color-surface-container-lowest: #ffffff;
+  --md-sys-color-surface-container-low: #f6f8f9;
+  --md-sys-color-surface-container: #f6f8f9;
+  --md-sys-color-surface-container-high: #ffffff;
+  --md-sys-color-secondary: #4a6268;
+  --md-sys-color-surface-container-highest: #eef2f3;
+  --md-sys-color-on-surface: #171d1f;
+  --md-sys-color-on-surface-variant: #55636a;
+  --md-sys-color-outline: #8a979c;
+  --md-sys-color-outline-variant: #dbe2e5;
+  --md-ref-typeface-brand: 'Inter', 'Roboto', system-ui, sans-serif;
+  --md-ref-typeface-plain: 'Inter', 'Roboto', system-ui, sans-serif;
+  --md-sys-shape-corner-small: 8px;
+  --md-sys-shape-corner-extra-small: 8px;
+  --md-list-container-color: transparent;
+
   display: block;
+  min-height: 100vh;
+  background: #f1f5f6;
+  color: var(--md-sys-color-on-surface);
+  font-family: var(--md-ref-typeface-plain);
 }

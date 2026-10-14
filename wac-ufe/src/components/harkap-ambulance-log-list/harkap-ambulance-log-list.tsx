@@ -1,18 +1,20 @@
 import { Component, Event, Host, Prop, EventEmitter, State, h } from '@stencil/core';
 import { AmbulanceDeviceLogListApiFactory, DeviceLog } from '../../api/ambulance-wl';
+import { ErrorPage, SkeletonRows } from '../../utils/error-page';
 
 @Component({
   tag: 'harkap-ambulance-log-list',
-  styleUrl: 'harkap-ambulance-log-list.css',
+  styleUrls: ['harkap-ambulance-log-list.css', '../../utils/shared.css'],
   shadow: true,
 })
 export class HarkapAmbulanceLogList {
   @Event({ eventName: 'log-clicked' }) logClicked: EventEmitter<string>;
   @State() errorMessage: string;
+  @State() errorStatus: number;
   @Prop() apiBase: string;
   @Prop() deviceId: string;
 
-  deviceLogs: DeviceLog[];
+  @State() deviceLogs: DeviceLog[];
 
   private async getDeviceLogsAsync() {
     try {
@@ -20,16 +22,17 @@ export class HarkapAmbulanceLogList {
       if (response.status < 299) {
         return response.data;
       } else {
-        this.errorMessage = `Cannot retrieve device logs: ${response.statusText}`;
+        this.errorMessage = `Nepodarilo sa načítať záznamy: ${response.statusText}`;
       }
     } catch (err: any) {
-      this.errorMessage = `Cannot retrieve device logs: ${err.message || 'unknown'}`;
+      this.errorStatus = err.response?.status;
+      this.errorMessage = `Nepodarilo sa načítať záznamy: ${err.message || 'neznáma chyba'}`;
     }
     return [];
   }
 
-  async componentWillLoad() {
-    this.deviceLogs = await this.getDeviceLogsAsync();
+  componentWillLoad() {
+    this.getDeviceLogsAsync().then(logs => (this.deviceLogs = logs));
   }
 
   private filteredLogs() {
@@ -40,34 +43,32 @@ export class HarkapAmbulanceLogList {
     return (
       <Host>
         {this.errorMessage ? (
-          <div class="error">{this.errorMessage}</div>
+          <ErrorPage status={this.errorStatus} message={this.errorMessage} />
         ) : (
           <div class="container">
-            <md-elevated-button class="add-button" onclick={() => this.logClicked.emit('@new')}>
+            <md-outlined-button class="add-button" onclick={() => this.logClicked.emit('@new')}>
               <md-icon slot="icon">add</md-icon>
-              <span>Pridať nový log</span>
-            </md-elevated-button>
-            {this.deviceLogs.length > 0 ? (
+              Pridať záznam
+            </md-outlined-button>
+            {!this.deviceLogs ? (
+              <div class="list">
+                <SkeletonRows />
+              </div>
+            ) : this.deviceLogs.length > 0 ? (
               <md-list class="list">
-                {this.filteredLogs().map(device => (
-                  <md-list-item class="list-item" onClick={() => this.logClicked.emit(device.id)}>
-                    <div slot="headline">
-                      <b>ID: </b>
-                      {device.id}
-                    </div>
-                    <div slot="headline">
-                      <b>Typ: </b>
-                      {device.text}
-                    </div>
+                {this.filteredLogs().map(log => (
+                  <md-list-item class="list-item" type="button" onClick={() => this.logClicked.emit(log.id)}>
+                    <md-icon slot="start">description</md-icon>
+                    <div slot="headline">{log.text}</div>
                     <div slot="supporting-text">
-                      <b>Čas: </b>
-                      {device.createdAt}
+                      {new Date(log.createdAt).toLocaleString('sk-SK', { dateStyle: 'medium', timeStyle: 'short' })}
                     </div>
+                    <md-icon slot="end">chevron_right</md-icon>
                   </md-list-item>
                 ))}
               </md-list>
             ) : (
-              <div class="empty">Zariadenie nemá žiadne logy</div>
+              <div class="empty">Zariadenie zatiaľ nemá žiadne záznamy</div>
             )}
           </div>
         )}
