@@ -25,7 +25,7 @@ type DeviceListEntry struct {
 	DeviceId string `json:"deviceId" bson:"deviceId"`
 
 	// End of the warranty
-	WarrantyUntil time.Time `json:"warrantyUntil,omitempty" bson:"warrantyUntil,omitempty"`
+	WarrantyUntil time.Time `json:"warrantyUntil" bson:"warrantyUntil"`
 
 	// Price of device
 	Price float64 `json:"price,omitempty" bson:"price,omitempty"`

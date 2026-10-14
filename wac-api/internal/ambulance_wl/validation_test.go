@@ -3,11 +3,12 @@ package ambulance_wl
 import (
 	"strings"
 	"testing"
+	"time"
 )
 
 func TestValidateDevice(t *testing.T) {
 	valid := func() DeviceListEntry {
-		return DeviceListEntry{Name: " EKG ", DeviceId: "1-ekg", Price: 10, Department: Department{Name: "Interné"}}
+		return DeviceListEntry{Name: " EKG ", DeviceId: "1-ekg", WarrantyUntil: time.Now(), Price: 10, Department: Department{Name: "Interné"}}
 	}
 	cases := []struct {
 		name   string
@@ -18,6 +19,7 @@ func TestValidateDevice(t *testing.T) {
 		{"blank name", func(d *DeviceListEntry) { d.Name = "  " }, "Name is required"},
 		{"long name", func(d *DeviceListEntry) { d.Name = strings.Repeat("é", maxNameLength+1) }, "Name can have at most 100 characters"},
 		{"no device ID", func(d *DeviceListEntry) { d.DeviceId = "" }, "Device ID is required"},
+		{"no warranty date", func(d *DeviceListEntry) { d.WarrantyUntil = time.Time{} }, "Warranty date is required"},
 		{"negative price", func(d *DeviceListEntry) { d.Price = -1 }, "Price must be between 0 and 100000000"},
 		{"no department", func(d *DeviceListEntry) { d.Department = Department{} }, "Department name is required"},
 		{"too many logs", func(d *DeviceListEntry) { d.LogList = make([]DeviceLog, maxLogsPerDevice+1) }, "A device can have at most 200 log entries"},

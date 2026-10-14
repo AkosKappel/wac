@@ -40,6 +40,9 @@ func validateDevice(device *DeviceListEntry) string {
 	if message := validateText(&device.DeviceId, "Device ID", maxDeviceIdLength); message != "" {
 		return message
 	}
+	if device.WarrantyUntil.IsZero() {
+		return "Warranty date is required"
+	}
 	if device.Price < 0 || device.Price > maxPrice {
 		return fmt.Sprintf("Price must be between 0 and %d", maxPrice)
 	}

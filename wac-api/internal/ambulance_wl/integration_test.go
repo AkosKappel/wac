@@ -53,7 +53,7 @@ func call(engine *gin.Engine, method, path, body string) *httptest.ResponseRecor
 func TestIntegration(t *testing.T) {
 	engine := newIntegrationEngine(t)
 	const devices = "/api/device-list/entries"
-	const device = `{"id": "d1", "name": "EKG", "deviceId": "1-ekg", "price": 1234.56, "department": {"name": "Interné", "code": "int"}}`
+	const device = `{"id": "d1", "name": "EKG", "deviceId": "1-ekg", "warrantyUntil": "2030-01-01T00:00:00Z", "price": 1234.56, "department": {"name": "Interné", "code": "int"}}`
 
 	expect := func(t *testing.T, r *httptest.ResponseRecorder, status int) {
 		t.Helper()
@@ -101,7 +101,7 @@ func TestIntegration(t *testing.T) {
 	})
 
 	t.Run("device update keeps its id and its logs", func(t *testing.T) {
-		expect(t, call(engine, "PUT", devices+"/d1", `{"name": "EKG 2", "deviceId": "2-ekg", "price": 10, "department": {"name": "Interné"}}`), http.StatusOK)
+		expect(t, call(engine, "PUT", devices+"/d1", `{"name": "EKG 2", "deviceId": "2-ekg", "warrantyUntil": "2030-01-01T00:00:00Z", "price": 10, "department": {"name": "Interné"}}`), http.StatusOK)
 		expect(t, call(engine, "PUT", devices+"/d1", `{"id": "other", "name": "EKG 2", "deviceId": "2-ekg"}`), http.StatusBadRequest)
 
 		r := call(engine, "GET", devices+"/d1", "")
@@ -130,7 +130,7 @@ func TestIntegration(t *testing.T) {
 
 	t.Run("invalid input is rejected", func(t *testing.T) {
 		expect(t, call(engine, "POST", devices, `{"name": " ", "deviceId": "x", "department": {"name": "x"}}`), http.StatusBadRequest)
-		expect(t, call(engine, "PUT", devices+"/d1", `{"name": "x", "deviceId": "x", "price": -5, "department": {"name": "x"}}`), http.StatusBadRequest)
+		expect(t, call(engine, "PUT", devices+"/d1", `{"name": "x", "deviceId": "x", "warrantyUntil": "2030-01-01T00:00:00Z", "price": -5, "department": {"name": "x"}}`), http.StatusBadRequest)
 		expect(t, call(engine, "POST", devices+"/d1/logs", `{"text": "", "deviceId": ""}`), http.StatusBadRequest)
 		expect(t, call(engine, "PUT", devices+"/d1/logs/l3", `{"text": " ", "deviceId": ""}`), http.StatusBadRequest)
 	})
@@ -140,7 +140,7 @@ func TestIntegration(t *testing.T) {
 		for i := range logs {
 			logs[i] = fmt.Sprintf(`{"id": "f%d", "text": "log", "deviceId": ""}`, i)
 		}
-		full := `{"id": "full", "name": "Full", "deviceId": "full", "department": {"name": "x"}, "logList": [` + strings.Join(logs, ",") + `]}`
+		full := `{"id": "full", "name": "Full", "deviceId": "full", "warrantyUntil": "2030-01-01T00:00:00Z", "department": {"name": "x"}, "logList": [` + strings.Join(logs, ",") + `]}`
 		expect(t, call(engine, "POST", devices, full), http.StatusCreated)
 		expect(t, call(engine, "POST", devices+"/full/logs", `{"text": "one more", "deviceId": ""}`), http.StatusConflict)
 	})

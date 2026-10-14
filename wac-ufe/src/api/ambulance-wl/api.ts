@@ -71,7 +71,7 @@ export interface DeviceListEntry {
      * @type {string}
      * @memberof DeviceListEntry
      */
-    'warrantyUntil'?: string;
+    'warrantyUntil': string;
     /**
      * Price of device
      * @type {number}
