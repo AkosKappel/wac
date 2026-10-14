@@ -1,10 +1,10 @@
 import { Component, Event, Host, Prop, EventEmitter, State, h } from '@stencil/core';
 import { AmbulanceDeviceLogListApiFactory, DeviceLog } from '../../api/ambulance-wl';
-import { ErrorPage } from '../../utils/error-page';
+import { ErrorPage, SkeletonRows } from '../../utils/error-page';
 
 @Component({
   tag: 'harkap-ambulance-log-list',
-  styleUrls: ['harkap-ambulance-log-list.css', '../../utils/error-page.css'],
+  styleUrls: ['harkap-ambulance-log-list.css', '../../utils/shared.css'],
   shadow: true,
 })
 export class HarkapAmbulanceLogList {
@@ -14,7 +14,7 @@ export class HarkapAmbulanceLogList {
   @Prop() apiBase: string;
   @Prop() deviceId: string;
 
-  deviceLogs: DeviceLog[];
+  @State() deviceLogs: DeviceLog[];
 
   private async getDeviceLogsAsync() {
     try {
@@ -22,17 +22,17 @@ export class HarkapAmbulanceLogList {
       if (response.status < 299) {
         return response.data;
       } else {
-        this.errorMessage = `Cannot retrieve device logs: ${response.statusText}`;
+        this.errorMessage = `Nepodarilo sa načítať záznamy: ${response.statusText}`;
       }
     } catch (err: any) {
       this.errorStatus = err.response?.status;
-      this.errorMessage = `Cannot retrieve device logs: ${err.message || 'unknown'}`;
+      this.errorMessage = `Nepodarilo sa načítať záznamy: ${err.message || 'neznáma chyba'}`;
     }
     return [];
   }
 
-  async componentWillLoad() {
-    this.deviceLogs = await this.getDeviceLogsAsync();
+  componentWillLoad() {
+    this.getDeviceLogsAsync().then(logs => (this.deviceLogs = logs));
   }
 
   private filteredLogs() {
@@ -50,7 +50,11 @@ export class HarkapAmbulanceLogList {
               <md-icon slot="icon">add</md-icon>
               Pridať záznam
             </md-outlined-button>
-            {this.deviceLogs.length > 0 ? (
+            {!this.deviceLogs ? (
+              <div class="list">
+                <SkeletonRows />
+              </div>
+            ) : this.deviceLogs.length > 0 ? (
               <md-list class="list">
                 {this.filteredLogs().map(log => (
                   <md-list-item class="list-item" type="button" onClick={() => this.logClicked.emit(log.id)}>

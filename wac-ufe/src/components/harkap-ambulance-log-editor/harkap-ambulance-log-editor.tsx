@@ -1,21 +1,25 @@
 import { Component, Host, Prop, State, h, EventEmitter, Event } from '@stencil/core';
 import { AmbulanceDeviceLogListApiFactory, DeviceLog } from '../../api/ambulance-wl';
 import { ErrorPage } from '../../utils/error-page';
+import { ConfirmDialog } from '../../utils/confirm-dialog';
+import { toLocalDateTimeInput, validateOnBlur } from '../../utils/utils';
 
 @Component({
   tag: 'harkap-ambulance-log-editor',
-  styleUrls: ['harkap-ambulance-log-editor.css', '../../utils/error-page.css'],
+  styleUrls: ['harkap-ambulance-log-editor.css', '../../utils/shared.css'],
   shadow: true,
 })
 export class HarkapAmbulanceLogEditor {
   @Prop() logId: string;
   @Prop() entryId: string;
-  @Prop() basePath: string = '';
   @Prop() apiBase: string;
   @State() log: DeviceLog;
   @State() errorMessage: string;
   @State() errorStatus: number;
   @State() isValid: boolean;
+  @State() actionError: string;
+  @State() busy = false;
+  @State() confirmDelete = false;
 
   private async getDeviceLogAsync(): Promise<DeviceLog> {
     if (this.logId === '@new') {
@@ -47,11 +51,11 @@ export class HarkapAmbulanceLogEditor {
         this.log = response.data;
         this.isValid = true;
       } else {
-        this.errorMessage = `Cannot retrieve log: ${response.statusText}`;
+        this.errorMessage = `Nepodarilo sa načítať záznam: ${response.statusText}`;
       }
     } catch (err: any) {
       this.errorStatus = err.response?.status;
-      this.errorMessage = `Cannot retrieve log: ${err.message || 'unknown'}`;
+      this.errorMessage = `Nepodarilo sa načítať záznam: ${err.message || 'neznáma chyba'}`;
     }
 
     return undefined;
@@ -75,56 +79,68 @@ export class HarkapAmbulanceLogEditor {
     return (
       <Host>
         <h3>{this.logId === '@new' ? 'Nový záznam' : 'Upraviť záznam'}</h3>
-        <form>
-          <md-outlined-text-field
-            required
-            value={this.log?.text}
-            oninput={(ev: InputEvent) => {
-              if (this.log) {
-                this.log.text = this.handleInputEvent(ev);
+        {!this.log ? (
+          <div class="form-skeleton" aria-busy="true" aria-label="Načítava sa">
+            {[1, 2, 3].map(() => (
+              <span class="skeleton"></span>
+            ))}
+          </div>
+        ) : (
+          <form onFocusout={validateOnBlur}>
+            <md-outlined-text-field
+              required
+              value={this.log.text}
+              oninput={(ev: InputEvent) => {
+                this.log.text = this.inputValue(ev);
                 this.isValid = this.isFormValid();
-              }
-            }}
-            label="Text"
-          >
-            <md-icon slot="leading-icon">notes</md-icon>
-          </md-outlined-text-field>
+              }}
+              label="Text"
+            >
+              <md-icon slot="leading-icon">notes</md-icon>
+            </md-outlined-text-field>
 
-          <md-outlined-text-field
-            required
-            value={this.log?.deviceId}
-            oninput={(ev: InputEvent) => {
-              if (this.log) {
-                this.log.deviceId = this.handleInputEvent(ev);
+            <md-outlined-text-field
+              required
+              value={this.log.deviceId}
+              oninput={(ev: InputEvent) => {
+                this.log.deviceId = this.inputValue(ev);
                 this.isValid = this.isFormValid();
-              }
-            }}
-            label="ID zariadenia"
-          >
-            <md-icon slot="leading-icon">pin</md-icon>
-          </md-outlined-text-field>
+              }}
+              label="ID zariadenia"
+            >
+              <md-icon slot="leading-icon">pin</md-icon>
+            </md-outlined-text-field>
 
-          <md-outlined-text-field
-            type="date"
-            required
-            value={(this.log?.createdAt ? new Date(this.log?.createdAt) : new Date()).toISOString().substring(0, 10)}
-            oninput={(ev: InputEvent) => {
-              if (this.log) {
-                this.log.createdAt = this.handleDateInputEvent(ev);
+            <md-outlined-text-field
+              type="datetime-local"
+              required
+              value={toLocalDateTimeInput(this.log.createdAt)}
+              oninput={(ev: InputEvent) => {
+                const date = new Date(this.inputValue(ev));
+                if (!isNaN(date.getTime())) {
+                  this.log.createdAt = date.toISOString();
+                }
                 this.isValid = this.isFormValid();
-              }
-            }}
-            label="Dátum a čas"
-          >
-            <md-icon slot="leading-icon">watch_later</md-icon>
-          </md-outlined-text-field>
-        </form>
+              }}
+              label="Dátum a čas"
+            >
+              <md-icon slot="leading-icon">watch_later</md-icon>
+            </md-outlined-text-field>
+          </form>
+        )}
+
+        {this.actionError && (
+          <div class="banner" role="alert">
+            <md-icon>error</md-icon>
+            <span>{this.actionError}</span>
+          </div>
+        )}
 
         <div class="actions">
           <md-text-button
             id="delete"
-            disabled={!this.log || this.log?.id === '@new'}
-            onClick={() => this.deleteEntry()}
+            disabled={!this.log || this.logId === '@new' || this.busy}
+            onClick={() => (this.confirmDelete = true)}
           >
             <md-icon slot="icon">delete</md-icon>
             Zmazať
@@ -134,11 +150,21 @@ export class HarkapAmbulanceLogEditor {
             <md-icon slot="icon">close</md-icon>
             Zrušiť
           </md-outlined-button>
-          <md-filled-button id="confirm" disabled={!this.isValid} onClick={() => this.updateEntry()}>
+          <md-filled-button id="confirm" disabled={!this.isValid || this.busy} onClick={() => this.updateEntry()}>
             <md-icon slot="icon">save</md-icon>
-            Uložiť
+            {this.busy ? 'Ukladá sa…' : 'Uložiť'}
           </md-filled-button>
         </div>
+        <ConfirmDialog
+          open={this.confirmDelete}
+          headline="Zmazať záznam?"
+          text="Záznam bude natrvalo odstránený z prevádzkového logu."
+          onCancel={() => (this.confirmDelete = false)}
+          onConfirm={() => {
+            this.confirmDelete = false;
+            this.deleteEntry();
+          }}
+        />
       </Host>
     );
   }
@@ -147,30 +173,13 @@ export class HarkapAmbulanceLogEditor {
     return this.log?.deviceId && this.log?.text && this.log?.createdAt && true;
   }
 
-  private handleInputEvent(ev: InputEvent): string {
-    const target = ev.target as HTMLInputElement;
-
-    // Check validity of the current input element
-    const isValid = target.reportValidity();
-    this.isValid = isValid;
-
-    return target.value;
-  }
-
-  private handleDateInputEvent(ev: InputEvent): string {
-    const target = ev.target as HTMLInputElement;
-    const date = new Date(target.value);
-
-    if (isNaN(date.getTime())) {
-      target.setCustomValidity('Invalid date format');
-    } else {
-      target.setCustomValidity('');
-    }
-
-    return date.toISOString();
+  private inputValue(ev: InputEvent): string {
+    return (ev.target as HTMLInputElement).value;
   }
 
   private async updateEntry() {
+    this.busy = true;
+    this.actionError = undefined;
     try {
       const api = AmbulanceDeviceLogListApiFactory(undefined, this.apiBase);
       const response =
@@ -180,15 +189,18 @@ export class HarkapAmbulanceLogEditor {
       if (response.status < 299) {
         this.logClosed.emit('store');
       } else {
-        this.errorMessage = `Cannot store log: ${response.statusText}`;
+        this.actionError = `Záznam sa nepodarilo uložiť: ${response.statusText}`;
       }
     } catch (err: any) {
-      this.errorStatus = err.response?.status;
-      this.errorMessage = `Cannot store log: ${err.message || 'unknown'}`;
+      this.actionError = `Záznam sa nepodarilo uložiť: ${err.message || 'neznáma chyba'}`;
+    } finally {
+      this.busy = false;
     }
   }
 
   private async deleteEntry() {
+    this.busy = true;
+    this.actionError = undefined;
     try {
       const response = await AmbulanceDeviceLogListApiFactory(undefined, this.apiBase).deleteDeviceLog(
         this.entryId,
@@ -197,11 +209,12 @@ export class HarkapAmbulanceLogEditor {
       if (response.status < 299) {
         this.logClosed.emit('delete');
       } else {
-        this.errorMessage = `Cannot delete log: ${response.statusText}`;
+        this.actionError = `Záznam sa nepodarilo zmazať: ${response.statusText}`;
       }
     } catch (err: any) {
-      this.errorStatus = err.response?.status;
-      this.errorMessage = `Cannot delete log: ${err.message || 'unknown'}`;
+      this.actionError = `Záznam sa nepodarilo zmazať: ${err.message || 'neznáma chyba'}`;
+    } finally {
+      this.busy = false;
     }
   }
 }

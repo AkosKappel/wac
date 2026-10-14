@@ -1,4 +1,6 @@
 import { newSpecPage } from '@stencil/core/testing';
+import axios from 'axios';
+import MockAdapter from 'axios-mock-adapter';
 import { HarkapAmbulanceLogList } from './../harkap-ambulance-log-list';
 import { DeviceLog } from '../../../api/ambulance-wl';
 
@@ -17,6 +19,13 @@ describe('harkap-ambulance-log-list', () => {
       text: 'Log text',
     },
   ];
+
+  let mock: MockAdapter;
+  beforeEach(() => {
+    mock = new MockAdapter(axios);
+    mock.onGet().reply(200, sampleLogs);
+  });
+  afterEach(() => mock.restore());
 
   it(`displays logs when data is loaded`, async () => {
     const page = await newSpecPage({

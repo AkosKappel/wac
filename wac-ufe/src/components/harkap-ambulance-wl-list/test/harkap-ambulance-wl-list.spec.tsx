@@ -1,4 +1,6 @@
 import { newSpecPage } from '@stencil/core/testing';
+import axios from 'axios';
+import MockAdapter from 'axios-mock-adapter';
 import { HarkapAmbulanceWlList } from './../harkap-ambulance-wl-list';
 import { DeviceListEntry } from '../../../api/ambulance-wl';
 
@@ -7,6 +9,13 @@ describe('harkap-ambulance-wl-list', () => {
     { id: '1', name: 'Defibrillator', department: { name: 'Cardiology' }, deviceId: '1' },
     { id: '2', name: 'Ultrasound', department: { name: 'Radiology' }, deviceId: '2' },
   ];
+
+  let mock: MockAdapter;
+  beforeEach(() => {
+    mock = new MockAdapter(axios);
+    mock.onGet().reply(200, sampleDevices);
+  });
+  afterEach(() => mock.restore());
 
   it('displays devices when data is loaded', async () => {
     const page = await newSpecPage({

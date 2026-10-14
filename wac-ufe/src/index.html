@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html dir="ltr" lang="en">
+<html dir="ltr" lang="sk">
   <head>
     <base href="/" />
     <meta charset="utf-8" />
@@ -12,5 +12,11 @@
   </head>
   <body style="margin: 0; font-family: 'Inter', sans-serif; background: #f1f5f6">
       <harkap-ambulance-wl-app api-base="/api" base-path="/"></harkap-ambulance-wl-app>
+      <script>
+        // `npm start` dev server has no /api proxy; call the mock API directly
+        if (location.port === '3333') {
+          document.querySelector('harkap-ambulance-wl-app').setAttribute('api-base', 'http://localhost:5555/api');
+        }
+      </script>
   </body>
 </html>

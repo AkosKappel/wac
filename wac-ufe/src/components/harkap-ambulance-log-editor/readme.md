@@ -7,12 +7,11 @@
 
 ## Properties
 
-| Property   | Attribute   | Description | Type     | Default     |
-| ---------- | ----------- | ----------- | -------- | ----------- |
-| `apiBase`  | `api-base`  |             | `string` | `undefined` |
-| `basePath` | `base-path` |             | `string` | `''`        |
-| `entryId`  | `entry-id`  |             | `string` | `undefined` |
-| `logId`    | `log-id`    |             | `string` | `undefined` |
+| Property  | Attribute  | Description | Type     | Default     |
+| --------- | ---------- | ----------- | -------- | ----------- |
+| `apiBase` | `api-base` |             | `string` | `undefined` |
+| `entryId` | `entry-id` |             | `string` | `undefined` |
+| `logId`   | `log-id`   |             | `string` | `undefined` |
 
 
 ## Events

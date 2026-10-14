@@ -38,3 +38,15 @@ export const ErrorPage: FunctionalComponent<ErrorPageProps> = ({ status, message
     </div>
   );
 };
+
+/** Placeholder rows shown while a list is loading. */
+export const SkeletonRows: FunctionalComponent<{ count?: number }> = ({ count = 3 }) =>
+  Array.from({ length: count }, () => (
+    <div class="skeleton-row" aria-hidden="true">
+      <span class="skeleton"></span>
+      <div class="skeleton-lines">
+        <span class="skeleton"></span>
+        <span class="skeleton"></span>
+      </div>
+    </div>
+  ));

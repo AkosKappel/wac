@@ -36,3 +36,17 @@ form > :first-child {
 .stretch-fill {
   flex: 1;
 }
+
+.form-skeleton {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 16px;
+}
+
+.form-skeleton .skeleton {
+  height: 56px;
+}
+
+.form-skeleton .skeleton:first-child {
+  grid-column: 1 / -1;
+}

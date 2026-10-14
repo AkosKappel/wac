@@ -8,6 +8,7 @@ import '@material/web/button/filled-button';
 import '@material/web/button/text-button';
 import '@material/web/button/outlined-button';
 import '@material/web/iconbutton/icon-button';
+import '@material/web/dialog/dialog';
 import { registerNavigationApi } from './navigation.js';
 
 export default function () {

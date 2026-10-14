@@ -1,10 +1,10 @@
 import { Component, Event, EventEmitter, Host, Prop, State, h } from '@stencil/core';
 import { AmbulanceDeviceListApiFactory, DeviceListEntry } from '../../api/ambulance-wl';
-import { ErrorPage } from '../../utils/error-page';
+import { ErrorPage, SkeletonRows } from '../../utils/error-page';
 
 @Component({
   tag: 'harkap-ambulance-wl-list',
-  styleUrls: ['harkap-ambulance-wl-list.css', '../../utils/error-page.css'],
+  styleUrls: ['harkap-ambulance-wl-list.css', '../../utils/shared.css'],
   shadow: true,
 })
 export class HarkapAmbulanceWlList {
@@ -14,7 +14,7 @@ export class HarkapAmbulanceWlList {
   @State() errorStatus: number;
   @State() searchText: string = '';
 
-  devices: DeviceListEntry[];
+  @State() devices: DeviceListEntry[];
 
   private async getDevicesAsync() {
     try {
@@ -22,17 +22,17 @@ export class HarkapAmbulanceWlList {
       if (response.status < 299) {
         return response.data;
       } else {
-        this.errorMessage = `Cannot retrieve list of devices: ${response.statusText}`;
+        this.errorMessage = `Nepodarilo sa načítať zariadenia: ${response.statusText}`;
       }
     } catch (err: any) {
       this.errorStatus = err.response?.status;
-      this.errorMessage = `Cannot retrieve list of devices: ${err.message || 'unknown'}`;
+      this.errorMessage = `Nepodarilo sa načítať zariadenia: ${err.message || 'neznáma chyba'}`;
     }
     return [];
   }
 
-  async componentWillLoad() {
-    this.devices = await this.getDevicesAsync();
+  componentWillLoad() {
+    this.getDevicesAsync().then(devices => (this.devices = devices));
   }
 
   private filteredDevices(): DeviceListEntry[] {
@@ -88,9 +88,11 @@ export class HarkapAmbulanceWlList {
                 >
                   <md-icon slot="leading-icon">search</md-icon>
                 </md-outlined-text-field>
-                <span class="count">{devices.length} zariadení</span>
+                <span class="count">{this.devices ? `${devices.length} zariadení` : ''}</span>
               </div>
-              {devices.length ? (
+              {!this.devices ? (
+                <SkeletonRows count={4} />
+              ) : devices.length ? (
                 <md-list class="list">
                   {devices.map(device => {
                     const expired = new Date(device.warrantyUntil) < new Date();
