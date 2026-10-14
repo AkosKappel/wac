@@ -48,7 +48,7 @@ const sk = {
     expired: 'Záruka vypršala',
   },
   home: {
-    eyebrow: 'Školský projekt, vylepšený v roku 2026',
+    eyebrow: 'Školský projekt, FIIT STU',
     title: 'Evidencia zdravotníckej techniky',
     intro:
       'Register prístrojov nemocničných oddelení: záruky, ceny a prevádzkový log každého zariadenia. Vznikol v predmete Webové aplikácie v prostredí cloudu ako micro-frontend, REST API v Go a GitOps nasadenie do Kubernetes.',
@@ -66,7 +66,7 @@ const sk = {
     links: {
       devices: ['Zariadenia', 'Vyhľadávanie, filtre a export do CSV.'],
       newDevice: ['Nové zariadenie', 'Formulár s kontrolou údajov na klientovi aj na serveri.'],
-      about: ['O projekte', 'Architektúra, technológie a čo sa zmenilo v roku 2026.'],
+      about: ['O projekte', 'Architektúra, technológie a predmet, v ktorom vznikol.'],
       apiDocs: ['API dokumentácia', 'OpenAPI špecifikácia v Swagger UI.'],
     },
   },
@@ -224,7 +224,7 @@ const en: Messages = {
     expired: 'Warranty expired',
   },
   home: {
-    eyebrow: 'University project, upgraded in 2026',
+    eyebrow: 'University project, FIIT STU',
     title: 'Medical device register',
     intro:
       'A register of hospital department equipment: warranties, prices and an operations log for every device. Built in the course Web Applications in the Cloud as a micro-frontend, a REST API in Go and a GitOps deployment to Kubernetes.',
@@ -242,7 +242,7 @@ const en: Messages = {
     links: {
       devices: ['Devices', 'Search, filters and CSV export.'],
       newDevice: ['New device', 'A form validated in the browser and on the server.'],
-      about: ['About', 'Architecture, stack and what changed in 2026.'],
+      about: ['About', 'Architecture, stack and the course it was built in.'],
       apiDocs: ['API docs', 'The OpenAPI spec in Swagger UI.'],
     },
   },

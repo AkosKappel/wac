@@ -2,7 +2,7 @@
 
 [![CI](https://github.com/AkosKappel/wac/actions/workflows/ci.yml/badge.svg)](https://github.com/AkosKappel/wac/actions/workflows/ci.yml)
 
-A register of medical devices in hospital departments: devices with warranty, price and department, each with its own operations log. Built in the course *Webové aplikácie v prostredí cloudu* (Web Applications in the Cloud, FIIT STU) as a micro-frontend, a REST API and a GitOps setup for Kubernetes, and upgraded in 2026. The UI is in Slovak and English.
+A register of medical devices in hospital departments: devices with warranty, price and department, each with its own operations log. Built in the course *Webové aplikácie v prostredí cloudu* (Web Applications in the Cloud, FIIT STU) as a micro-frontend, a REST API and a GitOps setup for Kubernetes. The UI is in Slovak and English.
 
 **Live demo:** https://ambulance.tailb52c43.ts.net (the demo data is restored every night at 03:00 CET). API docs: [/api-docs/](https://ambulance.tailb52c43.ts.net/api-docs/).
 
