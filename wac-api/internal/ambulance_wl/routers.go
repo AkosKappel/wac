@@ -17,6 +17,11 @@ func AddRoutes(engine *gin.Engine, deps Dependencies) {
   group := engine.Group("/api")
   
   {
+    api := newAmbulanceDepartmentsAPI(deps)
+    api.addRoutes(group)
+  }
+  
+  {
     api := newAmbulanceDeviceListAPI(deps)
     api.addRoutes(group)
   }

@@ -17,6 +17,8 @@ tags:
     description: Ambulance Device List API
   - name: ambulanceDeviceLogList
     description: Ambulance Device Log API
+  - name: ambulanceDepartments
+    description: Hospital departments
 paths:
   '/device-list/entries':
     get:
@@ -323,6 +325,22 @@ paths:
           description: Log deleted
         '404':
           description: Log with such ID does not exists
+  "/departments":
+    get:
+      tags:
+        - ambulanceDepartments
+      summary: Provides the hospital departments
+      operationId: getDepartments
+      description: Departments a device can belong to
+      responses:
+        "200":
+          description: List of departments
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Department"
 components:
   schemas:
     DeviceListEntry:

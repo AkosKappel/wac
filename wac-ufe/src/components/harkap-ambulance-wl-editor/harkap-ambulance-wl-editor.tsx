@@ -1,5 +1,5 @@
 import { Component, Host, Prop, State, h, EventEmitter, Event } from '@stencil/core';
-import { AmbulanceDeviceListApiFactory, DeviceListEntry } from '../../api/ambulance-wl';
+import { AmbulanceDepartmentsApiFactory, AmbulanceDeviceListApiFactory, Department, DeviceListEntry } from '../../api/ambulance-wl';
 import { ErrorPage } from '../../utils/error-page';
 import { ConfirmDialog } from '../../utils/confirm-dialog';
 import { navigateTo, watchRelativePath, validateOnBlur } from '../../utils/utils';
@@ -24,13 +24,7 @@ export class HarkapAmbulanceWlEditor {
 
   private unwatch: () => void;
 
-  private departments = [
-    { value: 'chir', name: 'Chirurgia' },
-    { value: 'dets', name: 'Detské' },
-    { value: 'ort', name: 'Ortopedické' },
-    { value: 'ped', name: 'Pediatrické' },
-    { value: 'int', name: 'Interné' },
-  ];
+  @State() departments: Department[] = [];
 
   private async getDeviceEntryAsync(): Promise<DeviceListEntry> {
     if (this.entryId === '@new') {
@@ -74,6 +68,17 @@ export class HarkapAmbulanceWlEditor {
 
   componentWillLoad() {
     this.getDeviceEntryAsync();
+    this.getDepartmentsAsync();
+  }
+
+  // without the list the select still offers the entry's own department
+  private async getDepartmentsAsync() {
+    try {
+      const response = await AmbulanceDepartmentsApiFactory(undefined, this.apiBase).getDepartments();
+      this.departments = response.data ?? [];
+    } catch {
+      this.departments = [];
+    }
   }
 
   connectedCallback() {
@@ -89,8 +94,8 @@ export class HarkapAmbulanceWlEditor {
   // includes the entry's own department when it is not in the predefined list
   private departmentOptions() {
     const current = this.entry?.department;
-    return current?.code && !this.departments.some(d => d.value === current.code)
-      ? [...this.departments, { value: current.code, name: current.name }]
+    return current?.code && !this.departments.some(d => d.code === current.code)
+      ? [...this.departments, current]
       : this.departments;
   }
 
@@ -184,7 +189,7 @@ export class HarkapAmbulanceWlEditor {
                   const selectedValue = (ev.target as HTMLSelectElement).value;
                   this.entry.department = {
                     code: selectedValue,
-                    name: this.departmentOptions().find(d => d.value === selectedValue)?.name || '',
+                    name: this.departmentOptions().find(d => d.code === selectedValue)?.name || '',
                   };
                   this.isValid = this.isFormValid();
                 }}
@@ -192,7 +197,7 @@ export class HarkapAmbulanceWlEditor {
               >
                 <md-icon slot="leading-icon">local_hospital</md-icon>
                 {this.departmentOptions().map(department => (
-                  <md-select-option value={department.value}>
+                  <md-select-option value={department.code}>
                     <div slot="headline">{department.name}</div>
                   </md-select-option>
                 ))}

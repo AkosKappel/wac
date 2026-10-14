@@ -124,6 +124,121 @@ export interface DeviceLog {
 }
 
 /**
+ * AmbulanceDepartmentsApi - axios parameter creator
+ * @export
+ */
+export const AmbulanceDepartmentsApiAxiosParamCreator = function (configuration?: Configuration) {
+    return {
+        /**
+         * Departments a device can belong to
+         * @summary Provides the hospital departments
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getDepartments: async (options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/departments`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+    }
+};
+
+/**
+ * AmbulanceDepartmentsApi - functional programming interface
+ * @export
+ */
+export const AmbulanceDepartmentsApiFp = function(configuration?: Configuration) {
+    const localVarAxiosParamCreator = AmbulanceDepartmentsApiAxiosParamCreator(configuration)
+    return {
+        /**
+         * Departments a device can belong to
+         * @summary Provides the hospital departments
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async getDepartments(options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<Department>>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getDepartments(options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+    }
+};
+
+/**
+ * AmbulanceDepartmentsApi - factory interface
+ * @export
+ */
+export const AmbulanceDepartmentsApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
+    const localVarFp = AmbulanceDepartmentsApiFp(configuration)
+    return {
+        /**
+         * Departments a device can belong to
+         * @summary Provides the hospital departments
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getDepartments(options?: any): AxiosPromise<Array<Department>> {
+            return localVarFp.getDepartments(options).then((request) => request(axios, basePath));
+        },
+    };
+};
+
+/**
+ * AmbulanceDepartmentsApi - interface
+ * @export
+ * @interface AmbulanceDepartmentsApi
+ */
+export interface AmbulanceDepartmentsApiInterface {
+    /**
+     * Departments a device can belong to
+     * @summary Provides the hospital departments
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof AmbulanceDepartmentsApiInterface
+     */
+    getDepartments(options?: AxiosRequestConfig): AxiosPromise<Array<Department>>;
+
+}
+
+/**
+ * AmbulanceDepartmentsApi - object-oriented interface
+ * @export
+ * @class AmbulanceDepartmentsApi
+ * @extends {BaseAPI}
+ */
+export class AmbulanceDepartmentsApi extends BaseAPI implements AmbulanceDepartmentsApiInterface {
+    /**
+     * Departments a device can belong to
+     * @summary Provides the hospital departments
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof AmbulanceDepartmentsApi
+     */
+    public getDepartments(options?: AxiosRequestConfig) {
+        return AmbulanceDepartmentsApiFp(this.configuration).getDepartments(options).then((request) => request(this.axios, this.basePath));
+    }
+}
+
+
+/**
  * AmbulanceDeviceListApi - axios parameter creator
  * @export
  */
