@@ -62,6 +62,14 @@ func TestIntegration(t *testing.T) {
 		}
 	}
 
+	t.Run("empty list is an empty array", func(t *testing.T) {
+		r := call(engine, "GET", devices, "")
+		expect(t, r, http.StatusOK)
+		if r.Body.String() != "[]" {
+			t.Fatalf("got %s, want []", r.Body.String())
+		}
+	})
+
 	t.Run("create and reject a duplicate id", func(t *testing.T) {
 		expect(t, call(engine, "POST", devices, device), http.StatusCreated)
 		expect(t, call(engine, "POST", devices, device), http.StatusConflict)

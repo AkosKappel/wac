@@ -233,7 +233,8 @@ func (this *mongoSvc[DocType]) FindDocuments(ctx context.Context) ([]*DocType, e
 		return nil, err
 	}
 	defer cursor.Close(ctx)
-	var documents []*DocType
+	// an empty slice, not nil, so an empty collection is sent as [] rather than null
+	documents := []*DocType{}
 	for cursor.Next(ctx) {
 		var document DocType
 		if err := cursor.Decode(&document); err != nil {

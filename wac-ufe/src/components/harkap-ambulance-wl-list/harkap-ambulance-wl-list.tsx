@@ -20,7 +20,7 @@ export class HarkapAmbulanceWlList {
     try {
       const response = await AmbulanceDeviceListApiFactory(undefined, this.apiBase).getDeviceListEntries();
       if (response.status < 299) {
-        return response.data;
+        return response.data ?? [];
       } else {
         this.errorMessage = `Nepodarilo sa načítať zariadenia: ${response.statusText}`;
       }
