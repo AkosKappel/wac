@@ -24,7 +24,8 @@ export function watchRelativePath(basePath: string, onChange: (relativePath: str
 
 /** The absolute href of a path relative to basePath, for links. */
 export function hrefTo(basePath: string, path: string): string {
-  return new URL(path, new URL(basePath, document.baseURI)).pathname;
+  const url = new URL(path, new URL(basePath, document.baseURI));
+  return url.pathname + url.search;
 }
 
 /** Navigates to a path relative to basePath. */

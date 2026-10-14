@@ -145,6 +145,16 @@ md-dialog .danger {
   }
 }
 
+/* Small label above a page title */
+.eyebrow {
+  margin: 0 0 4px;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--md-sys-color-primary);
+}
+
 /* Warranty status, same in list and detail */
 .badge {
   padding: 4px 10px;

@@ -17,15 +17,6 @@
   margin-bottom: 24px;
 }
 
-.eyebrow {
-  margin: 0 0 4px;
-  font-size: 0.8125rem;
-  font-weight: 600;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: var(--md-sys-color-primary);
-}
-
 h1 {
   margin: 0;
   font-size: 1.75rem;
