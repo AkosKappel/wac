@@ -10,8 +10,9 @@ export function watchRelativePath(basePath: string, onChange: (relativePath: str
   const report = (path: string) => onChange(path.startsWith(baseUri) ? path.slice(baseUri.length) : '');
   const listener = (ev: any) => {
     const path = new URL(ev.destination.url).pathname;
-    // the API and its docs page are served by nginx, downloads are not page changes
-    if (!ev.canIntercept || ev.downloadRequest || /^\/api(-docs)?(\/|$)/.test(path)) {
+    // the API and its docs page are served by nginx, downloads are not page changes,
+    // and a reload (the error page's retry button) must really load the page again
+    if (!ev.canIntercept || ev.downloadRequest || ev.navigationType === 'reload' || /^\/api(-docs)?(\/|$)/.test(path)) {
       return;
     }
     ev.intercept();
