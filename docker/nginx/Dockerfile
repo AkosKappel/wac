@@ -12,6 +12,13 @@ RUN npm ci
 COPY wac-ufe/ ./
 RUN npm run build
 
+# Swagger UI for /api-docs/; npm pack downloads only the package, without its dependencies
+FROM node:24-slim AS api-docs
+WORKDIR /docs
+RUN npm pack --silent swagger-ui-dist@5.33.0 && tar -xzf swagger-ui-dist-5.33.0.tgz
+
 FROM nginx:1.30-alpine
 
 COPY --from=build /build/www /usr/share/nginx/html
+COPY --from=api-docs /docs/package/swagger-ui-bundle.js /docs/package/swagger-ui.css /usr/share/nginx/html/api-docs/
+COPY docker/nginx/api-docs/ /usr/share/nginx/html/api-docs/

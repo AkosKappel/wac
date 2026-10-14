@@ -49,7 +49,9 @@ func main() {
 	defer dbService.Disconnect(context.Background())
 
 	ambulance_wl.AddRoutes(engine, ambulance_wl.Dependencies{DB: dbService})
+	// /openapi for the course's Kubernetes setup, /api/openapi behind the nginx /api proxy
 	engine.GET("/openapi", api.HandleOpenApi)
+	engine.GET("/api/openapi", api.HandleOpenApi)
 	// HEAD too: uptime monitors such as UptimeRobot check with HEAD, which Gin doesn't map to GET
 	health := healthHandler(dbService)
 	engine.GET("/api/health", health)
