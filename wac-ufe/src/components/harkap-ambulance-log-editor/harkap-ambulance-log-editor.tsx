@@ -1,5 +1,6 @@
 import { Component, Host, Prop, State, h, EventEmitter, Event } from '@stencil/core';
-import { AmbulanceDeviceLogListApiFactory, DeviceLog } from '../../api/ambulance-wl';
+import { DeviceLog } from '../../api/ambulance-wl';
+import { apiClients, apiError } from '../../utils/api';
 import { ErrorPage } from '../../utils/error-page';
 import { ConfirmDialog } from '../../utils/confirm-dialog';
 import { t } from '../../utils/i18n';
@@ -43,20 +44,12 @@ export class HarkapAmbulanceLogEditor {
     }
 
     try {
-      const response = await AmbulanceDeviceLogListApiFactory(undefined, this.apiBase).getDeviceLog(
-        this.entryId,
-        this.logId,
-      );
-
-      if (response.status < 299) {
-        this.log = response.data;
-        this.isValid = true;
-      } else {
-        this.errorMessage = `${t().logEditor.loadFailed}: ${response.statusText}`;
-      }
-    } catch (err: any) {
-      this.errorStatus = err.response?.status;
-      this.errorMessage = `${t().logEditor.loadFailed}: ${err.message || t().common.unknownError}`;
+      this.log = await apiClients(this.apiBase).logs.getDeviceLog({ entryId: this.entryId, logId: this.logId });
+      this.isValid = true;
+    } catch (err) {
+      const { status, message } = await apiError(err);
+      this.errorStatus = status;
+      this.errorMessage = `${t().logEditor.loadFailed}: ${message}`;
     }
 
     return undefined;
@@ -173,18 +166,15 @@ export class HarkapAmbulanceLogEditor {
     this.busy = true;
     this.actionError = undefined;
     try {
-      const api = AmbulanceDeviceLogListApiFactory(undefined, this.apiBase);
-      const response =
-        this.logId === '@new'
-          ? await api.createDeviceLog(this.entryId, this.log)
-          : await api.updateDeviceLog(this.entryId, this.logId, this.log);
-      if (response.status < 299) {
-        this.logClosed.emit('store');
+      const logs = apiClients(this.apiBase).logs;
+      if (this.logId === '@new') {
+        await logs.createDeviceLog({ entryId: this.entryId, deviceLog: this.log });
       } else {
-        this.actionError = `${t().logEditor.saveFailed}: ${response.statusText}`;
+        await logs.updateDeviceLog({ entryId: this.entryId, logId: this.logId, deviceLog: this.log });
       }
-    } catch (err: any) {
-      this.actionError = `${t().logEditor.saveFailed}: ${err.response?.data?.message || err.message || t().common.unknownError}`;
+      this.logClosed.emit('store');
+    } catch (err) {
+      this.actionError = `${t().logEditor.saveFailed}: ${(await apiError(err)).message}`;
     } finally {
       this.busy = false;
     }
@@ -194,17 +184,10 @@ export class HarkapAmbulanceLogEditor {
     this.busy = true;
     this.actionError = undefined;
     try {
-      const response = await AmbulanceDeviceLogListApiFactory(undefined, this.apiBase).deleteDeviceLog(
-        this.entryId,
-        this.logId,
-      );
-      if (response.status < 299) {
-        this.logClosed.emit('delete');
-      } else {
-        this.actionError = `${t().logEditor.deleteFailed}: ${response.statusText}`;
-      }
-    } catch (err: any) {
-      this.actionError = `${t().logEditor.deleteFailed}: ${err.response?.data?.message || err.message || t().common.unknownError}`;
+      await apiClients(this.apiBase).logs.deleteDeviceLog({ entryId: this.entryId, logId: this.logId });
+      this.logClosed.emit('delete');
+    } catch (err) {
+      this.actionError = `${t().logEditor.deleteFailed}: ${(await apiError(err)).message}`;
     } finally {
       this.busy = false;
     }

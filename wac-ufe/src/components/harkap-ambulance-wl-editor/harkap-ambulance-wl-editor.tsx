@@ -1,5 +1,6 @@
 import { Component, Host, Prop, State, h, EventEmitter, Event } from '@stencil/core';
-import { AmbulanceDepartmentsApiFactory, AmbulanceDeviceListApiFactory, Department, DeviceListEntry } from '../../api/ambulance-wl';
+import { Department, DeviceListEntry } from '../../api/ambulance-wl';
+import { apiClients, apiError } from '../../utils/api';
 import { ErrorPage } from '../../utils/error-page';
 import { ConfirmDialog } from '../../utils/confirm-dialog';
 import { WarrantyBadge } from '../../utils/warranty-badge';
@@ -52,17 +53,12 @@ export class HarkapAmbulanceWlEditor {
     }
 
     try {
-      const response = await AmbulanceDeviceListApiFactory(undefined, this.apiBase).getDeviceListEntry(this.entryId);
-
-      if (response.status < 299) {
-        this.entry = response.data;
-        this.isValid = true;
-      } else {
-        this.errorMessage = `${t().editor.loadFailed}: ${response.statusText}`;
-      }
-    } catch (err: any) {
-      this.errorStatus = err.response?.status;
-      this.errorMessage = `${t().editor.loadFailed}: ${err.message || t().common.unknownError}`;
+      this.entry = await apiClients(this.apiBase).devices.getDeviceListEntry({ entryId: this.entryId });
+      this.isValid = true;
+    } catch (err) {
+      const { status, message } = await apiError(err);
+      this.errorStatus = status;
+      this.errorMessage = `${t().editor.loadFailed}: ${message}`;
     }
 
     return undefined;
@@ -76,8 +72,7 @@ export class HarkapAmbulanceWlEditor {
   // without the list the select still offers the entry's own department
   private async getDepartmentsAsync() {
     try {
-      const response = await AmbulanceDepartmentsApiFactory(undefined, this.apiBase).getDepartments();
-      this.departments = response.data ?? [];
+      this.departments = (await apiClients(this.apiBase).departments.getDepartments()) ?? [];
     } catch {
       this.departments = [];
     }
@@ -313,18 +308,15 @@ export class HarkapAmbulanceWlEditor {
     this.busy = true;
     this.actionError = undefined;
     try {
-      const api = AmbulanceDeviceListApiFactory(undefined, this.apiBase);
-      const response =
-        this.entryId === '@new'
-          ? await api.createDeviceListEntry(this.entry)
-          : await api.updateDeviceListEntry(this.entryId, this.entry);
-      if (response.status < 299) {
-        this.editorClosed.emit('store');
+      const devices = apiClients(this.apiBase).devices;
+      if (this.entryId === '@new') {
+        await devices.createDeviceListEntry({ deviceListEntry: this.entry });
       } else {
-        this.actionError = `${t().editor.saveFailed}: ${response.statusText}`;
+        await devices.updateDeviceListEntry({ entryId: this.entryId, deviceListEntry: this.entry });
       }
-    } catch (err: any) {
-      this.actionError = `${t().editor.saveFailed}: ${err.response?.data?.message || err.message || t().common.unknownError}`;
+      this.editorClosed.emit('store');
+    } catch (err) {
+      this.actionError = `${t().editor.saveFailed}: ${(await apiError(err)).message}`;
     } finally {
       this.busy = false;
     }
@@ -334,14 +326,10 @@ export class HarkapAmbulanceWlEditor {
     this.busy = true;
     this.actionError = undefined;
     try {
-      const response = await AmbulanceDeviceListApiFactory(undefined, this.apiBase).deleteDeviceListEntry(this.entryId);
-      if (response.status < 299) {
-        this.editorClosed.emit('delete');
-      } else {
-        this.actionError = `${t().editor.deleteFailed}: ${response.statusText}`;
-      }
-    } catch (err: any) {
-      this.actionError = `${t().editor.deleteFailed}: ${err.response?.data?.message || err.message || t().common.unknownError}`;
+      await apiClients(this.apiBase).devices.deleteDeviceListEntry({ entryId: this.entryId });
+      this.editorClosed.emit('delete');
+    } catch (err) {
+      this.actionError = `${t().editor.deleteFailed}: ${(await apiError(err)).message}`;
     } finally {
       this.busy = false;
     }

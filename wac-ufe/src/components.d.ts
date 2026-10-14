@@ -10,6 +10,9 @@ export namespace Components {
     }
     interface HarkapAmbulanceHome {
         "apiBase": string;
+        /**
+          * @default ''
+         */
         "basePath": string;
     }
     interface HarkapAmbulanceLogEditor {
@@ -23,10 +26,16 @@ export namespace Components {
     }
     interface HarkapAmbulanceWlApp {
         "apiBase": string;
+        /**
+          * @default ''
+         */
         "basePath": string;
     }
     interface HarkapAmbulanceWlEditor {
         "apiBase": string;
+        /**
+          * @default ''
+         */
         "basePath": string;
         "entryId": string;
     }
@@ -152,6 +161,9 @@ declare namespace LocalJSX {
     }
     interface HarkapAmbulanceHome {
         "apiBase"?: string;
+        /**
+          * @default ''
+         */
         "basePath"?: string;
     }
     interface HarkapAmbulanceLogEditor {
@@ -167,10 +179,16 @@ declare namespace LocalJSX {
     }
     interface HarkapAmbulanceWlApp {
         "apiBase"?: string;
+        /**
+          * @default ''
+         */
         "basePath"?: string;
     }
     interface HarkapAmbulanceWlEditor {
         "apiBase"?: string;
+        /**
+          * @default ''
+         */
         "basePath"?: string;
         "entryId"?: string;
         "onEditor-closed"?: (event: HarkapAmbulanceWlEditorCustomEvent<string>) => void;
@@ -179,27 +197,54 @@ declare namespace LocalJSX {
         "apiBase"?: string;
         "onEntry-clicked"?: (event: HarkapAmbulanceWlListCustomEvent<string>) => void;
     }
+
+    interface HarkapAmbulanceHomeAttributes {
+        "apiBase": string;
+        "basePath": string;
+    }
+    interface HarkapAmbulanceLogEditorAttributes {
+        "logId": string;
+        "entryId": string;
+        "apiBase": string;
+    }
+    interface HarkapAmbulanceLogListAttributes {
+        "apiBase": string;
+        "deviceId": string;
+    }
+    interface HarkapAmbulanceWlAppAttributes {
+        "basePath": string;
+        "apiBase": string;
+    }
+    interface HarkapAmbulanceWlEditorAttributes {
+        "entryId": string;
+        "basePath": string;
+        "apiBase": string;
+    }
+    interface HarkapAmbulanceWlListAttributes {
+        "apiBase": string;
+    }
+
     interface IntrinsicElements {
         "harkap-ambulance-about": HarkapAmbulanceAbout;
-        "harkap-ambulance-home": HarkapAmbulanceHome;
-        "harkap-ambulance-log-editor": HarkapAmbulanceLogEditor;
-        "harkap-ambulance-log-list": HarkapAmbulanceLogList;
-        "harkap-ambulance-wl-app": HarkapAmbulanceWlApp;
-        "harkap-ambulance-wl-editor": HarkapAmbulanceWlEditor;
-        "harkap-ambulance-wl-list": HarkapAmbulanceWlList;
+        "harkap-ambulance-home": Omit<HarkapAmbulanceHome, keyof HarkapAmbulanceHomeAttributes> & { [K in keyof HarkapAmbulanceHome & keyof HarkapAmbulanceHomeAttributes]?: HarkapAmbulanceHome[K] } & { [K in keyof HarkapAmbulanceHome & keyof HarkapAmbulanceHomeAttributes as `attr:${K}`]?: HarkapAmbulanceHomeAttributes[K] } & { [K in keyof HarkapAmbulanceHome & keyof HarkapAmbulanceHomeAttributes as `prop:${K}`]?: HarkapAmbulanceHome[K] };
+        "harkap-ambulance-log-editor": Omit<HarkapAmbulanceLogEditor, keyof HarkapAmbulanceLogEditorAttributes> & { [K in keyof HarkapAmbulanceLogEditor & keyof HarkapAmbulanceLogEditorAttributes]?: HarkapAmbulanceLogEditor[K] } & { [K in keyof HarkapAmbulanceLogEditor & keyof HarkapAmbulanceLogEditorAttributes as `attr:${K}`]?: HarkapAmbulanceLogEditorAttributes[K] } & { [K in keyof HarkapAmbulanceLogEditor & keyof HarkapAmbulanceLogEditorAttributes as `prop:${K}`]?: HarkapAmbulanceLogEditor[K] };
+        "harkap-ambulance-log-list": Omit<HarkapAmbulanceLogList, keyof HarkapAmbulanceLogListAttributes> & { [K in keyof HarkapAmbulanceLogList & keyof HarkapAmbulanceLogListAttributes]?: HarkapAmbulanceLogList[K] } & { [K in keyof HarkapAmbulanceLogList & keyof HarkapAmbulanceLogListAttributes as `attr:${K}`]?: HarkapAmbulanceLogListAttributes[K] } & { [K in keyof HarkapAmbulanceLogList & keyof HarkapAmbulanceLogListAttributes as `prop:${K}`]?: HarkapAmbulanceLogList[K] };
+        "harkap-ambulance-wl-app": Omit<HarkapAmbulanceWlApp, keyof HarkapAmbulanceWlAppAttributes> & { [K in keyof HarkapAmbulanceWlApp & keyof HarkapAmbulanceWlAppAttributes]?: HarkapAmbulanceWlApp[K] } & { [K in keyof HarkapAmbulanceWlApp & keyof HarkapAmbulanceWlAppAttributes as `attr:${K}`]?: HarkapAmbulanceWlAppAttributes[K] } & { [K in keyof HarkapAmbulanceWlApp & keyof HarkapAmbulanceWlAppAttributes as `prop:${K}`]?: HarkapAmbulanceWlApp[K] };
+        "harkap-ambulance-wl-editor": Omit<HarkapAmbulanceWlEditor, keyof HarkapAmbulanceWlEditorAttributes> & { [K in keyof HarkapAmbulanceWlEditor & keyof HarkapAmbulanceWlEditorAttributes]?: HarkapAmbulanceWlEditor[K] } & { [K in keyof HarkapAmbulanceWlEditor & keyof HarkapAmbulanceWlEditorAttributes as `attr:${K}`]?: HarkapAmbulanceWlEditorAttributes[K] } & { [K in keyof HarkapAmbulanceWlEditor & keyof HarkapAmbulanceWlEditorAttributes as `prop:${K}`]?: HarkapAmbulanceWlEditor[K] };
+        "harkap-ambulance-wl-list": Omit<HarkapAmbulanceWlList, keyof HarkapAmbulanceWlListAttributes> & { [K in keyof HarkapAmbulanceWlList & keyof HarkapAmbulanceWlListAttributes]?: HarkapAmbulanceWlList[K] } & { [K in keyof HarkapAmbulanceWlList & keyof HarkapAmbulanceWlListAttributes as `attr:${K}`]?: HarkapAmbulanceWlListAttributes[K] } & { [K in keyof HarkapAmbulanceWlList & keyof HarkapAmbulanceWlListAttributes as `prop:${K}`]?: HarkapAmbulanceWlList[K] };
     }
 }
 export { LocalJSX as JSX };
 declare module "@stencil/core" {
     export namespace JSX {
         interface IntrinsicElements {
-            "harkap-ambulance-about": LocalJSX.HarkapAmbulanceAbout & JSXBase.HTMLAttributes<HTMLHarkapAmbulanceAboutElement>;
-            "harkap-ambulance-home": LocalJSX.HarkapAmbulanceHome & JSXBase.HTMLAttributes<HTMLHarkapAmbulanceHomeElement>;
-            "harkap-ambulance-log-editor": LocalJSX.HarkapAmbulanceLogEditor & JSXBase.HTMLAttributes<HTMLHarkapAmbulanceLogEditorElement>;
-            "harkap-ambulance-log-list": LocalJSX.HarkapAmbulanceLogList & JSXBase.HTMLAttributes<HTMLHarkapAmbulanceLogListElement>;
-            "harkap-ambulance-wl-app": LocalJSX.HarkapAmbulanceWlApp & JSXBase.HTMLAttributes<HTMLHarkapAmbulanceWlAppElement>;
-            "harkap-ambulance-wl-editor": LocalJSX.HarkapAmbulanceWlEditor & JSXBase.HTMLAttributes<HTMLHarkapAmbulanceWlEditorElement>;
-            "harkap-ambulance-wl-list": LocalJSX.HarkapAmbulanceWlList & JSXBase.HTMLAttributes<HTMLHarkapAmbulanceWlListElement>;
+            "harkap-ambulance-about": LocalJSX.IntrinsicElements["harkap-ambulance-about"] & JSXBase.HTMLAttributes<HTMLHarkapAmbulanceAboutElement>;
+            "harkap-ambulance-home": LocalJSX.IntrinsicElements["harkap-ambulance-home"] & JSXBase.HTMLAttributes<HTMLHarkapAmbulanceHomeElement>;
+            "harkap-ambulance-log-editor": LocalJSX.IntrinsicElements["harkap-ambulance-log-editor"] & JSXBase.HTMLAttributes<HTMLHarkapAmbulanceLogEditorElement>;
+            "harkap-ambulance-log-list": LocalJSX.IntrinsicElements["harkap-ambulance-log-list"] & JSXBase.HTMLAttributes<HTMLHarkapAmbulanceLogListElement>;
+            "harkap-ambulance-wl-app": LocalJSX.IntrinsicElements["harkap-ambulance-wl-app"] & JSXBase.HTMLAttributes<HTMLHarkapAmbulanceWlAppElement>;
+            "harkap-ambulance-wl-editor": LocalJSX.IntrinsicElements["harkap-ambulance-wl-editor"] & JSXBase.HTMLAttributes<HTMLHarkapAmbulanceWlEditorElement>;
+            "harkap-ambulance-wl-list": LocalJSX.IntrinsicElements["harkap-ambulance-wl-list"] & JSXBase.HTMLAttributes<HTMLHarkapAmbulanceWlListElement>;
         }
     }
 }

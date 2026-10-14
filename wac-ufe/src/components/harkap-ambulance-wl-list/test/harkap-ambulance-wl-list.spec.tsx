@@ -1,8 +1,10 @@
 import { newSpecPage } from '@stencil/core/testing';
-import axios from 'axios';
-import MockAdapter from 'axios-mock-adapter';
+import { MockResponse } from '@stencil/core/mock-doc';
 import { HarkapAmbulanceWlList } from './../harkap-ambulance-wl-list';
 import { DeviceListEntry } from '../../../api/ambulance-wl';
+
+const respondWith = (body: any, status = 200) =>
+  (global.fetch = jest.fn().mockResolvedValue(new MockResponse(JSON.stringify(body), { status })) as any);
 
 describe('harkap-ambulance-wl-list', () => {
   const sampleDevices: DeviceListEntry[] = [
@@ -10,12 +12,7 @@ describe('harkap-ambulance-wl-list', () => {
     { id: '2', name: 'Ultrasound', department: { name: 'Radiology' }, deviceId: '2', warrantyUntil: '2030-01-01T00:00:00Z' },
   ];
 
-  let mock: MockAdapter;
-  beforeEach(() => {
-    mock = new MockAdapter(axios);
-    mock.onGet().reply(200, sampleDevices);
-  });
-  afterEach(() => mock.restore());
+  beforeEach(() => respondWith(sampleDevices));
 
   it('displays devices when data is loaded', async () => {
     const page = await newSpecPage({
@@ -59,7 +56,7 @@ describe('harkap-ambulance-wl-list', () => {
   });
 
   it('shows the empty state when the API returns null', async () => {
-    mock.onGet().reply(200, null);
+    respondWith(null);
     const page = await newSpecPage({
       components: [HarkapAmbulanceWlList],
       html: `<harkap-ambulance-wl-list></harkap-ambulance-wl-list>`,

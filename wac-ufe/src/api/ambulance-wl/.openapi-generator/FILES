@@ -1,8 +1,8 @@
-.gitignore
-.npmignore
-api.ts
-base.ts
-common.ts
-configuration.ts
-git_push.sh
+.openapi-generator-ignore
+apis/AmbulanceDepartmentsApi.ts
+apis/AmbulanceDeviceListApi.ts
+apis/AmbulanceDeviceLogListApi.ts
+apis/index.ts
 index.ts
+models/index.ts
+runtime.ts

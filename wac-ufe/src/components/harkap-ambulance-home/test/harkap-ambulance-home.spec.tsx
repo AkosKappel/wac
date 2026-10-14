@@ -1,15 +1,13 @@
 import { newSpecPage } from '@stencil/core/testing';
-import axios from 'axios';
-import MockAdapter from 'axios-mock-adapter';
+import { MockResponse } from '@stencil/core/mock-doc';
 import { HarkapAmbulanceHome } from '../harkap-ambulance-home';
 
-describe('harkap-ambulance-home', () => {
-  let mock: MockAdapter;
-  beforeEach(() => (mock = new MockAdapter(axios)));
-  afterEach(() => mock.restore());
+const respondWith = (body: any, status = 200) =>
+  (global.fetch = jest.fn().mockResolvedValue(new MockResponse(JSON.stringify(body), { status })) as any);
 
+describe('harkap-ambulance-home', () => {
   it('shows the overview of the loaded devices', async () => {
-    mock.onGet().reply(200, [
+    respondWith([
       { id: '1', name: 'CT', deviceId: '1', price: 900, warrantyUntil: '2000-01-01T00:00:00Z', department: { code: 'rad', name: 'Radiology' } },
       { id: '2', name: 'MRI', deviceId: '2', price: 100, warrantyUntil: '2100-01-01T00:00:00Z', department: { code: 'rad', name: 'Radiology' } },
     ]);
@@ -28,7 +26,7 @@ describe('harkap-ambulance-home', () => {
   });
 
   it('keeps the page when the API fails', async () => {
-    mock.onGet().networkError();
+    global.fetch = jest.fn().mockRejectedValue(new TypeError('Failed to fetch')) as any;
     const page = await newSpecPage({
       components: [HarkapAmbulanceHome],
       html: `<harkap-ambulance-home></harkap-ambulance-home>`,

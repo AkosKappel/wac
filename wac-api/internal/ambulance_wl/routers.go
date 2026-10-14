@@ -10,25 +10,25 @@
 package ambulance_wl
 
 import (
-    "github.com/gin-gonic/gin"
+	"github.com/gin-gonic/gin"
 )
 
 func AddRoutes(engine *gin.Engine, deps Dependencies) {
-  group := engine.Group("/api")
-  
-  {
-    api := newAmbulanceDepartmentsAPI(deps)
-    api.addRoutes(group)
-  }
-  
-  {
-    api := newAmbulanceDeviceListAPI(deps)
-    api.addRoutes(group)
-  }
-  
-  {
-    api := newAmbulanceDeviceLogListAPI(deps)
-    api.addRoutes(group)
-  }
-  
+	group := engine.Group("/api")
+
+	{
+		api := newAmbulanceDepartmentsAPI(deps)
+		api.addRoutes(group)
+	}
+
+	{
+		api := newAmbulanceDeviceListAPI(deps)
+		api.addRoutes(group)
+	}
+
+	{
+		api := newAmbulanceDeviceLogListAPI(deps)
+		api.addRoutes(group)
+	}
+
 }

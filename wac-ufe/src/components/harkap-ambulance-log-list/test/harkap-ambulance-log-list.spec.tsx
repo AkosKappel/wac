@@ -1,8 +1,10 @@
 import { newSpecPage } from '@stencil/core/testing';
-import axios from 'axios';
-import MockAdapter from 'axios-mock-adapter';
+import { MockResponse } from '@stencil/core/mock-doc';
 import { HarkapAmbulanceLogList } from './../harkap-ambulance-log-list';
 import { DeviceLog } from '../../../api/ambulance-wl';
+
+const respondWith = (body: any, status = 200) =>
+  (global.fetch = jest.fn().mockResolvedValue(new MockResponse(JSON.stringify(body), { status })) as any);
 
 describe('harkap-ambulance-log-list', () => {
   const sampleLogs: DeviceLog[] = [
@@ -20,12 +22,7 @@ describe('harkap-ambulance-log-list', () => {
     },
   ];
 
-  let mock: MockAdapter;
-  beforeEach(() => {
-    mock = new MockAdapter(axios);
-    mock.onGet().reply(200, sampleLogs);
-  });
-  afterEach(() => mock.restore());
+  beforeEach(() => respondWith(sampleLogs));
 
   it(`displays logs when data is loaded`, async () => {
     const page = await newSpecPage({

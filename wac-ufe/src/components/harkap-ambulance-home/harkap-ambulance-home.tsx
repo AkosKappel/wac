@@ -1,5 +1,5 @@
 import { Component, Host, Prop, State, h } from '@stencil/core';
-import { AmbulanceDeviceListApiFactory } from '../../api/ambulance-wl';
+import { apiClients } from '../../utils/api';
 import { formatPrice, t } from '../../utils/i18n';
 import { Overview, overview } from '../../utils/overview';
 import { hrefTo } from '../../utils/utils';
@@ -22,8 +22,7 @@ export class HarkapAmbulanceHome {
 
   private async loadOverview() {
     try {
-      const response = await AmbulanceDeviceListApiFactory(undefined, this.apiBase).getDeviceListEntries();
-      this.overview = overview(response.data ?? []);
+      this.overview = overview((await apiClients(this.apiBase).devices.getDeviceListEntries()) ?? []);
     } catch {
       this.loadFailed = true;
     }

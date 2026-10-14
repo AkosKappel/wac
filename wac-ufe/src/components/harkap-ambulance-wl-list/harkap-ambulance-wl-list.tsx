@@ -1,5 +1,6 @@
 import { Component, Event, EventEmitter, Host, Prop, State, h } from '@stencil/core';
-import { AmbulanceDeviceListApiFactory, Department, DeviceListEntry } from '../../api/ambulance-wl';
+import { Department, DeviceListEntry } from '../../api/ambulance-wl';
+import { apiClients, apiError } from '../../utils/api';
 import { downloadText, toCsv } from '../../utils/csv';
 import { DeviceQuery, applyQuery, parseQuery, toSearch } from '../../utils/device-query';
 import { ErrorPage, SkeletonRows } from '../../utils/error-page';
@@ -22,17 +23,13 @@ export class HarkapAmbulanceWlList {
 
   private async getDevicesAsync() {
     try {
-      const response = await AmbulanceDeviceListApiFactory(undefined, this.apiBase).getDeviceListEntries();
-      if (response.status < 299) {
-        return response.data ?? [];
-      } else {
-        this.errorMessage = `${t().list.loadFailed}: ${response.statusText}`;
-      }
-    } catch (err: any) {
-      this.errorStatus = err.response?.status;
-      this.errorMessage = `${t().list.loadFailed}: ${err.message || t().common.unknownError}`;
+      return (await apiClients(this.apiBase).devices.getDeviceListEntries()) ?? [];
+    } catch (err) {
+      const { status, message } = await apiError(err);
+      this.errorStatus = status;
+      this.errorMessage = `${t().list.loadFailed}: ${message}`;
+      return [];
     }
-    return [];
   }
 
   componentWillLoad() {

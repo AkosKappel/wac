@@ -1,5 +1,6 @@
 import { Component, Event, Host, Prop, EventEmitter, State, h } from '@stencil/core';
-import { AmbulanceDeviceLogListApiFactory, DeviceLog } from '../../api/ambulance-wl';
+import { DeviceLog } from '../../api/ambulance-wl';
+import { apiClients, apiError } from '../../utils/api';
 import { ErrorPage, SkeletonRows } from '../../utils/error-page';
 import { formatDateTime, t } from '../../utils/i18n';
 
@@ -19,17 +20,13 @@ export class HarkapAmbulanceLogList {
 
   private async getDeviceLogsAsync() {
     try {
-      const response = await AmbulanceDeviceLogListApiFactory(undefined, this.apiBase).getDeviceLogs(this.deviceId);
-      if (response.status < 299) {
-        return response.data;
-      } else {
-        this.errorMessage = `${t().logList.loadFailed}: ${response.statusText}`;
-      }
-    } catch (err: any) {
-      this.errorStatus = err.response?.status;
-      this.errorMessage = `${t().logList.loadFailed}: ${err.message || t().common.unknownError}`;
+      return (await apiClients(this.apiBase).logs.getDeviceLogs({ entryId: this.deviceId })) ?? [];
+    } catch (err) {
+      const { status, message } = await apiError(err);
+      this.errorStatus = status;
+      this.errorMessage = `${t().logList.loadFailed}: ${message}`;
+      return [];
     }
-    return [];
   }
 
   componentWillLoad() {
