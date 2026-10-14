@@ -35,15 +35,15 @@ func main() {
 	engine := gin.New()
 	engine.Use(gin.Recovery(), requestLogger())
 
-	corsMiddleware := cors.New(cors.Config{
-		AllowOrigins:     []string{"*"},
-		AllowMethods:     []string{"GET", "PUT", "POST", "DELETE", "PATCH"},
-		AllowHeaders:     []string{"Origin", "Authorization", "Content-Type"},
-		ExposeHeaders:    []string{""},
-		AllowCredentials: false,
-		MaxAge:           12 * time.Hour,
-	})
-	engine.Use(corsMiddleware)
+	// The live site is same-origin behind nginx; CORS is only for a UI dev server on another port
+	if origins := os.Getenv("AMBULANCE_API_CORS_ORIGINS"); origins != "" {
+		engine.Use(cors.New(cors.Config{
+			AllowOrigins: strings.Split(origins, ","),
+			AllowMethods: []string{"GET", "PUT", "POST", "DELETE", "PATCH"},
+			AllowHeaders: []string{"Origin", "Authorization", "Content-Type"},
+			MaxAge:       12 * time.Hour,
+		}))
+	}
 
 	dbService := db_service.NewMongoService[ambulance_wl.DeviceListEntry](db_service.MongoServiceConfig{})
 	defer dbService.Disconnect(context.Background())
