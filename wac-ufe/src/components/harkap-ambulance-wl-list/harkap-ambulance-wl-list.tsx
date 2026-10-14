@@ -57,41 +57,67 @@ export class HarkapAmbulanceWlList {
   }
 
   render() {
+    const devices = this.filteredDevices() ?? [];
     return (
       <Host>
         {this.errorMessage ? (
           <div class="error">{this.errorMessage}</div>
         ) : (
           <div class="container">
-            <h1>Nemocnica HarKap - Zoznam zdravotníckeho vybavenia</h1>
-            <div class="header">
-              <md-elevated-button class="add-button" onclick={() => this.entryClicked.emit('@new')}>
+            <header class="page-header">
+              <div>
+                <p class="eyebrow">Nemocnica HarKap</p>
+                <h1>Zdravotnícke vybavenie</h1>
+              </div>
+              <md-filled-button onclick={() => this.entryClicked.emit('@new')}>
                 <md-icon slot="icon">add</md-icon>
-                <span>Pridať nové zariadenie</span>
-              </md-elevated-button>
-              <md-filled-text-field
-                class="search"
-                label="Filtrovať zariadenia"
-                onInput={(e: InputEvent) => (this.searchText = (e.target as HTMLInputElement).value)}
-                placeholder="Zadajte názov zariadenia alebo oddelenia"
-              >
-                <md-icon slot="leading-icon">search</md-icon>
-              </md-filled-text-field>
-            </div>
-            {this.devices ? (
-              <md-list class="list">
-                {this.filteredDevices().map(device => (
-                  <md-list-item class="list-item" onClick={() => this.entryClicked.emit(device.id)}>
-                    <div slot="headline">{device.name}</div>
-                    <div slot="supporting-text">{'Oddelenie: ' + device.department.name}</div>
-                    <md-icon slot="start">devices</md-icon>
-                    <md-icon slot="end">chevron_right</md-icon>
-                  </md-list-item>
-                ))}
-              </md-list>
-            ) : (
-              <div>Nenašli sa žiadne zariadenia</div>
-            )}
+                Nové zariadenie
+              </md-filled-button>
+            </header>
+            <section class="card">
+              <div class="toolbar">
+                <md-outlined-text-field
+                  class="search"
+                  placeholder="Hľadať podľa názvu alebo oddelenia"
+                  onInput={(e: InputEvent) => (this.searchText = (e.target as HTMLInputElement).value)}
+                >
+                  <md-icon slot="leading-icon">search</md-icon>
+                </md-outlined-text-field>
+                <span class="count">{devices.length} zariadení</span>
+              </div>
+              {devices.length ? (
+                <md-list class="list">
+                  {devices.map(device => {
+                    const expired = new Date(device.warrantyUntil) < new Date();
+                    return (
+                      <md-list-item class="list-item" type="button" onClick={() => this.entryClicked.emit(device.id)}>
+                        <div slot="start" class="avatar">
+                          <md-icon>medical_services</md-icon>
+                        </div>
+                        <div slot="headline">{device.name}</div>
+                        <div slot="supporting-text">
+                          {device.department.name}
+                          {device.deviceId ? ` · ${device.deviceId}` : ''}
+                        </div>
+                        <div slot="end" class="meta">
+                          {device.warrantyUntil && (
+                            <span class={{ badge: true, expired }}>
+                              {expired ? 'Záruka vypršala' : 'V záruke do ' + new Date(device.warrantyUntil).toLocaleDateString('sk-SK')}
+                            </span>
+                          )}
+                          <md-icon>chevron_right</md-icon>
+                        </div>
+                      </md-list-item>
+                    );
+                  })}
+                </md-list>
+              ) : (
+                <div class="empty">
+                  <md-icon>inventory_2</md-icon>
+                  <p>Nenašli sa žiadne zariadenia</p>
+                </div>
+              )}
+            </section>
           </div>
         )}
       </Host>

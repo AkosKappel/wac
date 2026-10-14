@@ -112,15 +112,18 @@ export class HarkapAmbulanceWlEditor {
 
     return (
       <Host>
-        {this.entryId !== '@new' ? (
-          <h2>
-            Zariadenie {this.entry?.name} - {this.entry?.deviceId}
-          </h2>
-        ) : (
-          <h2>Nové zariadenie</h2>
-        )}
+        <header class="page-header">
+          <md-icon-button aria-label="Späť na zoznam" onClick={() => this.editorClosed.emit('cancel')}>
+            <md-icon>arrow_back</md-icon>
+          </md-icon-button>
+          <div>
+            <p class="eyebrow">{this.entryId === '@new' ? 'Nové zariadenie' : 'Detail zariadenia'}</p>
+            <h1>{this.entryId === '@new' ? 'Pridať zariadenie' : this.entry?.name || '…'}</h1>
+          </div>
+        </header>
+        <section class="card">
         <form>
-          <md-filled-text-field
+          <md-outlined-text-field
             required
             value={this.entry?.name}
             oninput={(ev: InputEvent) => {
@@ -132,9 +135,9 @@ export class HarkapAmbulanceWlEditor {
             label="Názov zariadenia"
           >
             <md-icon slot="leading-icon">devices</md-icon>
-          </md-filled-text-field>
+          </md-outlined-text-field>
 
-          <md-filled-text-field
+          <md-outlined-text-field
             required
             value={this.entry?.deviceId}
             oninput={(ev: InputEvent) => {
@@ -146,9 +149,9 @@ export class HarkapAmbulanceWlEditor {
             label="Registračné číslo zariadenia"
           >
             <md-icon slot="leading-icon">pin</md-icon>
-          </md-filled-text-field>
+          </md-outlined-text-field>
 
-          <md-filled-text-field
+          <md-outlined-text-field
             type="date"
             required
             value={(this.entry?.warrantyUntil ? new Date(this.entry?.warrantyUntil) : new Date())
@@ -163,9 +166,9 @@ export class HarkapAmbulanceWlEditor {
             label="Záruka do"
           >
             <md-icon slot="leading-icon">event</md-icon>
-          </md-filled-text-field>
+          </md-outlined-text-field>
 
-          <md-filled-select
+          <md-outlined-select
             required
             value={this.entry?.department?.code}
             oninput={(ev: InputEvent) => {
@@ -184,9 +187,9 @@ export class HarkapAmbulanceWlEditor {
                 <div slot="headline">{department.name}</div>
               </md-select-option>
             ))}
-          </md-filled-select>
+          </md-outlined-select>
 
-          <md-filled-text-field
+          <md-outlined-text-field
             required
             value={this.entry?.price?.toFixed(2)}
             oninput={(ev: InputEvent) => {
@@ -203,19 +206,18 @@ export class HarkapAmbulanceWlEditor {
             placeholder="0.00"
           >
             <md-icon slot="leading-icon">euro</md-icon>
-          </md-filled-text-field>
+          </md-outlined-text-field>
         </form>
 
-        <md-divider></md-divider>
         <div class="actions">
-          <md-filled-tonal-button
+          <md-text-button
             id="delete"
             disabled={!this.entry || this.entryId === '@new'}
             onClick={() => this.deleteEntry()}
           >
             <md-icon slot="icon">delete</md-icon>
             Zmazať
-          </md-filled-tonal-button>
+          </md-text-button>
           <span class="stretch-fill"></span>
           <md-outlined-button id="cancel" onClick={() => this.editorClosed.emit('cancel')}>
             <md-icon slot="icon">close</md-icon>
@@ -226,9 +228,13 @@ export class HarkapAmbulanceWlEditor {
             Uložiť
           </md-filled-button>
         </div>
+        </section>
         {this.entryId !== '@new' ? (
-          <div class="device-log">
-            <h2>Prevádzkový log zariadenia {this.entry?.name || '...'}</h2>
+          <section class="card device-log">
+            <h2>
+              <md-icon>history</md-icon>
+              Prevádzkový log
+            </h2>
             {element === 'editor' ? (
               <harkap-ambulance-log-editor
                 entry-id={this.entryId}
@@ -246,7 +252,7 @@ export class HarkapAmbulanceWlEditor {
                 ></harkap-ambulance-log-list>
               </div>
             )}
-          </div>
+          </section>
         ) : null}
       </Host>
     );

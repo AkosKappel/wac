@@ -43,31 +43,25 @@ export class HarkapAmbulanceLogList {
           <div class="error">{this.errorMessage}</div>
         ) : (
           <div class="container">
-            <md-elevated-button class="add-button" onclick={() => this.logClicked.emit('@new')}>
+            <md-outlined-button class="add-button" onclick={() => this.logClicked.emit('@new')}>
               <md-icon slot="icon">add</md-icon>
-              <span>Pridať nový log</span>
-            </md-elevated-button>
+              Pridať záznam
+            </md-outlined-button>
             {this.deviceLogs.length > 0 ? (
               <md-list class="list">
-                {this.filteredLogs().map(device => (
-                  <md-list-item class="list-item" onClick={() => this.logClicked.emit(device.id)}>
-                    <div slot="headline">
-                      <b>ID: </b>
-                      {device.id}
-                    </div>
-                    <div slot="headline">
-                      <b>Typ: </b>
-                      {device.text}
-                    </div>
+                {this.filteredLogs().map(log => (
+                  <md-list-item class="list-item" type="button" onClick={() => this.logClicked.emit(log.id)}>
+                    <md-icon slot="start">description</md-icon>
+                    <div slot="headline">{log.text}</div>
                     <div slot="supporting-text">
-                      <b>Čas: </b>
-                      {device.createdAt}
+                      {new Date(log.createdAt).toLocaleString('sk-SK', { dateStyle: 'medium', timeStyle: 'short' })}
                     </div>
+                    <md-icon slot="end">chevron_right</md-icon>
                   </md-list-item>
                 ))}
               </md-list>
             ) : (
-              <div class="empty">Zariadenie nemá žiadne logy</div>
+              <div class="empty">Zariadenie zatiaľ nemá žiadne záznamy</div>
             )}
           </div>
         )}

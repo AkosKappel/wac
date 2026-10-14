@@ -71,9 +71,9 @@ export class HarkapAmbulanceLogEditor {
 
     return (
       <Host>
-        <h2>{this.logId === '@new' ? 'Nový log' : 'Log č. ' + this.logId}</h2>
+        <h3>{this.logId === '@new' ? 'Nový záznam' : 'Upraviť záznam'}</h3>
         <form>
-          <md-filled-text-field
+          <md-outlined-text-field
             required
             value={this.log?.text}
             oninput={(ev: InputEvent) => {
@@ -84,10 +84,10 @@ export class HarkapAmbulanceLogEditor {
             }}
             label="Text"
           >
-            <md-icon slot="leading-icon">devices</md-icon>
-          </md-filled-text-field>
+            <md-icon slot="leading-icon">notes</md-icon>
+          </md-outlined-text-field>
 
-          <md-filled-text-field
+          <md-outlined-text-field
             required
             value={this.log?.deviceId}
             oninput={(ev: InputEvent) => {
@@ -99,9 +99,9 @@ export class HarkapAmbulanceLogEditor {
             label="ID zariadenia"
           >
             <md-icon slot="leading-icon">pin</md-icon>
-          </md-filled-text-field>
+          </md-outlined-text-field>
 
-          <md-filled-text-field
+          <md-outlined-text-field
             type="date"
             required
             value={(this.log?.createdAt ? new Date(this.log?.createdAt) : new Date()).toISOString().substring(0, 10)}
@@ -114,19 +114,18 @@ export class HarkapAmbulanceLogEditor {
             label="Dátum a čas"
           >
             <md-icon slot="leading-icon">watch_later</md-icon>
-          </md-filled-text-field>
+          </md-outlined-text-field>
         </form>
 
-        <md-divider></md-divider>
         <div class="actions">
-          <md-filled-tonal-button
+          <md-text-button
             id="delete"
             disabled={!this.log || this.log?.id === '@new'}
             onClick={() => this.deleteEntry()}
           >
             <md-icon slot="icon">delete</md-icon>
             Zmazať
-          </md-filled-tonal-button>
+          </md-text-button>
           <span class="stretch-fill"></span>
           <md-outlined-button id="cancel" onClick={() => this.logClosed.emit('cancel')}>
             <md-icon slot="icon">close</md-icon>

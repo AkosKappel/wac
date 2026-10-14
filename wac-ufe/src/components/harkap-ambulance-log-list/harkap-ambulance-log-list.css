@@ -3,5 +3,39 @@
 }
 
 .add-button {
-  margin-bottom: 20px;
+  margin-bottom: 12px;
+}
+
+.list {
+  padding: 0;
+  border: 1px solid var(--md-sys-color-outline-variant);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.list-item {
+  border-bottom: 1px solid var(--md-sys-color-outline-variant);
+}
+
+.list-item:last-child {
+  border-bottom: none;
+}
+
+.list-item > md-icon[slot='start'] {
+  color: var(--md-sys-color-primary);
+}
+
+.empty {
+  padding: 32px 16px;
+  text-align: center;
+  border: 1px dashed var(--md-sys-color-outline-variant);
+  border-radius: 12px;
+  color: var(--md-sys-color-on-surface-variant);
+}
+
+.error {
+  padding: 16px 20px;
+  border-radius: 12px;
+  background: var(--md-sys-color-error-container, #fbe3e1);
+  color: var(--md-sys-color-on-error-container, #5c0f0b);
 }
