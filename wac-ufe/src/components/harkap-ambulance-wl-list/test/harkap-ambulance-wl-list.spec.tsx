@@ -58,4 +58,18 @@ describe('harkap-ambulance-wl-list', () => {
       { id: '1', name: 'Defibrillator', department: { name: 'Cardiology' }, deviceId: '1' },
     ]);
   });
+
+  it('shows the empty state when the API returns null', async () => {
+    mock.onGet().reply(200, null);
+    const page = await newSpecPage({
+      components: [HarkapAmbulanceWlList],
+      html: `<harkap-ambulance-wl-list></harkap-ambulance-wl-list>`,
+      supportsShadowDom: true,
+    });
+    await new Promise(resolve => setTimeout(resolve, 0));
+    await page.waitForChanges();
+
+    expect(page.rootInstance.devices).toEqual([]);
+    expect(page.root.shadowRoot.querySelector('.empty')).not.toBeNull();
+  });
 });
