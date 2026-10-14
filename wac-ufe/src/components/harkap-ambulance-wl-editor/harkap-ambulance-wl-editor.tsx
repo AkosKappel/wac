@@ -263,14 +263,14 @@ export class HarkapAmbulanceWlEditor {
                 entry-id={this.entryId}
                 log-id={logId}
                 api-base={this.apiBase}
-                onlog-closed={() => navigate('./entry/' + this.entryId)}
+                onlog-closed={() => navigate('./devices/' + this.entryId)}
               ></harkap-ambulance-log-editor>
             ) : (
               <div>
                 <harkap-ambulance-log-list
                   device-id={this.entryId}
                   api-base={this.apiBase}
-                  onlog-clicked={(ev: CustomEvent<string>) => navigate('./entry/' + this.entryId + '/log/' + ev.detail)}
+                  onlog-clicked={(ev: CustomEvent<string>) => navigate('./devices/' + this.entryId + '/log/' + ev.detail)}
                 ></harkap-ambulance-log-list>
               </div>
             )}

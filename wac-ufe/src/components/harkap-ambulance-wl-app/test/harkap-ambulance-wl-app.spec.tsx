@@ -1,28 +1,50 @@
 import { newSpecPage } from '@stencil/core/testing';
-import { HarkapAmbulanceWlApp } from './../harkap-ambulance-wl-app';
+import { HarkapAmbulanceWlApp, currentPath, pageOf } from './../harkap-ambulance-wl-app';
 
 describe('harkap-ambulance-wl-app', () => {
-  it('renders editor', async () => {
-    const page = await newSpecPage({
-      url: `http://localhost/entry/@new`,
+  const render = (url: string, basePath = '/') =>
+    newSpecPage({
+      url,
       components: [HarkapAmbulanceWlApp],
-      html: `<harkap-ambulance-wl-app base-path="/"></harkap-ambulance-wl-app>`,
+      html: `<harkap-ambulance-wl-app base-path="${basePath}"></harkap-ambulance-wl-app>`,
     });
 
-    page.win.navigation = new EventTarget();
-    const child = await page.root.shadowRoot.lastElementChild;
-    expect(child.tagName.toLocaleLowerCase()).toEqual('harkap-ambulance-wl-editor');
+  it('renders the homepage at the base path', async () => {
+    const page = await render('http://localhost/ambulance-wl/', '/ambulance-wl/');
+    expect(page.root.shadowRoot.querySelector('harkap-ambulance-home')).not.toBeNull();
   });
 
-  it('renders list', async () => {
-    const page = await newSpecPage({
-      url: `http://localhost/ambulance-wl/`,
-      components: [HarkapAmbulanceWlApp],
-      html: `<harkap-ambulance-wl-app base-path="/ambulance-wl/"></harkap-ambulance-wl-app>`,
-    });
+  it('renders the device list', async () => {
+    const page = await render('http://localhost/devices');
+    expect(page.root.shadowRoot.querySelector('harkap-ambulance-wl-list')).not.toBeNull();
+  });
 
-    page.win.navigation = new EventTarget();
-    const child = await page.root.shadowRoot.lastElementChild;
-    expect(child.tagName.toLocaleLowerCase()).toEqual('div');
+  it('renders the editor for an old /entry link', async () => {
+    const page = await render('http://localhost/entry/@new');
+    expect(page.root.shadowRoot.querySelector('harkap-ambulance-wl-editor').getAttribute('entry-id')).toEqual('@new');
+  });
+
+  it('marks the current page in the navigation', async () => {
+    const page = await render('http://localhost/about');
+    expect(page.root.shadowRoot.querySelector('.app-nav [aria-current="page"]').getAttribute('href')).toEqual('/about');
+  });
+});
+
+describe('routes', () => {
+  it('maps old links to /devices', () => {
+    expect(currentPath('list')).toEqual('devices');
+    expect(currentPath('list/')).toEqual('devices');
+    expect(currentPath('entry/ct-01/log/ct-01-2')).toEqual('devices/ct-01/log/ct-01-2');
+    expect(currentPath('about')).toEqual('about');
+  });
+
+  it('finds the page for a path', () => {
+    expect(pageOf('')).toEqual('home');
+    expect(pageOf('devices/')).toEqual('devices');
+    expect(pageOf('devices/ct-01')).toEqual('device');
+    expect(pageOf('devices/ct-01/log/@new')).toEqual('device');
+    expect(pageOf('about')).toEqual('about');
+    expect(pageOf('devices/ct-01/other')).toEqual('not-found');
+    expect(pageOf('missing')).toEqual('not-found');
   });
 });
