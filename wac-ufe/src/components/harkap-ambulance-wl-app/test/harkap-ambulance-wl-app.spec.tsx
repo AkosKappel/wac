@@ -10,7 +10,7 @@ describe('harkap-ambulance-wl-app', () => {
     });
 
     page.win.navigation = new EventTarget();
-    const child = await page.root.shadowRoot.firstElementChild;
+    const child = await page.root.shadowRoot.lastElementChild;
     expect(child.tagName.toLocaleLowerCase()).toEqual('harkap-ambulance-wl-editor');
   });
 
@@ -22,7 +22,7 @@ describe('harkap-ambulance-wl-app', () => {
     });
 
     page.win.navigation = new EventTarget();
-    const child = await page.root.shadowRoot.firstElementChild;
+    const child = await page.root.shadowRoot.lastElementChild;
     expect(child.tagName.toLocaleLowerCase()).toEqual('div');
   });
 });

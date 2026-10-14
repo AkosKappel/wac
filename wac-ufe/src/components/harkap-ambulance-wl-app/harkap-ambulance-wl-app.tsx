@@ -43,6 +43,10 @@ export class HarkapAmbulanceWlApp {
 
     return (
       <Host>
+        <p class="demo-notice">
+          <md-icon>info</md-icon>
+          Ukážková verzia: údaje sa každú noc o 3:00 obnovia do pôvodného stavu.
+        </p>
         {element === 'not-found' ? (
           <ErrorPage status={404} onBack={() => navigate('./list')} />
         ) : element === 'editor' ? (

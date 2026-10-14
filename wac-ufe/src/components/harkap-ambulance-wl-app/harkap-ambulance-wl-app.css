@@ -34,3 +34,21 @@
   color: var(--md-sys-color-on-surface);
   font-family: var(--md-ref-typeface-plain);
 }
+
+.demo-notice {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin: 0;
+  padding: 8px 16px;
+  background: var(--md-sys-color-primary-container);
+  color: var(--md-sys-color-on-primary-container);
+  font-size: 0.8125rem;
+  text-align: center;
+}
+
+.demo-notice md-icon {
+  --md-icon-size: 18px;
+  flex: none;
+}
