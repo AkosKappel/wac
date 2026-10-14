@@ -1,0 +1,363 @@
+import { Language, settings } from './settings';
+
+/** Slovak: 1 zariadenie, 2-4 zariadenia, 5+ zariadení. */
+function skPlural(count: number, one: string, few: string, many: string): string {
+  return count === 1 ? one : count >= 2 && count <= 4 ? few : many;
+}
+
+const sk = {
+  locale: 'sk-SK',
+  common: {
+    save: 'Uložiť',
+    saving: 'Ukladá sa…',
+    delete: 'Zmazať',
+    cancel: 'Zrušiť',
+    back: 'Späť',
+    loading: 'Načítava sa',
+    unknownError: 'neznáma chyba',
+    required: 'Toto pole je povinné.',
+  },
+  shell: {
+    demoNotice: 'Ukážková verzia: údaje sa každú noc o 3:00 obnovia do pôvodného stavu.',
+    mainNav: 'Hlavná navigácia',
+    home: 'Domov',
+    devices: 'Zariadenia',
+    about: 'O projekte',
+    switchLanguage: 'Switch to English',
+    otherLanguage: 'EN',
+    theme: { system: 'Téma: podľa systému', light: 'Téma: svetlá', dark: 'Téma: tmavá' },
+    footerLinks: 'Odkazy',
+    course: 'Webové aplikácie v prostredí cloudu, FIIT STU',
+    apiDocs: 'API dokumentácia',
+    portfolio: 'Portfólio',
+  },
+  errors: {
+    oops: 'Ups',
+    notFoundTitle: 'Stránka sa nenašla',
+    notFoundHint: 'Hľadaný záznam neexistuje alebo bol odstránený.',
+    serverTitle: 'Niečo sa pokazilo',
+    serverHint: 'Na serveri nastala chyba. Skúste to prosím o chvíľu znova.',
+    offlineTitle: 'Server je nedostupný',
+    offlineHint: 'Nepodarilo sa spojiť so serverom. Skontrolujte pripojenie a skúste to znova.',
+    retry: 'Skúsiť znova',
+    backToList: 'Späť na zoznam',
+  },
+  warranty: {
+    ok: (date: string) => `V záruke do ${date}`,
+    expiring: (date: string) => `Záruka končí ${date}`,
+    expired: 'Záruka vypršala',
+  },
+  home: {
+    eyebrow: 'Školský projekt, vylepšený v roku 2026',
+    title: 'Evidencia zdravotníckej techniky',
+    intro:
+      'Register prístrojov nemocničných oddelení: záruky, ceny a prevádzkový log každého zariadenia. Vznikol v predmete Webové aplikácie v prostredí cloudu ako micro-frontend, REST API v Go a GitOps nasadenie do Kubernetes.',
+    browse: 'Zobraziť zariadenia',
+    newDevice: 'Pridať zariadenie',
+    overview: 'Prehľad',
+    deviceCount: 'Zariadenia',
+    totalValue: 'Celková hodnota',
+    expiringSoon: 'Záruka končí do 90 dní',
+    expired: 'Záruka vypršala',
+    valueByDepartment: 'Hodnota podľa oddelení',
+    devicesIn: (count: number) => `${count} ${skPlural(count, 'zariadenie', 'zariadenia', 'zariadení')}`,
+    loadFailed: 'Prehľad sa nepodarilo načítať.',
+    explore: 'Kam ďalej',
+    links: {
+      devices: ['Zariadenia', 'Vyhľadávanie, filtre a export do CSV.'],
+      newDevice: ['Nové zariadenie', 'Formulár s kontrolou údajov na klientovi aj na serveri.'],
+      about: ['O projekte', 'Architektúra, technológie a čo sa zmenilo v roku 2026.'],
+      apiDocs: ['API dokumentácia', 'OpenAPI špecifikácia v Swagger UI.'],
+    },
+  },
+  list: {
+    eyebrow: 'Nemocnica HarKap',
+    title: 'Zdravotnícke vybavenie',
+    newDevice: 'Nové zariadenie',
+    search: 'Hľadať podľa názvu alebo oddelenia',
+    count: (count: number) => `${count} ${skPlural(count, 'zariadenie', 'zariadenia', 'zariadení')}`,
+    empty: 'Nenašli sa žiadne zariadenia',
+    loadFailed: 'Nepodarilo sa načítať zariadenia',
+    department: 'Oddelenie',
+    allDepartments: 'Všetky oddelenia',
+    warranty: 'Záruka',
+    allWarranties: 'Všetky',
+    warrantyOk: 'Platná',
+    warrantyExpiring: 'Končí do 90 dní',
+    warrantyExpired: 'Vypršala',
+    sort: 'Zoradiť',
+    sortName: 'Názov',
+    sortWarranty: 'Koniec záruky',
+    sortPrice: 'Cena (najvyššia)',
+    clearFilters: 'Zrušiť filtre',
+    exportCsv: 'Export CSV',
+    csvFile: 'zariadenia',
+    csvHeader: ['ID', 'Názov', 'Registračné číslo', 'Oddelenie', 'Záruka do', 'Cena (EUR)'],
+  },
+  editor: {
+    backToList: 'Späť na zoznam',
+    eyebrowNew: 'Nové zariadenie',
+    eyebrowDetail: 'Detail zariadenia',
+    titleNew: 'Pridať zariadenie',
+    name: 'Názov zariadenia',
+    deviceId: 'Registračné číslo zariadenia',
+    warrantyUntil: 'Záruka do',
+    department: 'Oddelenie',
+    price: 'Cena zariadenia',
+    log: 'Prevádzkový log',
+    loadFailed: 'Nepodarilo sa načítať zariadenie',
+    saveFailed: 'Zariadenie sa nepodarilo uložiť',
+    deleteFailed: 'Zariadenie sa nepodarilo zmazať',
+    deleteTitle: 'Zmazať zariadenie?',
+    deleteText: (name?: string) =>
+      `${name ? `Zariadenie „${name}“` : 'Toto zariadenie'} a jeho záznamy budú natrvalo odstránené.`,
+  },
+  logList: {
+    add: 'Pridať záznam',
+    empty: 'Zariadenie zatiaľ nemá žiadne záznamy',
+    loadFailed: 'Nepodarilo sa načítať záznamy',
+  },
+  logEditor: {
+    titleNew: 'Nový záznam',
+    titleEdit: 'Upraviť záznam',
+    text: 'Text',
+    dateTime: 'Dátum a čas',
+    loadFailed: 'Nepodarilo sa načítať záznam',
+    saveFailed: 'Záznam sa nepodarilo uložiť',
+    deleteFailed: 'Záznam sa nepodarilo zmazať',
+    deleteTitle: 'Zmazať záznam?',
+    deleteText: 'Záznam bude natrvalo odstránený z prevádzkového logu.',
+  },
+  about: {
+    eyebrow: 'O projekte',
+    lead: 'Evidencia zdravotníckej techniky pre nemocničné oddelenia. Každé zariadenie má registračné číslo, cenu, dátum konca záruky a vlastný prevádzkový log.',
+    whatTitle: 'Čo aplikácia robí',
+    what: [
+      'Zoznam zariadení s vyhľadávaním, filtrom podľa oddelenia a stavu záruky, zoradením a exportom do CSV.',
+      'Detail zariadenia s formulárom a prevádzkovým logom (nákup, inštalácia, servis, kalibrácia).',
+      'Prehľad na úvodnej stránke: počet zariadení, celková hodnota, končiace záruky a hodnota podľa oddelení.',
+      'Bez prihlasovania: ide o ukážku, údaje sa každú noc obnovia.',
+    ],
+    courseTitle: 'Predmet',
+    course:
+      'Projekt vznikol v predmete Webové aplikácie v prostredí cloudu (WAC) na FIIT STU v Bratislave. Predmet učí stavať webové aplikácie z micro-frontendov, REST API generovaných z OpenAPI špecifikácie a nasadzovať ich do Kubernetes pomocou GitOps.',
+    architectureTitle: 'Architektúra',
+    liveTitle: 'Dnes: živé demo na domácom serveri',
+    live: ['Prehliadač', 'Tailscale Funnel (HTTPS)', 'nginx: frontend a proxy /api', 'Go API (Gin)', 'MongoDB 7'],
+    liveNote:
+      'Všetko beží v Docker Compose. Samostatný kontajner každú noc o 3:00 obnoví ukážkové údaje. nginx posiela bezpečnostné hlavičky vrátane Content-Security-Policy a obmedzuje počet požiadaviek.',
+    courseSetupTitle: 'V predmete: Kubernetes a GitOps',
+    courseSetup: ['Git repozitár', 'Flux CD', 'Kubernetes (AKS)', 'Envoy Gateway', 'ufe-controller: portál z micro-frontendov'],
+    courseSetupNote:
+      'Flux CD sledoval repozitár s Kustomize manifestmi a nasadzoval API, MongoDB a micro-frontend do spoločného klastra predmetu. Webový komponent načítal do portálu ufe-controller. Tieto manifesty sú stále v priečinku wac-gitops/.',
+    stackTitle: 'Technológie',
+    stack: [
+      ['Frontend', 'Stencil 4 (webové komponenty), Material Web, TypeScript, klient API generovaný z OpenAPI'],
+      ['API', 'Go 1.27, Gin 1.12, MongoDB Go driver 1.17, kostra servera generovaná z OpenAPI'],
+      ['Databáza', 'MongoDB 7.0'],
+      ['Prevádzka', 'Docker Compose, nginx 1.30, Tailscale Funnel, štruktúrované JSON logy'],
+      ['V predmete', 'Kubernetes, Kustomize, Flux CD, Envoy Gateway'],
+    ],
+    changesTitle: 'Čo sa zmenilo v roku 2026',
+    changes: [
+      'Nový vzhľad v štýle Material 3, tmavý režim, slovenčina aj angličtina.',
+      'Úvodná stránka s prehľadom, filtre, zoradenie a export do CSV.',
+      'Stav záruky na prvý pohľad: platná, končí do 90 dní, vypršala.',
+      'API kontroluje vstupy, mení údaje atomicky a neprezrádza interné chyby.',
+      'Bezpečnosť: Content-Security-Policy, API bez root práv, žiadne predvolené heslá.',
+      'Dokumentácia API v Swagger UI, kontrola stavu /api/health, plynulé vypnutie servera.',
+      'Prechod z Kubernetes na Docker Compose na domácom serveri s nočným obnovením údajov.',
+    ],
+    linksTitle: 'Odkazy',
+    sourceCode: 'Zdrojový kód na GitHube',
+  },
+};
+
+type Messages = typeof sk;
+
+const en: Messages = {
+  locale: 'en-GB',
+  common: {
+    save: 'Save',
+    saving: 'Saving…',
+    delete: 'Delete',
+    cancel: 'Cancel',
+    back: 'Back',
+    loading: 'Loading',
+    unknownError: 'unknown error',
+    required: 'This field is required.',
+  },
+  shell: {
+    demoNotice: 'Demo: the data is restored to its original state every night at 3:00 (CET).',
+    mainNav: 'Main navigation',
+    home: 'Home',
+    devices: 'Devices',
+    about: 'About',
+    switchLanguage: 'Prepnúť do slovenčiny',
+    otherLanguage: 'SK',
+    theme: { system: 'Theme: system', light: 'Theme: light', dark: 'Theme: dark' },
+    footerLinks: 'Links',
+    course: 'Web Applications in the Cloud, FIIT STU',
+    apiDocs: 'API docs',
+    portfolio: 'Portfolio',
+  },
+  errors: {
+    oops: 'Oops',
+    notFoundTitle: 'Page not found',
+    notFoundHint: 'The record does not exist or has been deleted.',
+    serverTitle: 'Something went wrong',
+    serverHint: 'The server ran into an error. Please try again in a moment.',
+    offlineTitle: 'Server unavailable',
+    offlineHint: 'Could not reach the server. Check your connection and try again.',
+    retry: 'Try again',
+    backToList: 'Back to the list',
+  },
+  warranty: {
+    ok: (date: string) => `Under warranty until ${date}`,
+    expiring: (date: string) => `Warranty ends ${date}`,
+    expired: 'Warranty expired',
+  },
+  home: {
+    eyebrow: 'University project, upgraded in 2026',
+    title: 'Medical device register',
+    intro:
+      'A register of hospital department equipment: warranties, prices and an operations log for every device. Built in the course Web Applications in the Cloud as a micro-frontend, a REST API in Go and a GitOps deployment to Kubernetes.',
+    browse: 'Browse devices',
+    newDevice: 'Add a device',
+    overview: 'Overview',
+    deviceCount: 'Devices',
+    totalValue: 'Total value',
+    expiringSoon: 'Warranty ends within 90 days',
+    expired: 'Warranty expired',
+    valueByDepartment: 'Value by department',
+    devicesIn: (count: number) => `${count} ${count === 1 ? 'device' : 'devices'}`,
+    loadFailed: 'Could not load the overview.',
+    explore: 'Explore',
+    links: {
+      devices: ['Devices', 'Search, filters and CSV export.'],
+      newDevice: ['New device', 'A form validated in the browser and on the server.'],
+      about: ['About', 'Architecture, stack and what changed in 2026.'],
+      apiDocs: ['API docs', 'The OpenAPI spec in Swagger UI.'],
+    },
+  },
+  list: {
+    eyebrow: 'HarKap Hospital',
+    title: 'Medical equipment',
+    newDevice: 'New device',
+    search: 'Search by name or department',
+    count: (count: number) => `${count} ${count === 1 ? 'device' : 'devices'}`,
+    empty: 'No devices found',
+    loadFailed: 'Could not load the devices',
+    department: 'Department',
+    allDepartments: 'All departments',
+    warranty: 'Warranty',
+    allWarranties: 'All',
+    warrantyOk: 'Valid',
+    warrantyExpiring: 'Ends within 90 days',
+    warrantyExpired: 'Expired',
+    sort: 'Sort by',
+    sortName: 'Name',
+    sortWarranty: 'Warranty end',
+    sortPrice: 'Price (highest)',
+    clearFilters: 'Clear filters',
+    exportCsv: 'Export CSV',
+    csvFile: 'devices',
+    csvHeader: ['ID', 'Name', 'Registration number', 'Department', 'Warranty until', 'Price (EUR)'],
+  },
+  editor: {
+    backToList: 'Back to the list',
+    eyebrowNew: 'New device',
+    eyebrowDetail: 'Device detail',
+    titleNew: 'Add a device',
+    name: 'Device name',
+    deviceId: 'Registration number',
+    warrantyUntil: 'Warranty until',
+    department: 'Department',
+    price: 'Price',
+    log: 'Operations log',
+    loadFailed: 'Could not load the device',
+    saveFailed: 'Could not save the device',
+    deleteFailed: 'Could not delete the device',
+    deleteTitle: 'Delete the device?',
+    deleteText: (name?: string) =>
+      `${name ? `“${name}”` : 'This device'} and its log entries will be deleted permanently.`,
+  },
+  logList: {
+    add: 'Add an entry',
+    empty: 'This device has no log entries yet',
+    loadFailed: 'Could not load the log entries',
+  },
+  logEditor: {
+    titleNew: 'New entry',
+    titleEdit: 'Edit entry',
+    text: 'Text',
+    dateTime: 'Date and time',
+    loadFailed: 'Could not load the entry',
+    saveFailed: 'Could not save the entry',
+    deleteFailed: 'Could not delete the entry',
+    deleteTitle: 'Delete the entry?',
+    deleteText: 'The entry will be removed from the operations log permanently.',
+  },
+  about: {
+    eyebrow: 'About',
+    lead: 'A register of medical equipment for hospital departments. Every device has a registration number, a price, a warranty end date and its own operations log.',
+    whatTitle: 'What the app does',
+    what: [
+      'A device list with search, filters by department and warranty state, sorting and CSV export.',
+      'A device page with a form and an operations log (purchase, installation, service, calibration).',
+      'An overview on the homepage: device count, total value, warranties ending soon and value per department.',
+      'No accounts: it is a demo, and the data is restored every night.',
+    ],
+    courseTitle: 'The course',
+    course:
+      'The project was built in the course Web Applications in the Cloud (WAC) at FIIT STU in Bratislava. The course teaches building web applications from micro-frontends and REST APIs generated from an OpenAPI spec, and deploying them to Kubernetes with GitOps.',
+    architectureTitle: 'Architecture',
+    liveTitle: 'Today: the live demo on a home server',
+    live: ['Browser', 'Tailscale Funnel (HTTPS)', 'nginx: frontend and /api proxy', 'Go API (Gin)', 'MongoDB 7'],
+    liveNote:
+      'Everything runs in Docker Compose. A separate container restores the demo data every night at 3:00. nginx sends security headers including a Content-Security-Policy and rate limits requests.',
+    courseSetupTitle: 'In the course: Kubernetes and GitOps',
+    courseSetup: ['Git repository', 'Flux CD', 'Kubernetes (AKS)', 'Envoy Gateway', 'ufe-controller: a portal of micro-frontends'],
+    courseSetupNote:
+      "Flux CD watched a repository of Kustomize manifests and deployed the API, MongoDB and the micro-frontend to the course's shared cluster. The ufe-controller loaded the web component into the portal. The manifests are still in the wac-gitops/ folder.",
+    stackTitle: 'Stack',
+    stack: [
+      ['Frontend', 'Stencil 4 (web components), Material Web, TypeScript, API client generated from OpenAPI'],
+      ['API', 'Go 1.27, Gin 1.12, MongoDB Go driver 1.17, server stubs generated from OpenAPI'],
+      ['Database', 'MongoDB 7.0'],
+      ['Operations', 'Docker Compose, nginx 1.30, Tailscale Funnel, structured JSON logs'],
+      ['In the course', 'Kubernetes, Kustomize, Flux CD, Envoy Gateway'],
+    ],
+    changesTitle: 'What changed in 2026',
+    changes: [
+      'A new Material 3 look, dark mode, Slovak and English.',
+      'A homepage with an overview, filters, sorting and CSV export.',
+      'Warranty state at a glance: valid, ending within 90 days, expired.',
+      'The API validates input, updates data atomically and keeps internal errors to itself.',
+      'Security: Content-Security-Policy, the API runs without root, no default passwords.',
+      'API docs in Swagger UI, a /api/health check and graceful server shutdown.',
+      'Moved from Kubernetes to Docker Compose on a home server, with a nightly data reset.',
+    ],
+    linksTitle: 'Links',
+    sourceCode: 'Source code on GitHub',
+  },
+};
+
+const messages: Record<Language, Messages> = { sk, en };
+
+/** The strings of the current language; components that call it re-render when it changes. */
+export function t(): Messages {
+  return messages[settings.state.language];
+}
+
+export function formatDate(iso: string): string {
+  return new Date(iso).toLocaleDateString(t().locale);
+}
+
+export function formatDateTime(iso: string): string {
+  return new Date(iso).toLocaleString(t().locale, { dateStyle: 'medium', timeStyle: 'short' });
+}
+
+export function formatPrice(value: number): string {
+  return new Intl.NumberFormat(t().locale, { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 }).format(value);
+}

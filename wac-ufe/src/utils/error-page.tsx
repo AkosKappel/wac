@@ -1,4 +1,5 @@
 import { FunctionalComponent, h } from '@stencil/core';
+import { t } from './i18n';
 
 interface ErrorPageProps {
   status?: number; // HTTP status; undefined = network error
@@ -8,30 +9,27 @@ interface ErrorPageProps {
 
 export const ErrorPage: FunctionalComponent<ErrorPageProps> = ({ status, message, onBack }) => {
   const notFound = status === 404;
+  const m = t().errors;
   return (
     <div class="error-page" role="alert">
-      <div class="error-code">{notFound ? '404' : status >= 500 ? status : 'Ups'}</div>
+      <div class="error-code">{notFound ? '404' : status >= 500 ? status : m.oops}</div>
       <md-icon class="error-icon">{notFound ? 'search_off' : 'cloud_off'}</md-icon>
-      <h2>{notFound ? 'Stránka sa nenašla' : status ? 'Niečo sa pokazilo' : 'Server je nedostupný'}</h2>
+      <h2>{notFound ? m.notFoundTitle : status ? m.serverTitle : m.offlineTitle}</h2>
       <p class="hint">
-        {notFound
-          ? 'Hľadaný záznam neexistuje alebo bol odstránený.'
-          : status
-            ? 'Na serveri nastala chyba. Skúste to prosím o chvíľu znova.'
-            : 'Nepodarilo sa spojiť so serverom. Skontrolujte pripojenie a skúste to znova.'}
+        {notFound ? m.notFoundHint : status ? m.serverHint : m.offlineHint}
       </p>
       {message && <p class="error">{message}</p>}
       <div class="error-actions">
         {!notFound && (
           <md-outlined-button onClick={() => location.reload()}>
             <md-icon slot="icon">refresh</md-icon>
-            Skúsiť znova
+            {m.retry}
           </md-outlined-button>
         )}
         {onBack && (
           <md-filled-button onClick={onBack}>
             <md-icon slot="icon">arrow_back</md-icon>
-            Späť na zoznam
+            {m.backToList}
           </md-filled-button>
         )}
       </div>

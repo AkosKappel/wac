@@ -1,4 +1,5 @@
 import { FunctionalComponent, h } from '@stencil/core';
+import { t } from './i18n';
 
 interface ConfirmDialogProps {
   open: boolean;
@@ -14,9 +15,9 @@ export const ConfirmDialog: FunctionalComponent<ConfirmDialogProps> = ({ open, h
     <div slot="headline">{headline}</div>
     <div slot="content">{text}</div>
     <div slot="actions">
-      <md-text-button onClick={onCancel}>Zrušiť</md-text-button>
+      <md-text-button onClick={onCancel}>{t().common.cancel}</md-text-button>
       <md-filled-button class="danger" onClick={onConfirm}>
-        Zmazať
+        {t().common.delete}
       </md-filled-button>
     </div>
   </md-dialog>

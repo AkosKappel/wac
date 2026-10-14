@@ -3,6 +3,7 @@ import { AmbulanceDepartmentsApiFactory, AmbulanceDeviceListApiFactory, Departme
 import { ErrorPage } from '../../utils/error-page';
 import { ConfirmDialog } from '../../utils/confirm-dialog';
 import { WarrantyBadge } from '../../utils/warranty-badge';
+import { t } from '../../utils/i18n';
 import { navigateTo, watchRelativePath, validateOnBlur } from '../../utils/utils';
 
 @Component({
@@ -57,11 +58,11 @@ export class HarkapAmbulanceWlEditor {
         this.entry = response.data;
         this.isValid = true;
       } else {
-        this.errorMessage = `Nepodarilo sa načítať zariadenie: ${response.statusText}`;
+        this.errorMessage = `${t().editor.loadFailed}: ${response.statusText}`;
       }
     } catch (err: any) {
       this.errorStatus = err.response?.status;
-      this.errorMessage = `Nepodarilo sa načítať zariadenie: ${err.message || 'neznáma chyba'}`;
+      this.errorMessage = `${t().editor.loadFailed}: ${err.message || t().common.unknownError}`;
     }
 
     return undefined;
@@ -110,6 +111,8 @@ export class HarkapAmbulanceWlEditor {
     }
 
     const navigate = (path: string) => navigateTo(this.basePath, path);
+    const m = t().editor;
+    const common = t().common;
 
     if (this.errorMessage) {
       return (
@@ -122,18 +125,18 @@ export class HarkapAmbulanceWlEditor {
     return (
       <Host>
         <header class="page-header">
-          <md-icon-button aria-label="Späť na zoznam" onClick={() => this.editorClosed.emit('cancel')}>
+          <md-icon-button aria-label={m.backToList} onClick={() => this.editorClosed.emit('cancel')}>
             <md-icon>arrow_back</md-icon>
           </md-icon-button>
           <div>
-            <p class="eyebrow">{this.entryId === '@new' ? 'Nové zariadenie' : 'Detail zariadenia'}</p>
-            <h1>{this.entryId === '@new' ? 'Pridať zariadenie' : this.entry?.name || '…'}</h1>
+            <p class="eyebrow">{this.entryId === '@new' ? m.eyebrowNew : m.eyebrowDetail}</p>
+            <h1>{this.entryId === '@new' ? m.titleNew : this.entry?.name || '…'}</h1>
           </div>
           {this.entryId !== '@new' && this.entry?.warrantyUntil && <WarrantyBadge until={this.entry.warrantyUntil} />}
         </header>
         <section class="card">
           {!this.entry ? (
-            <div class="form-skeleton" aria-busy="true" aria-label="Načítava sa">
+            <div class="form-skeleton" aria-busy="true" aria-label={common.loading}>
               {[1, 2, 3, 4, 5].map(() => (
                 <span class="skeleton"></span>
               ))}
@@ -148,7 +151,7 @@ export class HarkapAmbulanceWlEditor {
                   this.entry.name = this.inputValue(ev);
                   this.isValid = this.isFormValid();
                 }}
-                label="Názov zariadenia"
+                label={m.name}
               >
                 <md-icon slot="leading-icon">devices</md-icon>
               </md-outlined-text-field>
@@ -161,7 +164,7 @@ export class HarkapAmbulanceWlEditor {
                   this.entry.deviceId = this.inputValue(ev);
                   this.isValid = this.isFormValid();
                 }}
-                label="Registračné číslo zariadenia"
+                label={m.deviceId}
               >
                 <md-icon slot="leading-icon">pin</md-icon>
               </md-outlined-text-field>
@@ -179,7 +182,7 @@ export class HarkapAmbulanceWlEditor {
                   }
                   this.isValid = this.isFormValid();
                 }}
-                label="Záruka do"
+                label={m.warrantyUntil}
               >
                 <md-icon slot="leading-icon">event</md-icon>
               </md-outlined-text-field>
@@ -195,7 +198,7 @@ export class HarkapAmbulanceWlEditor {
                   };
                   this.isValid = this.isFormValid();
                 }}
-                label="Oddelenie"
+                label={m.department}
               >
                 <md-icon slot="leading-icon">local_hospital</md-icon>
                 {this.departmentOptions().map(department => (
@@ -213,7 +216,7 @@ export class HarkapAmbulanceWlEditor {
                   this.entry.price = isNaN(inputValue) ? 0 : parseFloat(inputValue.toFixed(2));
                   this.isValid = this.isFormValid();
                 }}
-                label="Cena zariadenia"
+                label={m.price}
                 type="number"
                 min="0.00"
                 max="100000000"
@@ -239,16 +242,16 @@ export class HarkapAmbulanceWlEditor {
               onClick={() => (this.confirmDelete = true)}
             >
               <md-icon slot="icon">delete</md-icon>
-              Zmazať
+              {common.delete}
             </md-text-button>
             <span class="stretch-fill"></span>
             <md-outlined-button id="cancel" onClick={() => this.editorClosed.emit('cancel')}>
               <md-icon slot="icon">close</md-icon>
-              Späť
+              {common.back}
             </md-outlined-button>
             <md-filled-button id="confirm" disabled={!this.isValid || this.busy} onClick={() => this.updateEntry()}>
               <md-icon slot="icon">save</md-icon>
-              {this.busy ? 'Ukladá sa…' : 'Uložiť'}
+              {this.busy ? common.saving : common.save}
             </md-filled-button>
           </div>
         </section>
@@ -256,7 +259,7 @@ export class HarkapAmbulanceWlEditor {
           <section class="card device-log">
             <h2>
               <md-icon>history</md-icon>
-              Prevádzkový log
+              {m.log}
             </h2>
             {element === 'editor' ? (
               <harkap-ambulance-log-editor
@@ -278,8 +281,8 @@ export class HarkapAmbulanceWlEditor {
         ) : null}
         <ConfirmDialog
           open={this.confirmDelete}
-          headline="Zmazať zariadenie?"
-          text={`${this.entry?.name ? `Zariadenie „${this.entry.name}“` : 'Toto zariadenie'} a jeho záznamy budú natrvalo odstránené.`}
+          headline={m.deleteTitle}
+          text={m.deleteText(this.entry?.name)}
           onCancel={() => (this.confirmDelete = false)}
           onConfirm={() => {
             this.confirmDelete = false;
@@ -318,10 +321,10 @@ export class HarkapAmbulanceWlEditor {
       if (response.status < 299) {
         this.editorClosed.emit('store');
       } else {
-        this.actionError = `Zariadenie sa nepodarilo uložiť: ${response.statusText}`;
+        this.actionError = `${t().editor.saveFailed}: ${response.statusText}`;
       }
     } catch (err: any) {
-      this.actionError = `Zariadenie sa nepodarilo uložiť: ${err.response?.data?.message || err.message || 'neznáma chyba'}`;
+      this.actionError = `${t().editor.saveFailed}: ${err.response?.data?.message || err.message || t().common.unknownError}`;
     } finally {
       this.busy = false;
     }
@@ -335,10 +338,10 @@ export class HarkapAmbulanceWlEditor {
       if (response.status < 299) {
         this.editorClosed.emit('delete');
       } else {
-        this.actionError = `Zariadenie sa nepodarilo zmazať: ${response.statusText}`;
+        this.actionError = `${t().editor.deleteFailed}: ${response.statusText}`;
       }
     } catch (err: any) {
-      this.actionError = `Zariadenie sa nepodarilo zmazať: ${err.response?.data?.message || err.message || 'neznáma chyba'}`;
+      this.actionError = `${t().editor.deleteFailed}: ${err.response?.data?.message || err.message || t().common.unknownError}`;
     } finally {
       this.busy = false;
     }

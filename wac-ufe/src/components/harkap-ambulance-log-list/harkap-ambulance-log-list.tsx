@@ -1,6 +1,7 @@
 import { Component, Event, Host, Prop, EventEmitter, State, h } from '@stencil/core';
 import { AmbulanceDeviceLogListApiFactory, DeviceLog } from '../../api/ambulance-wl';
 import { ErrorPage, SkeletonRows } from '../../utils/error-page';
+import { formatDateTime, t } from '../../utils/i18n';
 
 @Component({
   tag: 'harkap-ambulance-log-list',
@@ -22,11 +23,11 @@ export class HarkapAmbulanceLogList {
       if (response.status < 299) {
         return response.data;
       } else {
-        this.errorMessage = `Nepodarilo sa načítať záznamy: ${response.statusText}`;
+        this.errorMessage = `${t().logList.loadFailed}: ${response.statusText}`;
       }
     } catch (err: any) {
       this.errorStatus = err.response?.status;
-      this.errorMessage = `Nepodarilo sa načítať záznamy: ${err.message || 'neznáma chyba'}`;
+      this.errorMessage = `${t().logList.loadFailed}: ${err.message || t().common.unknownError}`;
     }
     return [];
   }
@@ -40,6 +41,7 @@ export class HarkapAmbulanceLogList {
   }
 
   render() {
+    const m = t().logList;
     return (
       <Host>
         {this.errorMessage ? (
@@ -48,7 +50,7 @@ export class HarkapAmbulanceLogList {
           <div class="container">
             <md-outlined-button class="add-button" onclick={() => this.logClicked.emit('@new')}>
               <md-icon slot="icon">add</md-icon>
-              Pridať záznam
+              {m.add}
             </md-outlined-button>
             {!this.deviceLogs ? (
               <div class="list">
@@ -61,14 +63,14 @@ export class HarkapAmbulanceLogList {
                     <md-icon slot="start">description</md-icon>
                     <div slot="headline">{log.text}</div>
                     <div slot="supporting-text">
-                      {new Date(log.createdAt).toLocaleString('sk-SK', { dateStyle: 'medium', timeStyle: 'short' })}
+                      {formatDateTime(log.createdAt)}
                     </div>
                     <md-icon slot="end">chevron_right</md-icon>
                   </md-list-item>
                 ))}
               </md-list>
             ) : (
-              <div class="empty">Zariadenie zatiaľ nemá žiadne záznamy</div>
+              <div class="empty">{m.empty}</div>
             )}
           </div>
         )}

@@ -1,9 +1,10 @@
 import { FunctionalComponent, h } from '@stencil/core';
+import { formatDate, t } from './i18n';
 import { warrantyStatus } from './utils';
 
 export const WarrantyBadge: FunctionalComponent<{ until: string }> = ({ until }) => {
   const status = warrantyStatus(until);
-  const date = new Date(until).toLocaleDateString('sk-SK');
-  const label = { ok: `V záruke do ${date}`, expiring: `Záruka končí ${date}`, expired: 'Záruka vypršala' }[status];
+  const m = t().warranty;
+  const label = status === 'expired' ? m.expired : m[status](formatDate(until));
   return <span class={`badge ${status}`}>{label}</span>;
 };

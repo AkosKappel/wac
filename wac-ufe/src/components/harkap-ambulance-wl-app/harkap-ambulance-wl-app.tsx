@@ -1,6 +1,8 @@
 import { Component, Host, Prop, State, h } from '@stencil/core';
 import { ErrorPage } from '../../utils/error-page';
+import { t } from '../../utils/i18n';
 import { LogoMark } from '../../utils/logo';
+import { settings } from '../../utils/settings';
 import { hrefTo, navigateTo, watchRelativePath } from '../../utils/utils';
 
 declare global {
@@ -58,6 +60,7 @@ export class HarkapAmbulanceWlApp {
     const page = pageOf(this.relativePath);
     const href = (path: string) => hrefTo(this.basePath, path);
     const navigate = (path: string) => navigateTo(this.basePath, path);
+    const m = t().shell;
     const navLink = (path: string, target: Page[], label: string) => (
       <a href={href(path)} aria-current={target.includes(page) ? 'page' : undefined}>
         {label}
@@ -68,18 +71,29 @@ export class HarkapAmbulanceWlApp {
       <Host>
         <p class="demo-notice">
           <md-icon>info</md-icon>
-          Ukážková verzia: údaje sa každú noc o 3:00 obnovia do pôvodného stavu.
+          {m.demoNotice}
         </p>
         <header class="app-header">
           <a class="brand" href={href('./')}>
             <LogoMark />
             <span>Ambulance Devices</span>
           </a>
-          <nav class="app-nav" aria-label="Hlavná navigácia">
-            {navLink('./', ['home'], 'Domov')}
-            {navLink('./devices', ['devices', 'device'], 'Zariadenia')}
-            {navLink('./about', ['about'], 'O projekte')}
+          <nav class="app-nav" aria-label={m.mainNav}>
+            {navLink('./', ['home'], m.home)}
+            {navLink('./devices', ['devices', 'device'], m.devices)}
+            {navLink('./about', ['about'], m.about)}
           </nav>
+          <div class="header-actions">
+            <md-text-button
+              class="language"
+              aria-label={m.switchLanguage}
+              title={m.switchLanguage}
+              onClick={() => (settings.state.language = settings.state.language === 'sk' ? 'en' : 'sk')}
+            >
+              <md-icon slot="icon">translate</md-icon>
+              {m.otherLanguage}
+            </md-text-button>
+          </div>
         </header>
         <main>
           {page === 'home' ? (
@@ -103,12 +117,12 @@ export class HarkapAmbulanceWlApp {
           )}
         </main>
         <footer class="app-footer">
-          <span>© 2026 Ákos Kappel · Webové aplikácie v prostredí cloudu, FIIT STU</span>
-          <nav aria-label="Odkazy">
-            <a href={href('./about')}>O projekte</a>
-            <a href="/api-docs/">API dokumentácia</a>
+          <span>© 2026 Ákos Kappel · {m.course}</span>
+          <nav aria-label={m.footerLinks}>
+            <a href={href('./about')}>{m.about}</a>
+            <a href="/api-docs/">{m.apiDocs}</a>
             <a href={GITHUB_URL} rel="noopener">GitHub</a>
-            <a href={PORTFOLIO_URL} rel="noopener">Portfólio</a>
+            <a href={PORTFOLIO_URL} rel="noopener">{m.portfolio}</a>
           </nav>
         </footer>
       </Host>

@@ -2,6 +2,7 @@ import { Component, Host, Prop, State, h, EventEmitter, Event } from '@stencil/c
 import { AmbulanceDeviceLogListApiFactory, DeviceLog } from '../../api/ambulance-wl';
 import { ErrorPage } from '../../utils/error-page';
 import { ConfirmDialog } from '../../utils/confirm-dialog';
+import { t } from '../../utils/i18n';
 import { toLocalDateTimeInput, validateOnBlur } from '../../utils/utils';
 
 @Component({
@@ -51,11 +52,11 @@ export class HarkapAmbulanceLogEditor {
         this.log = response.data;
         this.isValid = true;
       } else {
-        this.errorMessage = `Nepodarilo sa načítať záznam: ${response.statusText}`;
+        this.errorMessage = `${t().logEditor.loadFailed}: ${response.statusText}`;
       }
     } catch (err: any) {
       this.errorStatus = err.response?.status;
-      this.errorMessage = `Nepodarilo sa načítať záznam: ${err.message || 'neznáma chyba'}`;
+      this.errorMessage = `${t().logEditor.loadFailed}: ${err.message || t().common.unknownError}`;
     }
 
     return undefined;
@@ -76,11 +77,13 @@ export class HarkapAmbulanceLogEditor {
       );
     }
 
+    const m = t().logEditor;
+    const common = t().common;
     return (
       <Host>
-        <h3>{this.logId === '@new' ? 'Nový záznam' : 'Upraviť záznam'}</h3>
+        <h3>{this.logId === '@new' ? m.titleNew : m.titleEdit}</h3>
         {!this.log ? (
-          <div class="form-skeleton" aria-busy="true" aria-label="Načítava sa">
+          <div class="form-skeleton" aria-busy="true" aria-label={common.loading}>
             {[1, 2, 3].map(() => (
               <span class="skeleton"></span>
             ))}
@@ -95,7 +98,7 @@ export class HarkapAmbulanceLogEditor {
                 this.log.text = this.inputValue(ev);
                 this.isValid = this.isFormValid();
               }}
-              label="Text"
+              label={m.text}
             >
               <md-icon slot="leading-icon">notes</md-icon>
             </md-outlined-text-field>
@@ -111,7 +114,7 @@ export class HarkapAmbulanceLogEditor {
                 }
                 this.isValid = this.isFormValid();
               }}
-              label="Dátum a čas"
+              label={m.dateTime}
             >
               <md-icon slot="leading-icon">watch_later</md-icon>
             </md-outlined-text-field>
@@ -132,22 +135,22 @@ export class HarkapAmbulanceLogEditor {
             onClick={() => (this.confirmDelete = true)}
           >
             <md-icon slot="icon">delete</md-icon>
-            Zmazať
+            {common.delete}
           </md-text-button>
           <span class="stretch-fill"></span>
           <md-outlined-button id="cancel" onClick={() => this.logClosed.emit('cancel')}>
             <md-icon slot="icon">close</md-icon>
-            Zrušiť
+            {common.cancel}
           </md-outlined-button>
           <md-filled-button id="confirm" disabled={!this.isValid || this.busy} onClick={() => this.updateEntry()}>
             <md-icon slot="icon">save</md-icon>
-            {this.busy ? 'Ukladá sa…' : 'Uložiť'}
+            {this.busy ? common.saving : common.save}
           </md-filled-button>
         </div>
         <ConfirmDialog
           open={this.confirmDelete}
-          headline="Zmazať záznam?"
-          text="Záznam bude natrvalo odstránený z prevádzkového logu."
+          headline={m.deleteTitle}
+          text={m.deleteText}
           onCancel={() => (this.confirmDelete = false)}
           onConfirm={() => {
             this.confirmDelete = false;
@@ -178,10 +181,10 @@ export class HarkapAmbulanceLogEditor {
       if (response.status < 299) {
         this.logClosed.emit('store');
       } else {
-        this.actionError = `Záznam sa nepodarilo uložiť: ${response.statusText}`;
+        this.actionError = `${t().logEditor.saveFailed}: ${response.statusText}`;
       }
     } catch (err: any) {
-      this.actionError = `Záznam sa nepodarilo uložiť: ${err.response?.data?.message || err.message || 'neznáma chyba'}`;
+      this.actionError = `${t().logEditor.saveFailed}: ${err.response?.data?.message || err.message || t().common.unknownError}`;
     } finally {
       this.busy = false;
     }
@@ -198,10 +201,10 @@ export class HarkapAmbulanceLogEditor {
       if (response.status < 299) {
         this.logClosed.emit('delete');
       } else {
-        this.actionError = `Záznam sa nepodarilo zmazať: ${response.statusText}`;
+        this.actionError = `${t().logEditor.deleteFailed}: ${response.statusText}`;
       }
     } catch (err: any) {
-      this.actionError = `Záznam sa nepodarilo zmazať: ${err.response?.data?.message || err.message || 'neznáma chyba'}`;
+      this.actionError = `${t().logEditor.deleteFailed}: ${err.response?.data?.message || err.message || t().common.unknownError}`;
     } finally {
       this.busy = false;
     }

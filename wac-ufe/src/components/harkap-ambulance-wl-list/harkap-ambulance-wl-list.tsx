@@ -2,6 +2,7 @@ import { Component, Event, EventEmitter, Host, Prop, State, h } from '@stencil/c
 import { AmbulanceDeviceListApiFactory, DeviceListEntry } from '../../api/ambulance-wl';
 import { ErrorPage, SkeletonRows } from '../../utils/error-page';
 import { WarrantyBadge } from '../../utils/warranty-badge';
+import { t } from '../../utils/i18n';
 
 @Component({
   tag: 'harkap-ambulance-wl-list',
@@ -23,11 +24,11 @@ export class HarkapAmbulanceWlList {
       if (response.status < 299) {
         return response.data ?? [];
       } else {
-        this.errorMessage = `Nepodarilo sa načítať zariadenia: ${response.statusText}`;
+        this.errorMessage = `${t().list.loadFailed}: ${response.statusText}`;
       }
     } catch (err: any) {
       this.errorStatus = err.response?.status;
-      this.errorMessage = `Nepodarilo sa načítať zariadenia: ${err.message || 'neznáma chyba'}`;
+      this.errorMessage = `${t().list.loadFailed}: ${err.message || t().common.unknownError}`;
     }
     return [];
   }
@@ -62,6 +63,7 @@ export class HarkapAmbulanceWlList {
 
   render() {
     const devices = this.filteredDevices() ?? [];
+    const m = t().list;
     return (
       <Host>
         {this.errorMessage ? (
@@ -72,24 +74,24 @@ export class HarkapAmbulanceWlList {
           <div class="container">
             <header class="page-header">
               <div>
-                <p class="eyebrow">Nemocnica HarKap</p>
-                <h1>Zdravotnícke vybavenie</h1>
+                <p class="eyebrow">{m.eyebrow}</p>
+                <h1>{m.title}</h1>
               </div>
               <md-filled-button onclick={() => this.entryClicked.emit('@new')}>
                 <md-icon slot="icon">add</md-icon>
-                Nové zariadenie
+                {m.newDevice}
               </md-filled-button>
             </header>
             <section class="card">
               <div class="toolbar">
                 <md-outlined-text-field
                   class="search"
-                  placeholder="Hľadať podľa názvu alebo oddelenia"
+                  placeholder={m.search}
                   onInput={(e: InputEvent) => (this.searchText = (e.target as HTMLInputElement).value)}
                 >
                   <md-icon slot="leading-icon">search</md-icon>
                 </md-outlined-text-field>
-                <span class="count">{this.devices ? `${devices.length} zariadení` : ''}</span>
+                <span class="count">{this.devices ? m.count(devices.length) : ''}</span>
               </div>
               {!this.devices ? (
                 <SkeletonRows count={4} />
@@ -115,7 +117,7 @@ export class HarkapAmbulanceWlList {
               ) : (
                 <div class="empty">
                   <md-icon>inventory_2</md-icon>
-                  <p>Nenašli sa žiadne zariadenia</p>
+                  <p>{m.empty}</p>
                 </div>
               )}
             </section>

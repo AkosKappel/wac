@@ -1,3 +1,5 @@
+import { t } from './i18n';
+
 export function format(first: string, middle: string, last: string): string {
   return (first || '') + (middle ? ` ${middle}` : '') + (last ? ` ${last}` : '');
 }
@@ -36,7 +38,7 @@ export function toLocalDateTimeInput(iso: string): string {
   return new Date(d.getTime() - d.getTimezoneOffset() * 60000).toISOString().slice(0, 16);
 }
 
-/** focusout handler: shows a field's validation error once the user leaves it, with a Slovak message for empty required fields. */
+/** focusout handler: shows a field's validation error once the user leaves it, with a translated message for empty required fields. */
 export function validateOnBlur(ev: FocusEvent) {
   const field = ev.target as any;
   if (!field.reportValidity) {
@@ -44,7 +46,7 @@ export function validateOnBlur(ev: FocusEvent) {
   }
   field.setCustomValidity('');
   if (field.validity?.valueMissing) {
-    field.setCustomValidity('Toto pole je povinné.');
+    field.setCustomValidity(t().common.required);
   }
   field.reportValidity();
 }
