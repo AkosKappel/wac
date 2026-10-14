@@ -1,5 +1,6 @@
 import { newSpecPage } from '@stencil/core/testing';
-import { HarkapAmbulanceWlApp, currentPath, pageOf } from './../harkap-ambulance-wl-app';
+import { HarkapAmbulanceWlApp } from './../harkap-ambulance-wl-app';
+import { currentPath, pageOf } from '../../../utils/routes';
 
 describe('harkap-ambulance-wl-app', () => {
   const render = (url: string, basePath = '/') =>

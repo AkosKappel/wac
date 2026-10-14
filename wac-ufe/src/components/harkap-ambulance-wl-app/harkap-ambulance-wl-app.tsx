@@ -3,6 +3,7 @@ import { ErrorPage } from '../../utils/error-page';
 import { t } from '../../utils/i18n';
 import { GITHUB_URL, PORTFOLIO_URL } from '../../utils/links';
 import { LogoMark } from '../../utils/logo';
+import { Page, currentPath, pageOf } from '../../utils/routes';
 import { activeTheme, nextTheme, settings } from '../../utils/settings';
 import { hrefTo, navigateTo, watchRelativePath } from '../../utils/utils';
 
@@ -12,23 +13,7 @@ declare global {
   }
 }
 
-type Page = 'home' | 'devices' | 'device' | 'about' | 'not-found';
-
 const THEME_ICONS = { system: 'brightness_auto', light: 'light_mode', dark: 'dark_mode' };
-
-/** Old links (/list, /entry/<id>) point to the device list and detail under /devices. */
-export function currentPath(relativePath: string): string {
-  return relativePath.replace(/^list\/?$/, 'devices').replace(/^entry\//, 'devices/');
-}
-
-export function pageOf(path: string): Page {
-  const clean = path.replace(/\/$/, '');
-  if (clean === '') return 'home';
-  if (clean === 'devices') return 'devices';
-  if (/^devices\/[^/]+(\/log\/[^/]+)?$/.test(clean)) return 'device';
-  if (clean === 'about') return 'about';
-  return 'not-found';
-}
 
 @Component({
   tag: 'harkap-ambulance-wl-app',

@@ -20,7 +20,7 @@ describe('harkap-ambulance-home', () => {
     await new Promise(resolve => setTimeout(resolve, 0));
     await page.waitForChanges();
 
-    const values = [...page.root.shadowRoot.querySelectorAll('.stat-value')].map(el => el.textContent);
+    const values = Array.from(page.root.shadowRoot.querySelectorAll('.stat-value')).map(el => el.textContent);
     expect(values[0]).toEqual('2');
     expect(values[3]).toEqual('1');
     const department = page.root.shadowRoot.querySelector('.departments a');

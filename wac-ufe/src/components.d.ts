@@ -6,6 +6,12 @@
  */
 import { HTMLStencilElement, JSXBase } from "@stencil/core/internal";
 export namespace Components {
+    interface HarkapAmbulanceAbout {
+    }
+    interface HarkapAmbulanceHome {
+        "apiBase": string;
+        "basePath": string;
+    }
     interface HarkapAmbulanceLogEditor {
         "apiBase": string;
         "entryId": string;
@@ -45,6 +51,18 @@ export interface HarkapAmbulanceWlListCustomEvent<T> extends CustomEvent<T> {
     target: HTMLHarkapAmbulanceWlListElement;
 }
 declare global {
+    interface HTMLHarkapAmbulanceAboutElement extends Components.HarkapAmbulanceAbout, HTMLStencilElement {
+    }
+    var HTMLHarkapAmbulanceAboutElement: {
+        prototype: HTMLHarkapAmbulanceAboutElement;
+        new (): HTMLHarkapAmbulanceAboutElement;
+    };
+    interface HTMLHarkapAmbulanceHomeElement extends Components.HarkapAmbulanceHome, HTMLStencilElement {
+    }
+    var HTMLHarkapAmbulanceHomeElement: {
+        prototype: HTMLHarkapAmbulanceHomeElement;
+        new (): HTMLHarkapAmbulanceHomeElement;
+    };
     interface HTMLHarkapAmbulanceLogEditorElementEventMap {
         "log-closed": string;
     }
@@ -120,6 +138,8 @@ declare global {
         new (): HTMLHarkapAmbulanceWlListElement;
     };
     interface HTMLElementTagNameMap {
+        "harkap-ambulance-about": HTMLHarkapAmbulanceAboutElement;
+        "harkap-ambulance-home": HTMLHarkapAmbulanceHomeElement;
         "harkap-ambulance-log-editor": HTMLHarkapAmbulanceLogEditorElement;
         "harkap-ambulance-log-list": HTMLHarkapAmbulanceLogListElement;
         "harkap-ambulance-wl-app": HTMLHarkapAmbulanceWlAppElement;
@@ -128,6 +148,12 @@ declare global {
     }
 }
 declare namespace LocalJSX {
+    interface HarkapAmbulanceAbout {
+    }
+    interface HarkapAmbulanceHome {
+        "apiBase"?: string;
+        "basePath"?: string;
+    }
     interface HarkapAmbulanceLogEditor {
         "apiBase"?: string;
         "entryId"?: string;
@@ -154,6 +180,8 @@ declare namespace LocalJSX {
         "onEntry-clicked"?: (event: HarkapAmbulanceWlListCustomEvent<string>) => void;
     }
     interface IntrinsicElements {
+        "harkap-ambulance-about": HarkapAmbulanceAbout;
+        "harkap-ambulance-home": HarkapAmbulanceHome;
         "harkap-ambulance-log-editor": HarkapAmbulanceLogEditor;
         "harkap-ambulance-log-list": HarkapAmbulanceLogList;
         "harkap-ambulance-wl-app": HarkapAmbulanceWlApp;
@@ -165,6 +193,8 @@ export { LocalJSX as JSX };
 declare module "@stencil/core" {
     export namespace JSX {
         interface IntrinsicElements {
+            "harkap-ambulance-about": LocalJSX.HarkapAmbulanceAbout & JSXBase.HTMLAttributes<HTMLHarkapAmbulanceAboutElement>;
+            "harkap-ambulance-home": LocalJSX.HarkapAmbulanceHome & JSXBase.HTMLAttributes<HTMLHarkapAmbulanceHomeElement>;
             "harkap-ambulance-log-editor": LocalJSX.HarkapAmbulanceLogEditor & JSXBase.HTMLAttributes<HTMLHarkapAmbulanceLogEditorElement>;
             "harkap-ambulance-log-list": LocalJSX.HarkapAmbulanceLogList & JSXBase.HTMLAttributes<HTMLHarkapAmbulanceLogListElement>;
             "harkap-ambulance-wl-app": LocalJSX.HarkapAmbulanceWlApp & JSXBase.HTMLAttributes<HTMLHarkapAmbulanceWlAppElement>;
