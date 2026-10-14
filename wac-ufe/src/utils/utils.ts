@@ -29,9 +29,16 @@ export function hrefTo(basePath: string, path: string): string {
   return url.pathname + url.search;
 }
 
-/** Navigates to a path relative to basePath. */
+/**
+ * Navigates to a path relative to basePath. Browsers without the Navigation API
+ * (Baseline only since 2026, e.g. Safari before 26.2) load the page normally.
+ */
 export function navigateTo(basePath: string, path: string) {
-  window.navigation.navigate(hrefTo(basePath, path));
+  if (window.navigation) {
+    window.navigation.navigate(hrefTo(basePath, path));
+  } else {
+    location.assign(hrefTo(basePath, path));
+  }
 }
 
 /** Converts an ISO timestamp to the local "YYYY-MM-DDTHH:mm" value used by datetime-local inputs. */

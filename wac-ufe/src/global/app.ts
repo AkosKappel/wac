@@ -9,10 +9,6 @@ import '@material/web/button/text-button';
 import '@material/web/button/outlined-button';
 import '@material/web/iconbutton/icon-button';
 import '@material/web/dialog/dialog';
-import { registerNavigationApi } from './navigation.js';
 
-export default function () {
-  // or export default async function()
-  // package initialization code
-  registerNavigationApi();
-}
+// Stencil runs this once on load; the imports above register the Material components
+export default function () {}
