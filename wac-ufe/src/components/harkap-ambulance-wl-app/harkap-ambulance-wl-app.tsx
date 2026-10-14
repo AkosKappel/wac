@@ -1,6 +1,7 @@
 import { Component, Host, Prop, State, h } from '@stencil/core';
 import { ErrorPage } from '../../utils/error-page';
 import { t } from '../../utils/i18n';
+import { GITHUB_URL, PORTFOLIO_URL } from '../../utils/links';
 import { LogoMark } from '../../utils/logo';
 import { activeTheme, nextTheme, settings } from '../../utils/settings';
 import { hrefTo, navigateTo, watchRelativePath } from '../../utils/utils';
@@ -13,8 +14,6 @@ declare global {
 
 type Page = 'home' | 'devices' | 'device' | 'about' | 'not-found';
 
-const GITHUB_URL = 'https://github.com/AkosKappel/wac';
-const PORTFOLIO_URL = 'https://portfolio-taupe-eta-51.vercel.app';
 const THEME_ICONS = { system: 'brightness_auto', light: 'light_mode', dark: 'dark_mode' };
 
 /** Old links (/list, /entry/<id>) point to the device list and detail under /devices. */
@@ -119,7 +118,7 @@ export class HarkapAmbulanceWlApp {
               oneditor-closed={() => navigate('./devices')}
             ></harkap-ambulance-wl-editor>
           ) : page === 'about' ? (
-            <harkap-ambulance-about base-path={this.basePath}></harkap-ambulance-about>
+            <harkap-ambulance-about></harkap-ambulance-about>
           ) : (
             <ErrorPage status={404} onBack={() => navigate('./devices')} />
           )}
