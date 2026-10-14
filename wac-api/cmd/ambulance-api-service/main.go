@@ -2,6 +2,7 @@ package main
 
 import (
 	"log"
+	"net/http"
 	"os"
 	"strings"
 
@@ -49,5 +50,25 @@ func main() {
 	// request routings
 	ambulance_wl.AddRoutes(engine)
 	engine.GET("/openapi", api.HandleOpenApi)
+	// HEAD too: uptime monitors such as UptimeRobot check with HEAD, which Gin doesn't map to GET
+	health := healthHandler(dbService)
+	engine.GET("/api/health", health)
+	engine.HEAD("/api/health", health)
 	engine.Run(":" + port)
+}
+
+type pinger interface {
+	Ping(ctx context.Context) error
+}
+
+// healthHandler answers 200 when the database is reachable and 503 otherwise.
+func healthHandler(db pinger) gin.HandlerFunc {
+	return func(ctx *gin.Context) {
+		if err := db.Ping(ctx); err != nil {
+			log.Printf("health check failed: %v", err)
+			ctx.JSON(http.StatusServiceUnavailable, gin.H{"status": "unavailable"})
+			return
+		}
+		ctx.JSON(http.StatusOK, gin.H{"status": "ok"})
+	}
 }

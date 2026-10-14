@@ -56,6 +56,11 @@ func (this *DbServiceMock[DocType]) Disconnect(ctx context.Context) error {
 	return args.Error(0)
 }
 
+func (this *DbServiceMock[DocType]) Ping(ctx context.Context) error {
+	args := this.Called(ctx)
+	return args.Error(0)
+}
+
 func (suite *AmbulanceDlSuite) SetupTest() {
 	suite.dbServiceMock = &DbServiceMock[DeviceListEntry]{}
 

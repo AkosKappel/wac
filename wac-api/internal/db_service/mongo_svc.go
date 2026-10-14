@@ -22,6 +22,7 @@ type DbService[DocType interface{}] interface {
 	DeleteDocument(ctx context.Context, id string) error
 	Disconnect(ctx context.Context) error
 	FindDocuments(ctx context.Context) ([]*DocType, error)
+	Ping(ctx context.Context) error
 }
 
 var ErrNotFound = fmt.Errorf("document not found")
@@ -124,7 +125,7 @@ func (this *mongoSvc[DocType]) connect(ctx context.Context) (*mongo.Client, erro
 	defer contextCancel()
 
 	var uri = fmt.Sprintf("mongodb://%v:%v", this.ServerHost, this.ServerPort)
-	log.Printf("Using URI: " + uri)
+	log.Printf("Using URI: %s", uri)
 
 	if len(this.UserName) != 0 {
 		uri = fmt.Sprintf("mongodb://%v:%v@%v:%v", this.UserName, this.Password, this.ServerHost, this.ServerPort)
@@ -136,6 +137,17 @@ func (this *mongoSvc[DocType]) connect(ctx context.Context) (*mongo.Client, erro
 		this.client.Store(client)
 		return client, nil
 	}
+}
+
+// Ping reports whether the database answers, for health checks.
+func (this *mongoSvc[DocType]) Ping(ctx context.Context) error {
+	ctx, contextCancel := context.WithTimeout(ctx, this.Timeout)
+	defer contextCancel()
+	client, err := this.connect(ctx)
+	if err != nil {
+		return err
+	}
+	return client.Ping(ctx, nil)
 }
 
 func (this *mongoSvc[DocType]) Disconnect(ctx context.Context) error {
