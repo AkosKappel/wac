@@ -3,7 +3,7 @@ package db_service
 import (
 	"context"
 	"fmt"
-	"log"
+	"log/slog"
 	"os"
 	"strconv"
 	"sync"
@@ -67,7 +67,7 @@ func NewMongoService[DocType interface{}](config MongoServiceConfig) DbService[D
 		if port, err := strconv.Atoi(port); err == nil {
 			svc.ServerPort = port
 		} else {
-			log.Printf("Invalid port value: %v", port)
+			slog.Warn("invalid AMBULANCE_API_MONGODB_PORT, using 27017", "value", port)
 			svc.ServerPort = 27017
 		}
 	}
@@ -93,18 +93,17 @@ func NewMongoService[DocType interface{}](config MongoServiceConfig) DbService[D
 		if seconds, err := strconv.Atoi(seconds); err == nil {
 			svc.Timeout = time.Duration(seconds) * time.Second
 		} else {
-			log.Printf("Invalid timeout value: %v", seconds)
+			slog.Warn("invalid AMBULANCE_API_MONGODB_TIMEOUT_SECONDS, using 10", "value", seconds)
 			svc.Timeout = 10 * time.Second
 		}
 	}
 
-	log.Printf(
-		"MongoDB config: //%v@%v:%v/%v/%v",
-		svc.UserName,
-		svc.ServerHost,
-		svc.ServerPort,
-		svc.DbName,
-		svc.Collection,
+	slog.Info("mongodb config",
+		"user", svc.UserName,
+		"host", svc.ServerHost,
+		"port", svc.ServerPort,
+		"database", svc.DbName,
+		"collection", svc.Collection,
 	)
 	return svc
 }
@@ -128,8 +127,6 @@ func (this *mongoSvc[DocType]) connect(ctx context.Context) (*mongo.Client, erro
 	defer contextCancel()
 
 	var uri = fmt.Sprintf("mongodb://%v:%v", this.ServerHost, this.ServerPort)
-	log.Printf("Using URI: %s", uri)
-
 	if len(this.UserName) != 0 {
 		uri = fmt.Sprintf("mongodb://%v:%v@%v:%v", this.UserName, this.Password, this.ServerHost, this.ServerPort)
 	}
@@ -144,7 +141,7 @@ func (this *mongoSvc[DocType]) connect(ctx context.Context) (*mongo.Client, erro
 		Options: options.Index().SetUnique(true),
 	})
 	if err != nil {
-		log.Printf("Failed to create the unique index on id: %v", err)
+		slog.Error("failed to create the unique index on id", "error", err)
 	}
 	this.client.Store(client)
 	return client, nil

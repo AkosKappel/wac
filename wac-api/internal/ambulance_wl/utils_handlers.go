@@ -1,7 +1,7 @@
 package ambulance_wl
 
 import (
-	"log"
+	"log/slog"
 	"net/http"
 
 	"github.com/AkosKappel/wac/wac-api/internal/db_service"
@@ -16,7 +16,7 @@ type Dependencies struct {
 // respondError logs err and answers with a short message; internal details stay in the log.
 func respondError(ctx *gin.Context, status int, message string, err error) {
 	if err != nil {
-		log.Printf("%s %s: %s: %v", ctx.Request.Method, ctx.Request.URL.Path, message, err)
+		slog.Error(message, "method", ctx.Request.Method, "path", ctx.Request.URL.Path, "error", err)
 	}
 	ctx.JSON(status, gin.H{
 		"status":  http.StatusText(status),

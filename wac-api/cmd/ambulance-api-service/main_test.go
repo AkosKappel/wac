@@ -1,8 +1,11 @@
 package main
 
 import (
+	"bytes"
 	"context"
+	"encoding/json"
 	"errors"
+	"log/slog"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -40,5 +43,25 @@ func TestHealthHandler(t *testing.T) {
 				t.Errorf("got %d, want %d", recorder.Code, c.want)
 			}
 		})
+	}
+}
+
+func TestRequestLogger(t *testing.T) {
+	gin.SetMode(gin.TestMode)
+	var out bytes.Buffer
+	previous := slog.Default()
+	slog.SetDefault(slog.New(slog.NewJSONHandler(&out, nil)))
+	t.Cleanup(func() { slog.SetDefault(previous) })
+
+	engine := gin.New()
+	engine.Use(requestLogger())
+	engine.ServeHTTP(httptest.NewRecorder(), httptest.NewRequest(http.MethodGet, "/missing?secret=1", nil))
+
+	var line map[string]any
+	if err := json.Unmarshal(out.Bytes(), &line); err != nil {
+		t.Fatalf("not one JSON line: %q", out.String())
+	}
+	if line["msg"] != "request" || line["path"] != "/missing" || line["status"] != float64(404) {
+		t.Errorf("unexpected log line: %v", line)
 	}
 }
