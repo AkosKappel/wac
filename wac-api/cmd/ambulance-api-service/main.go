@@ -1,12 +1,14 @@
 package main
 
 import (
+	"context"
+	"errors"
 	"log/slog"
 	"net/http"
 	"os"
+	"os/signal"
 	"strings"
-
-	"context"
+	"syscall"
 	"time"
 
 	"github.com/AkosKappel/wac/wac-api/api"
@@ -56,7 +58,32 @@ func main() {
 	health := healthHandler(dbService)
 	engine.GET("/api/health", health)
 	engine.HEAD("/api/health", health)
-	engine.Run(":" + port)
+
+	server := &http.Server{
+		Addr:              ":" + port,
+		Handler:           engine,
+		ReadHeaderTimeout: 5 * time.Second,
+		ReadTimeout:       10 * time.Second,
+		WriteTimeout:      30 * time.Second,
+		IdleTimeout:       60 * time.Second,
+	}
+	go func() {
+		if err := server.ListenAndServe(); err != nil && !errors.Is(err, http.ErrServerClosed) {
+			slog.Error("server failed", "error", err)
+			os.Exit(1)
+		}
+	}()
+
+	// docker stop sends SIGTERM: finish open requests before the deferred Disconnect runs
+	stop, cancel := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
+	defer cancel()
+	<-stop.Done()
+	slog.Info("shutting down")
+	shutdownCtx, cancelShutdown := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancelShutdown()
+	if err := server.Shutdown(shutdownCtx); err != nil {
+		slog.Error("shutdown failed", "error", err)
+	}
 }
 
 type pinger interface {
