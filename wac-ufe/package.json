@@ -30,7 +30,9 @@
     "test.watch": "stencil test --spec --e2e --watchAll",
     "generate": "stencil generate",
     "openapi": "../scripts/generate-api.sh",
-    "test:jest": "jest --config ./jest.config.js"
+    "test:jest": "jest --config ./jest.config.js",
+    "format": "prettier --write .",
+    "lint": "prettier --check ."
   },
   "dependencies": {
     "@material/web": "^2.5.0",
@@ -47,6 +49,7 @@
     "js-yaml": "^4.1.0",
     "npm-run-all": "^4.1.5",
     "open-api-mocker": "^2.0.0",
+    "prettier": "^3.9.9",
     "puppeteer": "^25.11.0"
   },
   "license": "MIT",

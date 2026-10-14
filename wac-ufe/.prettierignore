@@ -1,0 +1,8 @@
+# generated: the API client (scripts/generate-api.sh), Stencil's typings and component readmes
+src/api/
+src/components.d.ts
+src/components/**/readme.md
+www/
+dist/
+loader/
+package-lock.json
