@@ -135,6 +135,7 @@ export class HarkapAmbulanceWlEditor {
             <form onFocusout={validateOnBlur}>
               <md-outlined-text-field
                 required
+                maxLength={100}
                 value={this.entry.name}
                 oninput={(ev: InputEvent) => {
                   this.entry.name = this.inputValue(ev);
@@ -147,6 +148,7 @@ export class HarkapAmbulanceWlEditor {
 
               <md-outlined-text-field
                 required
+                maxLength={50}
                 value={this.entry.deviceId}
                 oninput={(ev: InputEvent) => {
                   this.entry.deviceId = this.inputValue(ev);
@@ -207,6 +209,7 @@ export class HarkapAmbulanceWlEditor {
                 label="Cena zariadenia"
                 type="number"
                 min="0.00"
+                max="100000000"
                 step="0.01"
                 placeholder="0.00"
               >
@@ -287,7 +290,8 @@ export class HarkapAmbulanceWlEditor {
       this.entry?.warrantyUntil &&
       this.entry?.department?.name &&
       this.entry?.price !== undefined &&
-      this.entry?.price >= 0
+      this.entry?.price >= 0 &&
+      this.entry?.price <= 100_000_000
     );
   }
 
@@ -310,7 +314,7 @@ export class HarkapAmbulanceWlEditor {
         this.actionError = `Zariadenie sa nepodarilo uložiť: ${response.statusText}`;
       }
     } catch (err: any) {
-      this.actionError = `Zariadenie sa nepodarilo uložiť: ${err.message || 'neznáma chyba'}`;
+      this.actionError = `Zariadenie sa nepodarilo uložiť: ${err.response?.data?.message || err.message || 'neznáma chyba'}`;
     } finally {
       this.busy = false;
     }
@@ -327,7 +331,7 @@ export class HarkapAmbulanceWlEditor {
         this.actionError = `Zariadenie sa nepodarilo zmazať: ${response.statusText}`;
       }
     } catch (err: any) {
-      this.actionError = `Zariadenie sa nepodarilo zmazať: ${err.message || 'neznáma chyba'}`;
+      this.actionError = `Zariadenie sa nepodarilo zmazať: ${err.response?.data?.message || err.message || 'neznáma chyba'}`;
     } finally {
       this.busy = false;
     }

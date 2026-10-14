@@ -128,6 +128,23 @@ func TestIntegration(t *testing.T) {
 		}
 	})
 
+	t.Run("invalid input is rejected", func(t *testing.T) {
+		expect(t, call(engine, "POST", devices, `{"name": " ", "deviceId": "x", "department": {"name": "x"}}`), http.StatusBadRequest)
+		expect(t, call(engine, "PUT", devices+"/d1", `{"name": "x", "deviceId": "x", "price": -5, "department": {"name": "x"}}`), http.StatusBadRequest)
+		expect(t, call(engine, "POST", devices+"/d1/logs", `{"text": "", "deviceId": ""}`), http.StatusBadRequest)
+		expect(t, call(engine, "PUT", devices+"/d1/logs/l3", `{"text": " ", "deviceId": ""}`), http.StatusBadRequest)
+	})
+
+	t.Run("a full log list takes no more entries", func(t *testing.T) {
+		logs := make([]string, maxLogsPerDevice)
+		for i := range logs {
+			logs[i] = fmt.Sprintf(`{"id": "f%d", "text": "log", "deviceId": ""}`, i)
+		}
+		full := `{"id": "full", "name": "Full", "deviceId": "full", "department": {"name": "x"}, "logList": [` + strings.Join(logs, ",") + `]}`
+		expect(t, call(engine, "POST", devices, full), http.StatusCreated)
+		expect(t, call(engine, "POST", devices+"/full/logs", `{"text": "one more", "deviceId": ""}`), http.StatusConflict)
+	})
+
 	t.Run("delete log and device", func(t *testing.T) {
 		expect(t, call(engine, "DELETE", devices+"/d1/logs/l3", ""), http.StatusNoContent)
 		expect(t, call(engine, "DELETE", devices+"/d1/logs/l3", ""), http.StatusNotFound)

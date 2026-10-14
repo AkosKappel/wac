@@ -378,7 +378,7 @@ func (suite *AmbulanceDlSuite) Test_UpdateDeviceListEntry_KeepsLogs() {
 	ctx, _ := gin.CreateTestContext(recorder)
 	ctx.Set("db_service", suite.dbServiceMock)
 	ctx.Params = []gin.Param{{Key: "entryId", Value: "test-device"}}
-	ctx.Request = httptest.NewRequest("PUT", "/device-list/entries/test-device", strings.NewReader(`{"name": "x", "deviceId": "x", "logList": []}`))
+	ctx.Request = httptest.NewRequest("PUT", "/device-list/entries/test-device", strings.NewReader(`{"name": "x", "deviceId": "x", "logList": [], "department": {"name": "x"}}`))
 
 	sut := implAmbulanceDeviceListAPI{}
 

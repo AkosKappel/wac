@@ -342,10 +342,14 @@ components:
           description: Unique id of the entry in this waiting list
         name:
           type: string
+          minLength: 1
+          maxLength: 100
           example: Jožko Púčik
           description: Name of patient in waiting list
         deviceId:
           type: string
+          minLength: 1
+          maxLength: 50
           example: 1-crp
           description: Unique identifier of the patient known to Web-In-Cloud system
         warrantyUntil:
@@ -356,10 +360,13 @@ components:
         price:
           type: number
           format: double
+          minimum: 0
+          maximum: 100000000
           example: 4.5
           description: Price of device
         logList:
           type: array
+          maxItems: 200
           items:
             $ref: "#/components/schemas/DeviceLog"
         department:
@@ -373,9 +380,12 @@ components:
       properties:
         name:
           type: string
+          minLength: 1
+          maxLength: 100
           example: Chirurgia
         code:
           type: string
+          maxLength: 50
           example: chir
       example:
         $ref: "#/components/examples/DepartmentExample"
@@ -389,6 +399,8 @@ components:
           description: Unique id of the log
         text:
           type: string
+          minLength: 1
+          maxLength: 1000
           example:
           description: Text of log operation
         deviceId:

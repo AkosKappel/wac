@@ -1,13 +1,13 @@
 package ambulance_wl
 
 import (
+	"fmt"
 	"net/http"
 	"slices"
 	"time"
 
 	"github.com/AkosKappel/wac/wac-api/internal/db_service"
 	"github.com/gin-gonic/gin"
-	"github.com/google/uuid"
 	"go.mongodb.org/mongo-driver/bson"
 )
 
@@ -80,24 +80,35 @@ func (this *implAmbulanceDeviceLogListAPI) CreateDeviceLog(ctx *gin.Context) {
 		respondError(ctx, http.StatusBadRequest, "Invalid request body", nil)
 		return
 	}
-	if entry.Id == "" || entry.Id == "@new" {
-		entry.Id = uuid.NewString()
+	if message := validateLog(&entry); message != "" {
+		respondError(ctx, http.StatusBadRequest, message, nil)
+		return
 	}
 	if entry.CreatedAt.IsZero() {
 		entry.CreatedAt = time.Now().UTC()
 	}
 
 	device, err := db.UpdateDocument(ctx, ctx.Param("entryId"),
-		bson.D{{Key: "logList.id", Value: bson.D{{Key: "$ne", Value: entry.Id}}}},
+		bson.D{
+			{Key: "logList.id", Value: bson.D{{Key: "$ne", Value: entry.Id}}},
+			// the list has fewer than maxLogsPerDevice entries when this index does not exist
+			{Key: fmt.Sprintf("logList.%d", maxLogsPerDevice-1), Value: bson.D{{Key: "$exists", Value: false}}},
+		},
 		bson.D{{Key: "$push", Value: bson.D{{Key: "logList", Value: entry}}}},
 	)
 	switch err {
 	case nil:
 		ctx.JSON(http.StatusOK, findLog(device, entry.Id))
 	case db_service.ErrNotFound:
-		// either the device is missing or it already has a log with this id
-		if _, ok := findDevice(ctx, db); ok {
+		// the device is missing, already has a log with this id, or is full
+		device, ok := findDevice(ctx, db)
+		if !ok {
+			return
+		}
+		if findLog(device, entry.Id) != nil {
 			respondError(ctx, http.StatusConflict, "Log entry already exists", nil)
+		} else {
+			respondError(ctx, http.StatusConflict, fmt.Sprintf("A device can have at most %d log entries", maxLogsPerDevice), nil)
 		}
 	default:
 		respondError(ctx, http.StatusBadGateway, "Failed to save log entry in database", err)
@@ -118,6 +129,10 @@ func (this *implAmbulanceDeviceLogListAPI) UpdateDeviceLog(ctx *gin.Context) {
 	}
 	if entry.Id != "" && entry.Id != logId {
 		respondError(ctx, http.StatusBadRequest, "Log id in the body does not match the URL", nil)
+		return
+	}
+	if message := validateText(&entry.Text, "Text", maxLogTextLength); message != "" {
+		respondError(ctx, http.StatusBadRequest, message, nil)
 		return
 	}
 

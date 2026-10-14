@@ -21,6 +21,10 @@ func (this *implAmbulanceDeviceListAPI) CreateDeviceListEntry(ctx *gin.Context) 
 		respondError(ctx, http.StatusBadRequest, "Invalid request body", nil)
 		return
 	}
+	if message := validateDevice(&device); message != "" {
+		respondError(ctx, http.StatusBadRequest, message, nil)
+		return
+	}
 	if device.Id == "" {
 		device.Id = uuid.New().String()
 	}
@@ -105,6 +109,10 @@ func (this *implAmbulanceDeviceListAPI) UpdateDeviceListEntry(ctx *gin.Context) 
 	}
 	if device.Id != "" && device.Id != deviceId {
 		respondError(ctx, http.StatusBadRequest, "Device id in the body does not match the URL", nil)
+		return
+	}
+	if message := validateDevice(&device); message != "" {
+		respondError(ctx, http.StatusBadRequest, message, nil)
 		return
 	}
 

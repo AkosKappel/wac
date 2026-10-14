@@ -89,6 +89,7 @@ export class HarkapAmbulanceLogEditor {
           <form onFocusout={validateOnBlur}>
             <md-outlined-text-field
               required
+              maxLength={1000}
               value={this.log.text}
               oninput={(ev: InputEvent) => {
                 this.log.text = this.inputValue(ev);
@@ -180,7 +181,7 @@ export class HarkapAmbulanceLogEditor {
         this.actionError = `Záznam sa nepodarilo uložiť: ${response.statusText}`;
       }
     } catch (err: any) {
-      this.actionError = `Záznam sa nepodarilo uložiť: ${err.message || 'neznáma chyba'}`;
+      this.actionError = `Záznam sa nepodarilo uložiť: ${err.response?.data?.message || err.message || 'neznáma chyba'}`;
     } finally {
       this.busy = false;
     }
@@ -200,7 +201,7 @@ export class HarkapAmbulanceLogEditor {
         this.actionError = `Záznam sa nepodarilo zmazať: ${response.statusText}`;
       }
     } catch (err: any) {
-      this.actionError = `Záznam sa nepodarilo zmazať: ${err.message || 'neznáma chyba'}`;
+      this.actionError = `Záznam sa nepodarilo zmazať: ${err.response?.data?.message || err.message || 'neznáma chyba'}`;
     } finally {
       this.busy = false;
     }
