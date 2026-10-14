@@ -115,15 +115,6 @@ h1 {
   color: var(--md-sys-color-outline);
 }
 
-.error {
-  max-width: 640px;
-  margin: 48px auto;
-  padding: 16px 20px;
-  border-radius: 12px;
-  background: var(--md-sys-color-error-container, #fbe3e1);
-  color: var(--md-sys-color-on-error-container, #5c0f0b);
-  font-weight: 500;
-}
 
 @media (max-width: 640px) {
   .toolbar {

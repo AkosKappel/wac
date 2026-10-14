@@ -1,9 +1,10 @@
 import { Component, Host, Prop, State, h, EventEmitter, Event } from '@stencil/core';
 import { AmbulanceDeviceListApiFactory, DeviceListEntry } from '../../api/ambulance-wl';
+import { ErrorPage } from '../../utils/error-page';
 
 @Component({
   tag: 'harkap-ambulance-wl-editor',
-  styleUrl: 'harkap-ambulance-wl-editor.css',
+  styleUrls: ['harkap-ambulance-wl-editor.css', '../../utils/error-page.css'],
   shadow: true,
 })
 export class HarkapAmbulanceWlEditor {
@@ -13,6 +14,7 @@ export class HarkapAmbulanceWlEditor {
   @Prop() apiBase: string;
   @State() entry: DeviceListEntry;
   @State() errorMessage: string;
+  @State() errorStatus: number;
   @State() isValid: boolean;
 
   private departments = [
@@ -53,10 +55,11 @@ export class HarkapAmbulanceWlEditor {
         this.entry = response.data;
         this.isValid = true;
       } else {
-        this.errorMessage = `Cannot retrieve list of devices: ${response.statusText}`;
+        this.errorMessage = `Cannot retrieve device: ${response.statusText}`;
       }
     } catch (err: any) {
-      this.errorMessage = `Cannot retrieve list of devices: ${err.message || 'unknown'}`;
+      this.errorStatus = err.response?.status;
+      this.errorMessage = `Cannot retrieve device: ${err.message || 'unknown'}`;
     }
 
     return undefined;
@@ -105,7 +108,7 @@ export class HarkapAmbulanceWlEditor {
     if (this.errorMessage) {
       return (
         <Host>
-          <div class="error">{this.errorMessage}</div>
+          <ErrorPage status={this.errorStatus} message={this.errorMessage} onBack={() => this.editorClosed.emit('cancel')} />
         </Host>
       );
     }
@@ -305,6 +308,7 @@ export class HarkapAmbulanceWlEditor {
         this.errorMessage = `Cannot store entry: ${response.statusText}`;
       }
     } catch (err: any) {
+      this.errorStatus = err.response?.status;
       this.errorMessage = `Cannot store entry: ${err.message || 'unknown'}`;
     }
   }
@@ -318,6 +322,7 @@ export class HarkapAmbulanceWlEditor {
         this.errorMessage = `Cannot delete entry: ${response.statusText}`;
       }
     } catch (err: any) {
+      this.errorStatus = err.response?.status;
       this.errorMessage = `Cannot delete entry: ${err.message || 'unknown'}`;
     }
   }

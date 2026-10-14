@@ -32,10 +32,3 @@
   border-radius: 12px;
   color: var(--md-sys-color-on-surface-variant);
 }
-
-.error {
-  padding: 16px 20px;
-  border-radius: 12px;
-  background: var(--md-sys-color-error-container, #fbe3e1);
-  color: var(--md-sys-color-on-error-container, #5c0f0b);
-}

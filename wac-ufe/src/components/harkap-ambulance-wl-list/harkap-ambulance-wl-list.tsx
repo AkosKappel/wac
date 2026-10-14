@@ -1,15 +1,17 @@
 import { Component, Event, EventEmitter, Host, Prop, State, h } from '@stencil/core';
 import { AmbulanceDeviceListApiFactory, DeviceListEntry } from '../../api/ambulance-wl';
+import { ErrorPage } from '../../utils/error-page';
 
 @Component({
   tag: 'harkap-ambulance-wl-list',
-  styleUrl: 'harkap-ambulance-wl-list.css',
+  styleUrls: ['harkap-ambulance-wl-list.css', '../../utils/error-page.css'],
   shadow: true,
 })
 export class HarkapAmbulanceWlList {
   @Event({ eventName: 'entry-clicked' }) entryClicked: EventEmitter<string>;
   @Prop() apiBase: string;
   @State() errorMessage: string;
+  @State() errorStatus: number;
   @State() searchText: string = '';
 
   devices: DeviceListEntry[];
@@ -23,6 +25,7 @@ export class HarkapAmbulanceWlList {
         this.errorMessage = `Cannot retrieve list of devices: ${response.statusText}`;
       }
     } catch (err: any) {
+      this.errorStatus = err.response?.status;
       this.errorMessage = `Cannot retrieve list of devices: ${err.message || 'unknown'}`;
     }
     return [];
@@ -61,7 +64,9 @@ export class HarkapAmbulanceWlList {
     return (
       <Host>
         {this.errorMessage ? (
-          <div class="error">{this.errorMessage}</div>
+          <div class="container">
+            <ErrorPage status={this.errorStatus} message={this.errorMessage} />
+          </div>
         ) : (
           <div class="container">
             <header class="page-header">

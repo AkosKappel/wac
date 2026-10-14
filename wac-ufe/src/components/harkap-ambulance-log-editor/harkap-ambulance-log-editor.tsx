@@ -1,9 +1,10 @@
 import { Component, Host, Prop, State, h, EventEmitter, Event } from '@stencil/core';
 import { AmbulanceDeviceLogListApiFactory, DeviceLog } from '../../api/ambulance-wl';
+import { ErrorPage } from '../../utils/error-page';
 
 @Component({
   tag: 'harkap-ambulance-log-editor',
-  styleUrl: 'harkap-ambulance-log-editor.css',
+  styleUrls: ['harkap-ambulance-log-editor.css', '../../utils/error-page.css'],
   shadow: true,
 })
 export class HarkapAmbulanceLogEditor {
@@ -13,6 +14,7 @@ export class HarkapAmbulanceLogEditor {
   @Prop() apiBase: string;
   @State() log: DeviceLog;
   @State() errorMessage: string;
+  @State() errorStatus: number;
   @State() isValid: boolean;
 
   private async getDeviceLogAsync(): Promise<DeviceLog> {
@@ -48,6 +50,7 @@ export class HarkapAmbulanceLogEditor {
         this.errorMessage = `Cannot retrieve log: ${response.statusText}`;
       }
     } catch (err: any) {
+      this.errorStatus = err.response?.status;
       this.errorMessage = `Cannot retrieve log: ${err.message || 'unknown'}`;
     }
 
@@ -64,7 +67,7 @@ export class HarkapAmbulanceLogEditor {
     if (this.errorMessage) {
       return (
         <Host>
-          <div class="error">{this.errorMessage}</div>
+          <ErrorPage status={this.errorStatus} message={this.errorMessage} onBack={() => this.logClosed.emit('cancel')} />
         </Host>
       );
     }
@@ -180,6 +183,7 @@ export class HarkapAmbulanceLogEditor {
         this.errorMessage = `Cannot store log: ${response.statusText}`;
       }
     } catch (err: any) {
+      this.errorStatus = err.response?.status;
       this.errorMessage = `Cannot store log: ${err.message || 'unknown'}`;
     }
   }
@@ -196,6 +200,7 @@ export class HarkapAmbulanceLogEditor {
         this.errorMessage = `Cannot delete log: ${response.statusText}`;
       }
     } catch (err: any) {
+      this.errorStatus = err.response?.status;
       this.errorMessage = `Cannot delete log: ${err.message || 'unknown'}`;
     }
   }

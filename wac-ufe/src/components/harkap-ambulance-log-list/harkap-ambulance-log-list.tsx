@@ -1,14 +1,16 @@
 import { Component, Event, Host, Prop, EventEmitter, State, h } from '@stencil/core';
 import { AmbulanceDeviceLogListApiFactory, DeviceLog } from '../../api/ambulance-wl';
+import { ErrorPage } from '../../utils/error-page';
 
 @Component({
   tag: 'harkap-ambulance-log-list',
-  styleUrl: 'harkap-ambulance-log-list.css',
+  styleUrls: ['harkap-ambulance-log-list.css', '../../utils/error-page.css'],
   shadow: true,
 })
 export class HarkapAmbulanceLogList {
   @Event({ eventName: 'log-clicked' }) logClicked: EventEmitter<string>;
   @State() errorMessage: string;
+  @State() errorStatus: number;
   @Prop() apiBase: string;
   @Prop() deviceId: string;
 
@@ -23,6 +25,7 @@ export class HarkapAmbulanceLogList {
         this.errorMessage = `Cannot retrieve device logs: ${response.statusText}`;
       }
     } catch (err: any) {
+      this.errorStatus = err.response?.status;
       this.errorMessage = `Cannot retrieve device logs: ${err.message || 'unknown'}`;
     }
     return [];
@@ -40,7 +43,7 @@ export class HarkapAmbulanceLogList {
     return (
       <Host>
         {this.errorMessage ? (
-          <div class="error">{this.errorMessage}</div>
+          <ErrorPage status={this.errorStatus} message={this.errorMessage} />
         ) : (
           <div class="container">
             <md-outlined-button class="add-button" onclick={() => this.logClicked.emit('@new')}>

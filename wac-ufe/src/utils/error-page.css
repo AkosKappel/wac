@@ -1,0 +1,65 @@
+.error-page {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  max-width: 520px;
+  margin: 48px auto;
+  padding: 40px 24px;
+  text-align: center;
+}
+
+.error-code {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 7rem;
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: -0.04em;
+  color: var(--md-sys-color-outline-variant, #dbe2e5);
+  user-select: none;
+  z-index: 0;
+}
+
+.error-icon {
+  --md-icon-size: 32px;
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 64px;
+  height: 64px;
+  margin-top: 32px;
+  border-radius: 20px;
+  background: var(--md-sys-color-primary-container, #d3f0f7);
+  color: var(--md-sys-color-on-primary-container, #003642);
+}
+
+.error-page h2 {
+  margin: 20px 0 8px;
+  font-size: 1.375rem;
+  font-weight: 650;
+}
+
+.hint {
+  margin: 0;
+  color: var(--md-sys-color-on-surface-variant, #55636a);
+  line-height: 1.5;
+}
+
+.error-page .error {
+  margin: 16px 0 0;
+  padding: 8px 12px;
+  border-radius: 8px;
+  background: var(--md-sys-color-surface-container-highest, #eef2f3);
+  color: var(--md-sys-color-on-surface-variant, #55636a);
+  font-family: ui-monospace, monospace;
+  font-size: 0.8125rem;
+}
+
+.error-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 28px;
+}
