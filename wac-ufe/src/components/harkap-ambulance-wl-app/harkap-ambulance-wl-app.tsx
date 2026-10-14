@@ -2,7 +2,7 @@ import { Component, Host, Prop, State, h } from '@stencil/core';
 import { ErrorPage } from '../../utils/error-page';
 import { t } from '../../utils/i18n';
 import { LogoMark } from '../../utils/logo';
-import { settings } from '../../utils/settings';
+import { activeTheme, nextTheme, settings } from '../../utils/settings';
 import { hrefTo, navigateTo, watchRelativePath } from '../../utils/utils';
 
 declare global {
@@ -15,6 +15,7 @@ type Page = 'home' | 'devices' | 'device' | 'about' | 'not-found';
 
 const GITHUB_URL = 'https://github.com/AkosKappel/wac';
 const PORTFOLIO_URL = 'https://portfolio-taupe-eta-51.vercel.app';
+const THEME_ICONS = { system: 'brightness_auto', light: 'light_mode', dark: 'dark_mode' };
 
 /** Old links (/list, /entry/<id>) point to the device list and detail under /devices. */
 export function currentPath(relativePath: string): string {
@@ -68,7 +69,7 @@ export class HarkapAmbulanceWlApp {
     );
 
     return (
-      <Host>
+      <Host data-theme={activeTheme()}>
         <p class="demo-notice">
           <md-icon>info</md-icon>
           {m.demoNotice}
@@ -93,6 +94,13 @@ export class HarkapAmbulanceWlApp {
               <md-icon slot="icon">translate</md-icon>
               {m.otherLanguage}
             </md-text-button>
+            <md-icon-button
+              aria-label={m.theme[settings.state.theme]}
+              title={m.theme[settings.state.theme]}
+              onClick={() => (settings.state.theme = nextTheme(settings.state.theme))}
+            >
+              <md-icon>{THEME_ICONS[settings.state.theme]}</md-icon>
+            </md-icon-button>
           </div>
         </header>
         <main>

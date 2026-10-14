@@ -38,6 +38,33 @@
   font-family: var(--md-ref-typeface-plain);
 }
 
+/* Teal tonal palette for dark surfaces; set from the theme setting in the header */
+:host([data-theme='dark']) {
+  --md-sys-color-primary: #84d2e6;
+  --md-sys-color-on-primary: #003641;
+  --md-sys-color-primary-container: #0b4f5e;
+  --md-sys-color-on-primary-container: #b5ecfa;
+  --md-sys-color-secondary-container: #324a50;
+  --md-sys-color-on-secondary-container: #cde7ee;
+  --md-sys-color-error: #ffb4ab;
+  --md-sys-color-error-container: #8c1d18;
+  --md-sys-color-on-error-container: #ffdad6;
+  --app-color-warning-container: #5c4300;
+  --app-color-on-warning-container: #ffdf9e;
+  --md-sys-color-surface: #172123;
+  --md-sys-color-surface-container-lowest: #0b1113;
+  --md-sys-color-surface-container-low: #1b2527;
+  --md-sys-color-surface-container: #1f292b;
+  --md-sys-color-surface-container-high: #253033;
+  --md-sys-color-secondary: #b1cbd1;
+  --md-sys-color-surface-container-highest: #2e393c;
+  --md-sys-color-on-surface: #dee4e6;
+  --md-sys-color-on-surface-variant: #b4c1c6;
+  --md-sys-color-outline: #8a979c;
+  --md-sys-color-outline-variant: #2f3b3e;
+  --app-color-background: #0f1719;
+}
+
 .demo-notice {
   display: flex;
   align-items: center;
