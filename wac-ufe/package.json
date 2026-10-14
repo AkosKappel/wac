@@ -1,7 +1,7 @@
 {
-  "name": "wac-projekt",
+  "name": "ambulance-ufe",
   "version": "0.0.1",
-  "description": "Stencil Component Starter",
+  "description": "Micro-frontend for the register of medical devices in hospital departments",
   "main": "dist/index.cjs.js",
   "module": "dist/index.js",
   "es2015": "dist/esm/index.js",
@@ -12,7 +12,8 @@
   "unpkg": "dist/ambulance-ufe/ambulance-ufe.esm.js",
   "repository": {
     "type": "git",
-    "url": "https://github.com/ionic-team/stencil-component-starter.git"
+    "url": "https://github.com/AkosKappel/wac.git",
+    "directory": "wac-ufe"
   },
   "files": [
     "dist/",

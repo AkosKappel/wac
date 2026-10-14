@@ -44,11 +44,12 @@ RUN CGO_ENABLED=0 GOOS=linux \
 FROM scratch
 
 # see https://github.com/opencontainers/image-spec/blob/main/annotations.md for details
-LABEL org.opencontainers.image.authors="Your Name"
-LABEL org.opencontainers.image.title="Ambulance Waiting List WebAPI Service"
-LABEL org.opencontainers.image.description="WEBAPI for managing entries in ambulances` waiting list"
+LABEL org.opencontainers.image.authors="Ákos Kappel"
+LABEL org.opencontainers.image.title="Ambulance Devices API"
+LABEL org.opencontainers.image.description="REST API for the medical devices of hospital departments and their operations logs"
 
-# list all variables and their default values for clarity
+# list all variables and their default values for clarity;
+# AMBULANCE_API_MONGODB_PASSWORD has no default and must be set at runtime
 ENV AMBULANCE_API_ENVIRONMENT=production
 ENV AMBULANCE_API_PORT=8080
 ENV AMBULANCE_API_MONGODB_HOST=mongo
@@ -56,7 +57,6 @@ ENV AMBULANCE_API_MONGODB_PORT=27017
 ENV AMBULANCE_API_MONGODB_DATABASE=harkap-ambulance
 ENV AMBULANCE_API_MONGODB_COLLECTION=ambulance
 ENV AMBULANCE_API_MONGODB_USERNAME=root
-ENV AMBULANCE_API_MONGODB_PASSWORD=neUhaDnes
 ENV AMBULANCE_API_MONGODB_TIMEOUT_SECONDS=5
 
 COPY --from=build /app/ambulance-webapi-srv ./

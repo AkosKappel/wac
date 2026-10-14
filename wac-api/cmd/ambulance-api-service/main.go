@@ -18,6 +18,9 @@ import (
 
 func main() {
 	log.Printf("Server started")
+	if os.Getenv("AMBULANCE_API_MONGODB_PASSWORD") == "" {
+		log.Fatal("AMBULANCE_API_MONGODB_PASSWORD is not set")
+	}
 	port := os.Getenv("AMBULANCE_API_PORT")
 	if port == "" {
 		port = "8080"

@@ -7,7 +7,8 @@ info:
   version: "1.0.0"
   title: Device List Api
   contact:
-    email: <your_email>
+    name: Ákos Kappel
+    url: https://github.com/AkosKappel/wac
   license:
     name: CC BY 4.0
     url: "https://creativecommons.org/licenses/by/4.0/"
@@ -55,10 +56,8 @@ paths:
         description: Device list entry to store
         required: true
       responses:
-        "200":
-          description: >-
-            Value of the device list entry with re-computed estimated time of
-            ambulance entry
+        "201":
+          description: The stored device list entry
           content:
             application/json:
               schema:
@@ -124,9 +123,7 @@ paths:
         required: true
       responses:
         "200":
-          description: >-
-            value of the device list entry with re-computed estimated time of
-            ambulance entry
+          description: The updated device list entry
           content:
             application/json:
               schema:
@@ -134,10 +131,8 @@ paths:
               examples:
                 response:
                   $ref: "#/components/examples/DeviceListEntryExample"
-        "403":
-          description: >-
-            Value of the entryID and the data id is mismatching. Details are
-            provided in the response body.
+        "400":
+          description: Invalid input, or the id in the body does not match the URL
         "404":
           description: Entry with such ID does not exists
     delete:
@@ -300,10 +295,8 @@ paths:
               examples:
                 response:
                   $ref: "#/components/examples/DeviceLogExample"
-        "403":
-          description: >-
-            Value of the entryID and the data id is mismatching. Details are
-            provided in the response body.
+        "400":
+          description: Invalid input, or the id in the body does not match the URL
         "404":
           description: Log with such ID does not exists
     delete:
@@ -339,24 +332,24 @@ components:
         id:
           type: string
           example: x321ab3
-          description: Unique id of the entry in this waiting list
+          description: Unique id of the device
         name:
           type: string
           minLength: 1
           maxLength: 100
           example: Jožko Púčik
-          description: Name of patient in waiting list
+          description: Name of the device
         deviceId:
           type: string
           minLength: 1
           maxLength: 50
           example: 1-crp
-          description: Unique identifier of the patient known to Web-In-Cloud system
+          description: Registration number of the device
         warrantyUntil:
           type: string
           format: date-time
           example: "2038-12-24T10:05:00Z"
-          description: Timestamp since when the patient entered the waiting list
+          description: End of the warranty
         price:
           type: number
           format: double
@@ -406,12 +399,12 @@ components:
         deviceId:
           type: string
           example: 1-crp
-          description: Unique identifier of the device
+          description: Registration number of the device; filled by the server from the device
         createdAt:
           type: string
           format: date-time
           example: "2038-12-24T10:05:00Z"
-          description: Timestamp since when the patient entered the waiting list
+          description: When the operation happened; set by the server when missing
       example:
         $ref: "#/components/examples/DeviceLogExample"
   examples:

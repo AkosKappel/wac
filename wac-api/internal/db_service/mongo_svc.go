@@ -77,7 +77,7 @@ func NewMongoService[DocType interface{}](config MongoServiceConfig) DbService[D
 	}
 
 	if svc.Password == "" {
-		svc.Password = enviro("AMBULANCE_API_MONGODB_PASSWORD", "neUhaDnes")
+		svc.Password = enviro("AMBULANCE_API_MONGODB_PASSWORD", "")
 	}
 
 	if svc.DbName == "" {
