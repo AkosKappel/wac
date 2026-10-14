@@ -186,7 +186,9 @@ export class HarkapAmbulanceWlEditor {
                 <md-icon slot="leading-icon">event</md-icon>
               </md-outlined-text-field>
 
+              {/* a new select once the departments arrive: Material Web ignores a value set before its options */}
               <md-outlined-select
+                key={`departments-${this.departments.length}`}
                 required
                 value={this.entry.department?.code}
                 oninput={(ev: InputEvent) => {

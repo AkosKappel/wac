@@ -107,7 +107,9 @@ export class HarkapAmbulanceWlList {
                 </md-outlined-button>
               </div>
               <div class="filters">
+                {/* a new select once the devices arrive: Material Web ignores a value set before its options */}
                 <md-outlined-select
+                  key={this.devices ? 'departments' : 'loading'}
                   label={m.department}
                   value={this.query.department || 'all'}
                   onChange={(ev: Event) =>
