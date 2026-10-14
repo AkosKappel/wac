@@ -7,3 +7,6 @@ docker/tailscale/state/
 
 # git worktrees
 .worktrees/
+
+# local planning file
+BACKLOG.md
