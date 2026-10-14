@@ -1,5 +1,7 @@
 # Ambulance Devices
 
+[![CI](https://github.com/AkosKappel/wac/actions/workflows/ci.yml/badge.svg)](https://github.com/AkosKappel/wac/actions/workflows/ci.yml)
+
 A register of medical devices in hospital departments: devices with warranty, price and department, each with its own operations log. Built in the course *Webové aplikácie v prostredí cloudu* (Web Applications in the Cloud, FIIT STU) as a micro-frontend, a REST API and a GitOps setup for Kubernetes, and upgraded in 2026. The UI is in Slovak and English.
 
 **Live demo:** https://ambulance.tailb52c43.ts.net (the demo data is restored every night at 03:00 CET). API docs: [/api-docs/](https://ambulance.tailb52c43.ts.net/api-docs/).
@@ -45,6 +47,7 @@ flowchart LR
 | [`wac-api/`](wac-api/) | REST API in Go (Gin) on MongoDB, server stubs generated from [`ambulance-wl.openapi.yaml`](wac-api/api/ambulance-wl.openapi.yaml) |
 | [`wac-gitops/`](wac-gitops/) | Kubernetes manifests (Kustomize) deployed by Flux CD to the course's AKS cluster and to a local cluster, with Envoy Gateway and the ufe-controller that loads the micro-frontend into the shared portal |
 | [`docker/`](docker/) | The single-host deployment used for the live demo |
+| [`scripts/`](scripts/) | `generate-api.sh` regenerates the Go server stubs and the TypeScript client from the spec |
 
 ## Run locally
 
@@ -58,20 +61,24 @@ The app is served at http://127.0.0.1:8084. nginx serves the built frontend and 
 
 For frontend work, `npm start` in `wac-ufe/` serves the app at http://localhost:3333 against a mock API generated from the spec. To use the real API from that dev server instead, start the API with `AMBULANCE_API_CORS_ORIGINS=http://localhost:3333`.
 
-## Tests
+## Tests and checks
 
 ```bash
-cd wac-api && go test ./...
+cd wac-api && gofmt -l . && go vet ./... && go test ./...
 ```
 
 The API tests include an integration test against a real MongoDB, which runs when the `AMBULANCE_API_MONGODB_*` variables point at one and is skipped otherwise.
 
 ```bash
-cd wac-ufe && npx stencil test --spec
+cd wac-ufe && npm run lint && npm test
 ```
 
-`npm test` in `wac-ufe/` also runs the end-to-end tests in a headless Chrome.
+`npm test` runs the spec tests and the end-to-end tests in a headless Chrome; `npx stencil test --spec` runs only the spec tests. `npm run build` also type-checks.
+
+After changing [`ambulance-wl.openapi.yaml`](wac-api/api/ambulance-wl.openapi.yaml), run `scripts/generate-api.sh` (needs Docker and Go) and commit the result.
+
+[CI](.github/workflows/ci.yml) runs all of this on every push and pull request, against a MongoDB service container, plus `govulncheck`, `npm audit` and a check that the generated code matches the spec.
 
 ## Deployment
 
-The live demo runs on a home server with Docker Compose instead of Kubernetes: nginx, the API, MongoDB and a small service that restores the demo data every night. A Tailscale sidecar ([`docker-compose.tailscale.yml`](docker-compose.tailscale.yml)) publishes it over HTTPS with Funnel. The Kubernetes setup in `wac-gitops/` is kept as it ran in the course.
+The live demo runs on a home server with Docker Compose instead of Kubernetes: nginx, the API, MongoDB and a small service that restores the demo data every night. A Tailscale sidecar ([`docker-compose.tailscale.yml`](docker-compose.tailscale.yml)) publishes it over HTTPS with Funnel. CI builds the API and nginx images on every push to `main` and pushes them to GHCR (`ghcr.io/akoskappel/wac-api`, `wac-nginx`), so the server only pulls them. The Kubernetes setup in `wac-gitops/` is kept as it ran in the course.
