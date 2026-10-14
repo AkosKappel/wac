@@ -53,6 +53,7 @@ form > :first-child {
 
 .actions {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   gap: 12px;
   margin-top: 24px;
@@ -81,4 +82,13 @@ form > :first-child {
 
 .form-skeleton .skeleton:first-child {
   grid-column: 1 / -1;
+}
+
+@media (max-width: 640px) {
+  :host {
+    padding: 24px 16px 48px;
+  }
+  .card {
+    padding: 16px;
+  }
 }

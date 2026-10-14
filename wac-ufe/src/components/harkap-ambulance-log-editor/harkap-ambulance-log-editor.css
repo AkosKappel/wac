@@ -23,6 +23,7 @@ form > :first-child {
 
 .actions {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   gap: 12px;
   margin-top: 20px;
@@ -49,4 +50,14 @@ form > :first-child {
 
 .form-skeleton .skeleton:first-child {
   grid-column: 1 / -1;
+}
+
+@media (max-width: 640px) {
+  :host {
+    padding: 12px;
+  }
+  form,
+  .form-skeleton {
+    grid-template-columns: 1fr;
+  }
 }

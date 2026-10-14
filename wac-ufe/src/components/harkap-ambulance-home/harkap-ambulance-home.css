@@ -130,7 +130,7 @@ a.quick-link:hover,
 
 .departments a {
   display: grid;
-  grid-template-columns: minmax(140px, 1fr) 2fr auto;
+  grid-template-columns: 200px 1fr 120px;
   align-items: center;
   gap: 16px;
   padding: 8px 12px;
