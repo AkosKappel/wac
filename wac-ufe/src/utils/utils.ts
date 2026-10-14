@@ -40,3 +40,13 @@ export function validateOnBlur(ev: FocusEvent) {
   }
   field.reportValidity();
 }
+
+export type WarrantyStatus = 'ok' | 'expiring' | 'expired';
+
+const EXPIRING_DAYS = 90;
+
+/** Warranty state: expired, expiring within 90 days, or ok. */
+export function warrantyStatus(warrantyUntil: string, now = new Date()): WarrantyStatus {
+  const daysLeft = (new Date(warrantyUntil).getTime() - now.getTime()) / 86_400_000;
+  return daysLeft < 0 ? 'expired' : daysLeft <= EXPIRING_DAYS ? 'expiring' : 'ok';
+}

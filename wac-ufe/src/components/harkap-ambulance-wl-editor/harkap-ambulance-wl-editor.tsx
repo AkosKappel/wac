@@ -2,6 +2,7 @@ import { Component, Host, Prop, State, h, EventEmitter, Event } from '@stencil/c
 import { AmbulanceDepartmentsApiFactory, AmbulanceDeviceListApiFactory, Department, DeviceListEntry } from '../../api/ambulance-wl';
 import { ErrorPage } from '../../utils/error-page';
 import { ConfirmDialog } from '../../utils/confirm-dialog';
+import { WarrantyBadge } from '../../utils/warranty-badge';
 import { navigateTo, watchRelativePath, validateOnBlur } from '../../utils/utils';
 
 @Component({
@@ -128,6 +129,7 @@ export class HarkapAmbulanceWlEditor {
             <p class="eyebrow">{this.entryId === '@new' ? 'Nové zariadenie' : 'Detail zariadenia'}</p>
             <h1>{this.entryId === '@new' ? 'Pridať zariadenie' : this.entry?.name || '…'}</h1>
           </div>
+          {this.entryId !== '@new' && this.entry?.warrantyUntil && <WarrantyBadge until={this.entry.warrantyUntil} />}
         </header>
         <section class="card">
           {!this.entry ? (

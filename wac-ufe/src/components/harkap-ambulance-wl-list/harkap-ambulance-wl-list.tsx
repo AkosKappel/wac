@@ -1,6 +1,7 @@
 import { Component, Event, EventEmitter, Host, Prop, State, h } from '@stencil/core';
 import { AmbulanceDeviceListApiFactory, DeviceListEntry } from '../../api/ambulance-wl';
 import { ErrorPage, SkeletonRows } from '../../utils/error-page';
+import { WarrantyBadge } from '../../utils/warranty-badge';
 
 @Component({
   tag: 'harkap-ambulance-wl-list',
@@ -94,29 +95,22 @@ export class HarkapAmbulanceWlList {
                 <SkeletonRows count={4} />
               ) : devices.length ? (
                 <md-list class="list">
-                  {devices.map(device => {
-                    const expired = new Date(device.warrantyUntil) < new Date();
-                    return (
-                      <md-list-item class="list-item" type="button" onClick={() => this.entryClicked.emit(device.id)}>
-                        <div slot="start" class="avatar">
-                          <md-icon>medical_services</md-icon>
-                        </div>
-                        <div slot="headline">{device.name}</div>
-                        <div slot="supporting-text">
-                          {device.department.name}
-                          {device.deviceId ? ` · ${device.deviceId}` : ''}
-                        </div>
-                        <div slot="end" class="meta">
-                          {device.warrantyUntil && (
-                            <span class={{ badge: true, expired }}>
-                              {expired ? 'Záruka vypršala' : 'V záruke do ' + new Date(device.warrantyUntil).toLocaleDateString('sk-SK')}
-                            </span>
-                          )}
-                          <md-icon>chevron_right</md-icon>
-                        </div>
-                      </md-list-item>
-                    );
-                  })}
+                  {devices.map(device => (
+                    <md-list-item class="list-item" type="button" onClick={() => this.entryClicked.emit(device.id)}>
+                      <div slot="start" class="avatar">
+                        <md-icon>medical_services</md-icon>
+                      </div>
+                      <div slot="headline">{device.name}</div>
+                      <div slot="supporting-text">
+                        {device.department.name}
+                        {device.deviceId ? ` · ${device.deviceId}` : ''}
+                      </div>
+                      <div slot="end" class="meta">
+                        {device.warrantyUntil && <WarrantyBadge until={device.warrantyUntil} />}
+                        <md-icon>chevron_right</md-icon>
+                      </div>
+                    </md-list-item>
+                  ))}
                 </md-list>
               ) : (
                 <div class="empty">

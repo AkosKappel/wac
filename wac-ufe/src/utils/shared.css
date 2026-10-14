@@ -144,3 +144,24 @@ md-dialog .danger {
     animation: none;
   }
 }
+
+/* Warranty status, same in list and detail */
+.badge {
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  white-space: nowrap;
+  background: var(--md-sys-color-secondary-container, #e1ecef);
+  color: var(--md-sys-color-on-secondary-container, #1c3238);
+}
+
+.badge.expiring {
+  background: var(--app-color-warning-container, #fdecc8);
+  color: var(--app-color-on-warning-container, #4f3500);
+}
+
+.badge.expired {
+  background: var(--md-sys-color-error-container, #fbe3e1);
+  color: var(--md-sys-color-on-error-container, #5c0f0b);
+}

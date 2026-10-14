@@ -89,21 +89,6 @@ h1 {
   gap: 12px;
 }
 
-.badge {
-  padding: 4px 10px;
-  border-radius: 999px;
-  font-size: 0.75rem;
-  font-weight: 600;
-  white-space: nowrap;
-  background: var(--md-sys-color-secondary-container);
-  color: var(--md-sys-color-on-secondary-container);
-}
-
-.badge.expired {
-  background: var(--md-sys-color-error-container);
-  color: var(--md-sys-color-on-error-container);
-}
-
 .empty {
   padding: 56px 24px;
   text-align: center;
