@@ -6,8 +6,8 @@ import { DeviceListEntry } from '../../../api/ambulance-wl';
 
 describe('harkap-ambulance-wl-list', () => {
   const sampleDevices: DeviceListEntry[] = [
-    { id: '1', name: 'Defibrillator', department: { name: 'Cardiology' }, deviceId: '1' },
-    { id: '2', name: 'Ultrasound', department: { name: 'Radiology' }, deviceId: '2' },
+    { id: '1', name: 'Defibrillator', department: { name: 'Cardiology' }, deviceId: '1', warrantyUntil: '2030-01-01T00:00:00Z' },
+    { id: '2', name: 'Ultrasound', department: { name: 'Radiology' }, deviceId: '2', warrantyUntil: '2030-01-01T00:00:00Z' },
   ];
 
   let mock: MockAdapter;
@@ -55,7 +55,7 @@ describe('harkap-ambulance-wl-list', () => {
     await page.rootInstance.filteredDevices();
 
     expect(page.rootInstance.filteredDevices()).toEqual([
-      { id: '1', name: 'Defibrillator', department: { name: 'Cardiology' }, deviceId: '1' },
+      { id: '1', name: 'Defibrillator', department: { name: 'Cardiology' }, deviceId: '1', warrantyUntil: '2030-01-01T00:00:00Z' },
     ]);
   });
 
