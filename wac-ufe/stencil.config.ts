@@ -3,6 +3,8 @@ import { Config } from '@stencil/core';
 export const config: Config = {
   namespace: 'ambulance-ufe',
   globalScript: 'src/global/app.ts',
+  // keep the entry script external, so the Content-Security-Policy can forbid inline scripts
+  allowInlineScripts: false,
   outputTargets: [
     {
       type: 'dist',

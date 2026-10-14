@@ -14,7 +14,7 @@ ENTRYPOINT ["bash"]
 
 ############################################
 
-FROM golang:1.23 AS build
+FROM golang:1.27 AS build
 
 WORKDIR /app
 
@@ -60,6 +60,9 @@ ENV AMBULANCE_API_MONGODB_PASSWORD=neUhaDnes
 ENV AMBULANCE_API_MONGODB_TIMEOUT_SECONDS=5
 
 COPY --from=build /app/ambulance-webapi-srv ./
+
+# scratch has no users; run as nobody instead of root
+USER 65534:65534
 
 # Actual port may be changed during runtime
 # Default using for the simple case scenario

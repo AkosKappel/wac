@@ -43,7 +43,6 @@ services:
     build:
       context: ./wac-api
       dockerfile: build/docker/Dockerfile
-    image: ambulance-api
     container_name: ${CONTAINER_PREFIX:-ambulance}-api
     restart: unless-stopped
     logging: *logging
@@ -96,7 +95,6 @@ services:
     build:
       context: .
       dockerfile: docker/nginx/Dockerfile
-    image: ambulance-web
     container_name: ${CONTAINER_PREFIX:-ambulance}-nginx
     restart: unless-stopped
     logging: *logging
