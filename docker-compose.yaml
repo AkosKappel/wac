@@ -11,7 +11,7 @@ x-mongo-env: &mongo-env
 
 services:
   mongo:
-    image: mongo:7.0
+    image: mongo:8.0
     container_name: ${CONTAINER_PREFIX:-ambulance}-mongo
     restart: unless-stopped
     logging: *logging
@@ -71,7 +71,7 @@ services:
 
   # restores the demo data every night
   reset:
-    image: mongo:7.0
+    image: mongo:8.0
     container_name: ${CONTAINER_PREFIX:-ambulance}-reset
     restart: unless-stopped
     logging: *logging

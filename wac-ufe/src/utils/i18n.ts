@@ -143,7 +143,7 @@ const sk = {
       'Projekt vznikol v predmete Webové aplikácie v prostredí cloudu (WAC) na FIIT STU v Bratislave. Predmet učí stavať webové aplikácie z micro-frontendov, REST API generovaných z OpenAPI špecifikácie a nasadzovať ich do Kubernetes pomocou GitOps.',
     architectureTitle: 'Architektúra',
     liveTitle: 'Dnes: živé demo na domácom serveri',
-    live: ['Prehliadač', 'Tailscale Funnel (HTTPS)', 'nginx: frontend a proxy /api', 'Go API (Gin)', 'MongoDB 7'],
+    live: ['Prehliadač', 'Tailscale Funnel (HTTPS)', 'nginx: frontend a proxy /api', 'Go API (Gin)', 'MongoDB 8'],
     liveNote:
       'Všetko beží v Docker Compose. Samostatný kontajner každú noc o 3:00 obnoví ukážkové údaje. nginx posiela bezpečnostné hlavičky vrátane Content-Security-Policy a obmedzuje počet požiadaviek.',
     courseSetupTitle: 'V predmete: Kubernetes a GitOps',
@@ -160,7 +160,7 @@ const sk = {
     stack: [
       ['Frontend', 'Stencil 4 (webové komponenty), Material Web, TypeScript, klient API generovaný z OpenAPI'],
       ['API', 'Go 1.27, Gin 1.12, MongoDB Go driver 1.17, kostra servera generovaná z OpenAPI'],
-      ['Databáza', 'MongoDB 7.0'],
+      ['Databáza', 'MongoDB 8.0'],
       ['Prevádzka', 'Docker Compose, nginx 1.30, Tailscale Funnel, štruktúrované JSON logy'],
       ['V predmete', 'Kubernetes, Kustomize, Flux CD, Envoy Gateway'],
     ],
@@ -319,7 +319,7 @@ const en: Messages = {
       'The project was built in the course Web Applications in the Cloud (WAC) at FIIT STU in Bratislava. The course teaches building web applications from micro-frontends and REST APIs generated from an OpenAPI spec, and deploying them to Kubernetes with GitOps.',
     architectureTitle: 'Architecture',
     liveTitle: 'Today: the live demo on a home server',
-    live: ['Browser', 'Tailscale Funnel (HTTPS)', 'nginx: frontend and /api proxy', 'Go API (Gin)', 'MongoDB 7'],
+    live: ['Browser', 'Tailscale Funnel (HTTPS)', 'nginx: frontend and /api proxy', 'Go API (Gin)', 'MongoDB 8'],
     liveNote:
       'Everything runs in Docker Compose. A separate container restores the demo data every night at 3:00. nginx sends security headers including a Content-Security-Policy and rate limits requests.',
     courseSetupTitle: 'In the course: Kubernetes and GitOps',
@@ -336,7 +336,7 @@ const en: Messages = {
     stack: [
       ['Frontend', 'Stencil 4 (web components), Material Web, TypeScript, API client generated from OpenAPI'],
       ['API', 'Go 1.27, Gin 1.12, MongoDB Go driver 1.17, server stubs generated from OpenAPI'],
-      ['Database', 'MongoDB 7.0'],
+      ['Database', 'MongoDB 8.0'],
       ['Operations', 'Docker Compose, nginx 1.30, Tailscale Funnel, structured JSON logs'],
       ['In the course', 'Kubernetes, Kustomize, Flux CD, Envoy Gateway'],
     ],

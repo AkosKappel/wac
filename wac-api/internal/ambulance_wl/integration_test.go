@@ -20,7 +20,7 @@ import (
 // for example a throwaway container:
 //
 //	docker run -d --rm --name ambulance-test-mongo -p 127.0.0.1:27099:27017 \
-//	  -e MONGO_INITDB_ROOT_USERNAME=root -e MONGO_INITDB_ROOT_PASSWORD=test mongo:7.0
+//	  -e MONGO_INITDB_ROOT_USERNAME=root -e MONGO_INITDB_ROOT_PASSWORD=test mongo:8.0
 //	AMBULANCE_API_MONGODB_PORT=27099 AMBULANCE_API_MONGODB_PASSWORD=test go test ./...
 func newIntegrationEngine(t *testing.T) *gin.Engine {
 	if os.Getenv("AMBULANCE_API_MONGODB_PASSWORD") == "" {

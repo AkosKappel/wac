@@ -22,7 +22,7 @@ flowchart LR
   browser[Browser] --> funnel[Tailscale Funnel<br/>HTTPS sidecar]
   funnel --> nginx[nginx<br/>frontend, /api proxy, CSP]
   nginx --> api[Go API<br/>Gin]
-  api --> mongo[(MongoDB 7)]
+  api --> mongo[(MongoDB 8)]
   reset[Nightly reset<br/>mongosh seed.js] --> mongo
 ```
 
