@@ -13,7 +13,6 @@ To see how to make this your own, look here:
 [README](https://openapi-generator.tech)
 
 - API version: 1.0.0
-- Build date: 2026-10-14T18:06:30.913254456Z[Etc/UTC]
 - Generator version: 7.25.0
 For more information, please visit [https://github.com/AkosKappel/wac](https://github.com/AkosKappel/wac)
 
