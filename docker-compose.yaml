@@ -39,7 +39,10 @@ services:
     networks:
       - app-network
 
+  # CI builds both images and pushes them to GHCR; "docker compose pull" fetches them,
+  # "docker compose build" still builds them here. IMAGE_TAG picks a commit (sha-<short sha>).
   api:
+    image: ghcr.io/akoskappel/wac-api:${IMAGE_TAG:-latest}
     build:
       context: ./wac-api
       dockerfile: build/docker/Dockerfile
@@ -92,6 +95,7 @@ services:
         condition: service_healthy
 
   nginx:
+    image: ghcr.io/akoskappel/wac-nginx:${IMAGE_TAG:-latest}
     build:
       context: .
       dockerfile: docker/nginx/Dockerfile
