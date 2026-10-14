@@ -6,6 +6,8 @@ const collection = database.getCollection(process.env.AMBULANCE_API_MONGODB_COLL
 const log = (id, deviceId, text, createdAt) => ({ id, text, deviceId, createdAt: new Date(createdAt) });
 
 collection.deleteMany({});
+// the API also creates this index; here it protects the data before the API first connects
+collection.createIndex({ id: 1 }, { unique: true });
 collection.insertMany([
   {
     id: 'crp-01',

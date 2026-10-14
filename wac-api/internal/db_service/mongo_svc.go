@@ -18,7 +18,10 @@ import (
 type DbService[DocType interface{}] interface {
 	CreateDocument(ctx context.Context, id string, document *DocType) error
 	FindDocument(ctx context.Context, id string) (*DocType, error)
-	UpdateDocument(ctx context.Context, id string, document *DocType) error
+	// UpdateDocument applies a MongoDB update (e.g. $set, $push) to the document with the given
+	// id that also matches filter, and returns the updated document. Doing the change in one
+	// atomic operation keeps concurrent requests from overwriting each other.
+	UpdateDocument(ctx context.Context, id string, filter bson.D, update bson.D) (*DocType, error)
 	DeleteDocument(ctx context.Context, id string) error
 	Disconnect(ctx context.Context) error
 	FindDocuments(ctx context.Context) ([]*DocType, error)
@@ -131,12 +134,20 @@ func (this *mongoSvc[DocType]) connect(ctx context.Context) (*mongo.Client, erro
 		uri = fmt.Sprintf("mongodb://%v:%v@%v:%v", this.UserName, this.Password, this.ServerHost, this.ServerPort)
 	}
 
-	if client, err := mongo.Connect(ctx, options.Client().ApplyURI(uri).SetConnectTimeout(10*time.Second)); err != nil {
+	client, err := mongo.Connect(ctx, options.Client().ApplyURI(uri).SetConnectTimeout(10*time.Second))
+	if err != nil {
 		return nil, err
-	} else {
-		this.client.Store(client)
-		return client, nil
 	}
+	// the unique index turns a duplicate id into an insert error instead of a second document
+	_, err = client.Database(this.DbName).Collection(this.Collection).Indexes().CreateOne(ctx, mongo.IndexModel{
+		Keys:    bson.D{{Key: "id", Value: 1}},
+		Options: options.Index().SetUnique(true),
+	})
+	if err != nil {
+		log.Printf("Failed to create the unique index on id: %v", err)
+	}
+	this.client.Store(client)
+	return client, nil
 }
 
 // Ping reports whether the database answers, for health checks.
@@ -177,17 +188,10 @@ func (this *mongoSvc[DocType]) CreateDocument(ctx context.Context, id string, do
 	}
 	db := client.Database(this.DbName)
 	collection := db.Collection(this.Collection)
-	result := collection.FindOne(ctx, bson.D{{Key: "id", Value: id}})
-	switch result.Err() {
-	case nil: // no error means there is conflicting document
-		return ErrConflict
-	case mongo.ErrNoDocuments:
-		// do nothing, this is expected
-	default: // other errors - return them
-		return result.Err()
-	}
-
 	_, err = collection.InsertOne(ctx, document)
+	if mongo.IsDuplicateKeyError(err) {
+		return ErrConflict
+	}
 	return err
 }
 
@@ -240,25 +244,29 @@ func (this *mongoSvc[DocType]) FindDocuments(ctx context.Context) ([]*DocType, e
 	return documents, nil
 }
 
-func (this *mongoSvc[DocType]) UpdateDocument(ctx context.Context, id string, document *DocType) error {
+func (this *mongoSvc[DocType]) UpdateDocument(ctx context.Context, id string, filter bson.D, update bson.D) (*DocType, error) {
 	ctx, contextCancel := context.WithTimeout(ctx, this.Timeout)
 	defer contextCancel()
 	client, err := this.connect(ctx)
 	if err != nil {
-		return err
+		return nil, err
 	}
-	db := client.Database(this.DbName)
-	collection := db.Collection(this.Collection)
-	result := collection.FindOne(ctx, bson.D{{Key: "id", Value: id}})
-	switch result.Err() {
+	collection := client.Database(this.DbName).Collection(this.Collection)
+	result := collection.FindOneAndUpdate(
+		ctx,
+		append(bson.D{{Key: "id", Value: id}}, filter...),
+		update,
+		options.FindOneAndUpdate().SetReturnDocument(options.After),
+	)
+	var document *DocType
+	switch err := result.Decode(&document); err {
 	case nil:
+		return document, nil
 	case mongo.ErrNoDocuments:
-		return ErrNotFound
-	default: // other errors - return them
-		return result.Err()
+		return nil, ErrNotFound
+	default:
+		return nil, err
 	}
-	_, err = collection.ReplaceOne(ctx, bson.D{{Key: "id", Value: id}}, document)
-	return err
 }
 
 func (this *mongoSvc[DocType]) DeleteDocument(ctx context.Context, id string) error {
@@ -270,14 +278,12 @@ func (this *mongoSvc[DocType]) DeleteDocument(ctx context.Context, id string) er
 	}
 	db := client.Database(this.DbName)
 	collection := db.Collection(this.Collection)
-	result := collection.FindOne(ctx, bson.D{{Key: "id", Value: id}})
-	switch result.Err() {
-	case nil:
-	case mongo.ErrNoDocuments:
-		return ErrNotFound
-	default: // other errors - return them
-		return result.Err()
+	result, err := collection.DeleteOne(ctx, bson.D{{Key: "id", Value: id}})
+	if err != nil {
+		return err
 	}
-	_, err = collection.DeleteOne(ctx, bson.D{{Key: "id", Value: id}})
-	return err
+	if result.DeletedCount == 0 {
+		return ErrNotFound
+	}
+	return nil
 }

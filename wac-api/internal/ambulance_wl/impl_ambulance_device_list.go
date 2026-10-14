@@ -6,304 +6,124 @@ import (
 	"github.com/AkosKappel/wac/wac-api/internal/db_service"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
+	"go.mongodb.org/mongo-driver/bson"
 )
-
-// Nasledujúci kód je kópiou vygenerovaného a zakomentovaného kódu zo súboru api_ambulance_Device_list.go
 
 // CreateDeviceListEntry - Saves new entry into Device list
 func (this *implAmbulanceDeviceListAPI) CreateDeviceListEntry(ctx *gin.Context) {
-	value, exists := ctx.Get("db_service")
-	if !exists {
-		ctx.JSON(
-			http.StatusInternalServerError,
-			gin.H{
-				"status":  "Internal Server Error",
-				"message": "db not found",
-				"error":   "db not found",
-			})
-		return
-	}
-
-	db, ok := value.(db_service.DbService[DeviceListEntry])
+	db, ok := dbService(ctx)
 	if !ok {
-		ctx.JSON(
-			http.StatusInternalServerError,
-			gin.H{
-				"status":  "Internal Server Error",
-				"message": "db context is not of required type",
-				"error":   "cannot cast db context to db_service.DbService",
-			})
 		return
 	}
 
 	device := DeviceListEntry{}
-	err := ctx.BindJSON(&device)
-	if err != nil {
-		ctx.JSON(
-			http.StatusBadRequest,
-			gin.H{
-				"status":  "Bad Request",
-				"message": "Invalid request body",
-				"error":   err.Error(),
-			})
+	if err := ctx.ShouldBindJSON(&device); err != nil {
+		respondError(ctx, http.StatusBadRequest, "Invalid request body", nil)
 		return
 	}
-
 	if device.Id == "" {
 		device.Id = uuid.New().String()
 	}
+	syncLogDeviceIds(&device)
 
-	err = db.CreateDocument(ctx, device.Id, &device)
-
-	switch err {
+	switch err := db.CreateDocument(ctx, device.Id, &device); err {
 	case nil:
-		ctx.JSON(
-			http.StatusCreated,
-			device,
-		)
+		ctx.JSON(http.StatusCreated, device)
 	case db_service.ErrConflict:
-		ctx.JSON(
-			http.StatusConflict,
-			gin.H{
-				"status":  "Conflict",
-				"message": "Ambulance already exists",
-				"error":   err.Error(),
-			},
-		)
+		respondError(ctx, http.StatusConflict, "Device already exists", nil)
 	default:
-		ctx.JSON(
-			http.StatusBadGateway,
-			gin.H{
-				"status":  "Bad Gateway",
-				"message": "Failed to create ambulance in database",
-				"error":   err.Error(),
-			},
-		)
+		respondError(ctx, http.StatusBadGateway, "Failed to create device in database", err)
 	}
 }
 
 // DeleteDeviceListEntry - Deletes specific entry
 func (this *implAmbulanceDeviceListAPI) DeleteDeviceListEntry(ctx *gin.Context) {
-	value, exists := ctx.Get("db_service")
-	if !exists {
-		ctx.JSON(
-			http.StatusInternalServerError,
-			gin.H{
-				"status":  "Internal Server Error",
-				"message": "db not found",
-				"error":   "db not found",
-			})
-		return
-	}
-
-	db, ok := value.(db_service.DbService[DeviceListEntry])
+	db, ok := dbService(ctx)
 	if !ok {
-		ctx.JSON(
-			http.StatusInternalServerError,
-			gin.H{
-				"status":  "Internal Server Error",
-				"message": "db context is not of required type",
-				"error":   "cannot cast db context to db_service.DbService",
-			})
 		return
 	}
 
-	deviceId := ctx.Param("entryId")
-
-	err := db.DeleteDocument(ctx, deviceId)
-
-	switch err {
+	switch err := db.DeleteDocument(ctx, ctx.Param("entryId")); err {
 	case nil:
-		ctx.JSON(
-			http.StatusNoContent,
-			nil,
-		)
+		ctx.AbortWithStatus(http.StatusNoContent)
 	case db_service.ErrNotFound:
-		ctx.JSON(
-			http.StatusNotFound,
-			gin.H{
-				"status":  "Not Found",
-				"message": "Device not found",
-				"error":   err.Error(),
-			},
-		)
+		respondError(ctx, http.StatusNotFound, "Device not found", nil)
 	default:
-		ctx.JSON(
-			http.StatusBadGateway,
-			gin.H{
-				"status":  "Bad Gateway",
-				"message": "Failed to delete device from database",
-				"error":   err.Error(),
-			})
+		respondError(ctx, http.StatusBadGateway, "Failed to delete device from database", err)
 	}
 }
 
 // GetDeviceListEntries - Provides the ambulance Device list
 func (this *implAmbulanceDeviceListAPI) GetDeviceListEntries(ctx *gin.Context) {
-	value, exists := ctx.Get("db_service")
-	if !exists {
-		ctx.JSON(
-			http.StatusInternalServerError,
-			gin.H{
-				"status":  "Internal Server Error",
-				"message": "db not found",
-				"error":   "db not found",
-			})
-		return
-	}
-
-	db, ok := value.(db_service.DbService[DeviceListEntry])
+	db, ok := dbService(ctx)
 	if !ok {
-		ctx.JSON(
-			http.StatusInternalServerError,
-			gin.H{
-				"status":  "Internal Server Error",
-				"message": "db context is not of required type",
-				"error":   "cannot cast db context to db_service.DbService",
-			})
 		return
 	}
 
 	devices, err := db.FindDocuments(ctx)
-
 	if err != nil {
-		ctx.JSON(
-			http.StatusBadGateway,
-			gin.H{
-				"status":  "Bad Gateway",
-				"message": "Failed to load devices from database",
-				"error":   err.Error(),
-			})
+		respondError(ctx, http.StatusBadGateway, "Failed to load devices from database", err)
 		return
 	}
-
-	ctx.JSON(
-		http.StatusOK,
-		devices,
-	)
+	for _, device := range devices {
+		syncLogDeviceIds(device)
+	}
+	ctx.JSON(http.StatusOK, devices)
 }
 
 // GetDeviceListEntry - Provides details about Device list entry
 func (this *implAmbulanceDeviceListAPI) GetDeviceListEntry(ctx *gin.Context) {
-	value, exists := ctx.Get("db_service")
-	if !exists {
-		ctx.JSON(
-			http.StatusInternalServerError,
-			gin.H{
-				"status":  "Internal Server Error",
-				"message": "db not found",
-				"error":   "db not found",
-			})
-		return
-	}
-
-	db, ok := value.(db_service.DbService[DeviceListEntry])
+	db, ok := dbService(ctx)
 	if !ok {
-		ctx.JSON(
-			http.StatusInternalServerError,
-			gin.H{
-				"status":  "Internal Server Error",
-				"message": "db context is not of required type",
-				"error":   "cannot cast db context to db_service.DbService",
-			})
 		return
 	}
 
-	deviceId := ctx.Param("entryId")
-
-	device, err := db.FindDocument(ctx, deviceId)
-
+	device, err := db.FindDocument(ctx, ctx.Param("entryId"))
 	switch err {
 	case nil:
-		ctx.JSON(
-			http.StatusOK,
-			device,
-		)
+		syncLogDeviceIds(device)
+		ctx.JSON(http.StatusOK, device)
 	case db_service.ErrNotFound:
-		ctx.JSON(
-			http.StatusNotFound,
-			gin.H{
-				"status":  "Not Found",
-				"message": "Device not found",
-				"error":   err.Error(),
-			},
-		)
+		respondError(ctx, http.StatusNotFound, "Device not found", nil)
 	default:
-		ctx.JSON(
-			http.StatusBadGateway,
-			gin.H{
-				"status":  "Bad Gateway",
-				"message": "Failed to load device from database",
-				"error":   err.Error(),
-			})
+		respondError(ctx, http.StatusBadGateway, "Failed to load device from database", err)
 	}
 }
 
 // UpdateDeviceListEntry - Updates specific entry
 func (this *implAmbulanceDeviceListAPI) UpdateDeviceListEntry(ctx *gin.Context) {
-	value, exists := ctx.Get("db_service")
-	if !exists {
-		ctx.JSON(
-			http.StatusInternalServerError,
-			gin.H{
-				"status":  "Internal Server Error",
-				"message": "db not found",
-				"error":   "db not found",
-			})
-		return
-	}
-
-	db, ok := value.(db_service.DbService[DeviceListEntry])
+	db, ok := dbService(ctx)
 	if !ok {
-		ctx.JSON(
-			http.StatusInternalServerError,
-			gin.H{
-				"status":  "Internal Server Error",
-				"message": "db context is not of required type",
-				"error":   "cannot cast db context to db_service.DbService",
-			})
 		return
 	}
 
 	deviceId := ctx.Param("entryId")
-
 	device := DeviceListEntry{}
-	err := ctx.BindJSON(&device)
-	if err != nil {
-		ctx.JSON(
-			http.StatusBadRequest,
-			gin.H{
-				"status":  "Bad Request",
-				"message": "Invalid request body",
-				"error":   err.Error(),
-			})
+	if err := ctx.ShouldBindJSON(&device); err != nil {
+		respondError(ctx, http.StatusBadRequest, "Invalid request body", nil)
+		return
+	}
+	if device.Id != "" && device.Id != deviceId {
+		respondError(ctx, http.StatusBadRequest, "Device id in the body does not match the URL", nil)
 		return
 	}
 
-	err = db.UpdateDocument(ctx, deviceId, &device)
-
+	// the log list changes only through the log endpoints, so saving a device that was
+	// loaded earlier cannot drop log entries added in the meantime
+	updated, err := db.UpdateDocument(ctx, deviceId, nil, bson.D{{Key: "$set", Value: bson.D{
+		{Key: "name", Value: device.Name},
+		{Key: "deviceId", Value: device.DeviceId},
+		{Key: "warrantyUntil", Value: device.WarrantyUntil},
+		{Key: "price", Value: device.Price},
+		{Key: "department", Value: device.Department},
+	}}})
 	switch err {
 	case nil:
-		ctx.JSON(
-			http.StatusOK,
-			device,
-		)
+		syncLogDeviceIds(updated)
+		ctx.JSON(http.StatusOK, updated)
 	case db_service.ErrNotFound:
-		ctx.JSON(
-			http.StatusNotFound,
-			gin.H{
-				"status":  "Not Found",
-				"message": "Device not found",
-				"error":   err.Error(),
-			},
-		)
+		respondError(ctx, http.StatusNotFound, "Device not found", nil)
 	default:
-		ctx.JSON(
-			http.StatusBadGateway,
-			gin.H{
-				"status":  "Bad Gateway",
-				"message": "Failed to update device in database",
-				"error":   err.Error(),
-			})
+		respondError(ctx, http.StatusBadGateway, "Failed to update device in database", err)
 	}
 }

@@ -100,18 +100,6 @@ export class HarkapAmbulanceLogEditor {
             </md-outlined-text-field>
 
             <md-outlined-text-field
-              required
-              value={this.log.deviceId}
-              oninput={(ev: InputEvent) => {
-                this.log.deviceId = this.inputValue(ev);
-                this.isValid = this.isFormValid();
-              }}
-              label="ID zariadenia"
-            >
-              <md-icon slot="leading-icon">pin</md-icon>
-            </md-outlined-text-field>
-
-            <md-outlined-text-field
               type="datetime-local"
               required
               value={toLocalDateTimeInput(this.log.createdAt)}
@@ -170,7 +158,7 @@ export class HarkapAmbulanceLogEditor {
   }
 
   private isFormValid(): boolean {
-    return this.log?.deviceId && this.log?.text && this.log?.createdAt && true;
+    return this.log?.text && this.log?.createdAt && true;
   }
 
   private inputValue(ev: InputEvent): string {
