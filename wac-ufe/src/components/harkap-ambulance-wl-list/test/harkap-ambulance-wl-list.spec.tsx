@@ -51,8 +51,7 @@ describe('harkap-ambulance-wl-list', () => {
       supportsShadowDom: true,
     });
     page.rootInstance.devices = sampleDevices;
-    page.rootInstance.searchText = 'defib';
-    await page.rootInstance.filteredDevices();
+    page.rootInstance.query = { ...page.rootInstance.query, q: 'defib' };
 
     expect(page.rootInstance.filteredDevices()).toEqual([
       { id: '1', name: 'Defibrillator', department: { name: 'Cardiology' }, deviceId: '1', warrantyUntil: '2030-01-01T00:00:00Z' },

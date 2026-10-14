@@ -1,8 +1,10 @@
 import { Component, Event, EventEmitter, Host, Prop, State, h } from '@stencil/core';
-import { AmbulanceDeviceListApiFactory, DeviceListEntry } from '../../api/ambulance-wl';
+import { AmbulanceDeviceListApiFactory, Department, DeviceListEntry } from '../../api/ambulance-wl';
+import { downloadText, toCsv } from '../../utils/csv';
+import { DeviceQuery, applyQuery, parseQuery, toSearch } from '../../utils/device-query';
 import { ErrorPage, SkeletonRows } from '../../utils/error-page';
-import { WarrantyBadge } from '../../utils/warranty-badge';
 import { t } from '../../utils/i18n';
+import { WarrantyBadge } from '../../utils/warranty-badge';
 
 @Component({
   tag: 'harkap-ambulance-wl-list',
@@ -14,7 +16,7 @@ export class HarkapAmbulanceWlList {
   @Prop() apiBase: string;
   @State() errorMessage: string;
   @State() errorStatus: number;
-  @State() searchText: string = '';
+  @State() query: DeviceQuery = parseQuery(location.search);
 
   @State() devices: DeviceListEntry[];
 
@@ -38,32 +40,40 @@ export class HarkapAmbulanceWlList {
   }
 
   private filteredDevices(): DeviceListEntry[] {
-    const searchText = this.escapeRegExp(this.normalizeSearchText(this.searchText));
-    const searchRegex = new RegExp(searchText.split('').join('.*?'), 'i');
-
-    return this.devices?.filter((device: DeviceListEntry) => {
-      const deviceName = this.normalizeSearchText(device.name);
-      const departmentName = this.normalizeSearchText(device.department.name);
-      return searchRegex.test(deviceName) || searchRegex.test(departmentName);
-    });
+    return this.devices && applyQuery([...this.devices], this.query, t().locale);
   }
 
-  private normalizeSearchText(text: string): string {
-    return text
-      .normalize('NFD') // Normalize diacritics
-      .replace(/[\u0300-\u036f]/g, '') // Remove accents
-      .replace(/\s+/g, ' ') // Replace multiple spaces with a single space
-      .toLowerCase() // Convert to lowercase
-      .trim(); // Remove leading and trailing spaces
+  private setQuery(change: Partial<DeviceQuery>) {
+    this.query = { ...this.query, ...change };
+    // replace, not push: typing in the search box should not fill the back button history
+    history.replaceState(history.state, '', location.pathname + toSearch(this.query));
   }
 
-  private escapeRegExp(text: string): string {
-    return text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); // Escapes RegExp special characters
+  /** The departments that have devices, by name. */
+  private departments(): Department[] {
+    const byCode = new Map((this.devices ?? []).map(device => [device.department?.code, device.department]));
+    byCode.delete(undefined);
+    return [...byCode.values()].sort((a, b) => a.name.localeCompare(b.name, t().locale));
+  }
+
+  private exportCsv(devices: DeviceListEntry[]) {
+    const m = t().list;
+    const rows = devices.map(device => [
+      device.id,
+      device.name,
+      device.deviceId,
+      device.department?.name ?? '',
+      device.warrantyUntil?.substring(0, 10) ?? '',
+      device.price ?? 0,
+    ]);
+    downloadText(`${m.csvFile}-${new Date().toISOString().substring(0, 10)}.csv`, toCsv([m.csvHeader, ...rows]));
   }
 
   render() {
     const devices = this.filteredDevices() ?? [];
     const m = t().list;
+    const filtered = this.query.q || this.query.department || this.query.warranty;
+    const selectValue = (ev: Event) => (ev.target as HTMLSelectElement).value;
     return (
       <Host>
         {this.errorMessage ? (
@@ -87,11 +97,72 @@ export class HarkapAmbulanceWlList {
                 <md-outlined-text-field
                   class="search"
                   placeholder={m.search}
-                  onInput={(e: InputEvent) => (this.searchText = (e.target as HTMLInputElement).value)}
+                  aria-label={m.search}
+                  value={this.query.q}
+                  onInput={(e: InputEvent) => this.setQuery({ q: (e.target as HTMLInputElement).value })}
                 >
                   <md-icon slot="leading-icon">search</md-icon>
                 </md-outlined-text-field>
                 <span class="count">{this.devices ? m.count(devices.length) : ''}</span>
+                <md-outlined-button disabled={!devices.length} onClick={() => this.exportCsv(devices)}>
+                  <md-icon slot="icon">download</md-icon>
+                  {m.exportCsv}
+                </md-outlined-button>
+              </div>
+              <div class="filters">
+                <md-outlined-select
+                  label={m.department}
+                  value={this.query.department || 'all'}
+                  onChange={(ev: Event) => this.setQuery({ department: selectValue(ev) === 'all' ? '' : selectValue(ev) })}
+                >
+                  <md-select-option value="all">
+                    <div slot="headline">{m.allDepartments}</div>
+                  </md-select-option>
+                  {this.departments().map(department => (
+                    <md-select-option value={department.code}>
+                      <div slot="headline">{department.name}</div>
+                    </md-select-option>
+                  ))}
+                </md-outlined-select>
+                <md-outlined-select
+                  label={m.warranty}
+                  value={this.query.warranty || 'all'}
+                  onChange={(ev: Event) =>
+                    this.setQuery({ warranty: selectValue(ev) === 'all' ? '' : (selectValue(ev) as DeviceQuery['warranty']) })
+                  }
+                >
+                  {[
+                    ['all', m.allWarranties],
+                    ['ok', m.warrantyOk],
+                    ['expiring', m.warrantyExpiring],
+                    ['expired', m.warrantyExpired],
+                  ].map(([value, label]) => (
+                    <md-select-option value={value}>
+                      <div slot="headline">{label}</div>
+                    </md-select-option>
+                  ))}
+                </md-outlined-select>
+                <md-outlined-select
+                  label={m.sort}
+                  value={this.query.sort}
+                  onChange={(ev: Event) => this.setQuery({ sort: selectValue(ev) as DeviceQuery['sort'] })}
+                >
+                  {[
+                    ['name', m.sortName],
+                    ['warranty', m.sortWarranty],
+                    ['price', m.sortPrice],
+                  ].map(([value, label]) => (
+                    <md-select-option value={value}>
+                      <div slot="headline">{label}</div>
+                    </md-select-option>
+                  ))}
+                </md-outlined-select>
+                {filtered && (
+                  <md-text-button onClick={() => this.setQuery({ q: '', department: '', warranty: '' })}>
+                    <md-icon slot="icon">filter_alt_off</md-icon>
+                    {m.clearFilters}
+                  </md-text-button>
+                )}
               </div>
               {!this.devices ? (
                 <SkeletonRows count={4} />
@@ -104,7 +175,7 @@ export class HarkapAmbulanceWlList {
                       </div>
                       <div slot="headline">{device.name}</div>
                       <div slot="supporting-text">
-                        {device.department.name}
+                        {device.department?.name}
                         {device.deviceId ? ` · ${device.deviceId}` : ''}
                       </div>
                       <div slot="end" class="meta">
