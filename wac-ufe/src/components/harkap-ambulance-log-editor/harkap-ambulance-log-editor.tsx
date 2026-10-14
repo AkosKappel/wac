@@ -65,7 +65,11 @@ export class HarkapAmbulanceLogEditor {
     if (this.errorMessage) {
       return (
         <Host>
-          <ErrorPage status={this.errorStatus} message={this.errorMessage} onBack={() => this.logClosed.emit('cancel')} />
+          <ErrorPage
+            status={this.errorStatus}
+            message={this.errorMessage}
+            onBack={() => this.logClosed.emit('cancel')}
+          />
         </Host>
       );
     }

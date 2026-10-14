@@ -110,7 +110,9 @@ export class HarkapAmbulanceWlList {
                 <md-outlined-select
                   label={m.department}
                   value={this.query.department || 'all'}
-                  onChange={(ev: Event) => this.setQuery({ department: selectValue(ev) === 'all' ? '' : selectValue(ev) })}
+                  onChange={(ev: Event) =>
+                    this.setQuery({ department: selectValue(ev) === 'all' ? '' : selectValue(ev) })
+                  }
                 >
                   <md-select-option value="all">
                     <div slot="headline">{m.allDepartments}</div>
@@ -125,7 +127,9 @@ export class HarkapAmbulanceWlList {
                   label={m.warranty}
                   value={this.query.warranty || 'all'}
                   onChange={(ev: Event) =>
-                    this.setQuery({ warranty: selectValue(ev) === 'all' ? '' : (selectValue(ev) as DeviceQuery['warranty']) })
+                    this.setQuery({
+                      warranty: selectValue(ev) === 'all' ? '' : (selectValue(ev) as DeviceQuery['warranty']),
+                    })
                   }
                 >
                   {[

@@ -5,7 +5,10 @@ import { settings } from '../../../utils/settings';
 describe('harkap-ambulance-about', () => {
   it('follows the chosen language', async () => {
     settings.state.language = 'en';
-    const page = await newSpecPage({ components: [HarkapAmbulanceAbout], html: `<harkap-ambulance-about></harkap-ambulance-about>` });
+    const page = await newSpecPage({
+      components: [HarkapAmbulanceAbout],
+      html: `<harkap-ambulance-about></harkap-ambulance-about>`,
+    });
     expect(page.root.shadowRoot.querySelector('h2').textContent).toEqual('What the app does');
 
     settings.state.language = 'sk';

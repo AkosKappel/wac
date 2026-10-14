@@ -37,7 +37,9 @@ h2 md-icon {
   background: var(--md-sys-color-surface);
   border: 1px solid var(--md-sys-color-outline-variant);
   border-radius: 16px;
-  box-shadow: 0 1px 2px rgb(16 40 48 / 0.04), 0 4px 16px rgb(16 40 48 / 0.04);
+  box-shadow:
+    0 1px 2px rgb(16 40 48 / 0.04),
+    0 4px 16px rgb(16 40 48 / 0.04);
   padding: 24px;
 }
 

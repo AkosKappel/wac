@@ -9,7 +9,13 @@ interface ConfirmDialogProps {
   onConfirm: () => void;
 }
 
-export const ConfirmDialog: FunctionalComponent<ConfirmDialogProps> = ({ open, headline, text, onCancel, onConfirm }) => (
+export const ConfirmDialog: FunctionalComponent<ConfirmDialogProps> = ({
+  open,
+  headline,
+  text,
+  onCancel,
+  onConfirm,
+}) => (
   <md-dialog type="alert" open={open} onClosed={onCancel}>
     <md-icon slot="icon">delete_forever</md-icon>
     <div slot="headline">{headline}</div>

@@ -113,8 +113,12 @@ export class HarkapAmbulanceWlApp {
           <nav aria-label={m.footerLinks}>
             <a href={href('./about')}>{m.about}</a>
             <a href="/api-docs/">{m.apiDocs}</a>
-            <a href={GITHUB_URL} rel="noopener">GitHub</a>
-            <a href={PORTFOLIO_URL} rel="noopener">{m.portfolio}</a>
+            <a href={GITHUB_URL} rel="noopener">
+              GitHub
+            </a>
+            <a href={PORTFOLIO_URL} rel="noopener">
+              {m.portfolio}
+            </a>
           </nav>
         </footer>
       </Host>

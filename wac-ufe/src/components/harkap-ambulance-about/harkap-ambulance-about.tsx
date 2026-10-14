@@ -59,9 +59,7 @@ export class HarkapAmbulanceAbout {
 
           <section>
             <h2>{m.stackTitle}</h2>
-            <dl class="stack">
-              {m.stack.map(([area, tools]) => [<dt>{area}</dt>, <dd>{tools}</dd>])}
-            </dl>
+            <dl class="stack">{m.stack.map(([area, tools]) => [<dt>{area}</dt>, <dd>{tools}</dd>])}</dl>
           </section>
 
           <section>

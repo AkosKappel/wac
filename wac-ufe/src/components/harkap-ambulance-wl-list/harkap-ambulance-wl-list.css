@@ -28,7 +28,9 @@ h1 {
   background: var(--md-sys-color-surface);
   border: 1px solid var(--md-sys-color-outline-variant);
   border-radius: 16px;
-  box-shadow: 0 1px 2px rgb(16 40 48 / 0.04), 0 4px 16px rgb(16 40 48 / 0.04);
+  box-shadow:
+    0 1px 2px rgb(16 40 48 / 0.04),
+    0 4px 16px rgb(16 40 48 / 0.04);
   overflow: hidden;
 }
 
@@ -102,7 +104,6 @@ h1 {
   --md-icon-size: 40px;
   color: var(--md-sys-color-outline);
 }
-
 
 @media (max-width: 640px) {
   .toolbar {

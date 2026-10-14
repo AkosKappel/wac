@@ -3,9 +3,30 @@ import { applyQuery, parseQuery, toSearch } from './device-query';
 describe('device query', () => {
   const now = new Date('2026-10-14T12:00:00Z');
   const devices = [
-    { id: 'a', name: 'Röntgen', deviceId: 'a', price: 150000, warrantyUntil: '2030-01-01T00:00:00Z', department: { code: 'ort', name: 'Ortopedické' } },
-    { id: 'b', name: 'Defibrilátor', deviceId: 'b', price: 12800, warrantyUntil: '2026-11-01T00:00:00Z', department: { code: 'chir', name: 'Chirurgia' } },
-    { id: 'c', name: 'Centrifúga', deviceId: 'c', price: 6800, warrantyUntil: '2026-01-01T00:00:00Z', department: { code: 'lab', name: 'Laboratórium' } },
+    {
+      id: 'a',
+      name: 'Röntgen',
+      deviceId: 'a',
+      price: 150000,
+      warrantyUntil: '2030-01-01T00:00:00Z',
+      department: { code: 'ort', name: 'Ortopedické' },
+    },
+    {
+      id: 'b',
+      name: 'Defibrilátor',
+      deviceId: 'b',
+      price: 12800,
+      warrantyUntil: '2026-11-01T00:00:00Z',
+      department: { code: 'chir', name: 'Chirurgia' },
+    },
+    {
+      id: 'c',
+      name: 'Centrifúga',
+      deviceId: 'c',
+      price: 6800,
+      warrantyUntil: '2026-01-01T00:00:00Z',
+      department: { code: 'lab', name: 'Laboratórium' },
+    },
   ];
   const ids = (query: string) => applyQuery([...devices], parseQuery(query), 'sk-SK', now).map(d => d.id);
 

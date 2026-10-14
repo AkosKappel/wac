@@ -112,7 +112,11 @@ export class HarkapAmbulanceWlEditor {
     if (this.errorMessage) {
       return (
         <Host>
-          <ErrorPage status={this.errorStatus} message={this.errorMessage} onBack={() => this.editorClosed.emit('cancel')} />
+          <ErrorPage
+            status={this.errorStatus}
+            message={this.errorMessage}
+            onBack={() => this.editorClosed.emit('cancel')}
+          />
         </Host>
       );
     }
@@ -268,7 +272,9 @@ export class HarkapAmbulanceWlEditor {
                 <harkap-ambulance-log-list
                   device-id={this.entryId}
                   api-base={this.apiBase}
-                  onlog-clicked={(ev: CustomEvent<string>) => navigate('./devices/' + this.entryId + '/log/' + ev.detail)}
+                  onlog-clicked={(ev: CustomEvent<string>) =>
+                    navigate('./devices/' + this.entryId + '/log/' + ev.detail)
+                  }
                 ></harkap-ambulance-log-list>
               </div>
             )}

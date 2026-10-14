@@ -15,9 +15,7 @@ export const ErrorPage: FunctionalComponent<ErrorPageProps> = ({ status, message
       <div class="error-code">{notFound ? '404' : status >= 500 ? status : m.oops}</div>
       <md-icon class="error-icon">{notFound ? 'search_off' : 'cloud_off'}</md-icon>
       <h2>{notFound ? m.notFoundTitle : status ? m.serverTitle : m.offlineTitle}</h2>
-      <p class="hint">
-        {notFound ? m.notFoundHint : status ? m.serverHint : m.offlineHint}
-      </p>
+      <p class="hint">{notFound ? m.notFoundHint : status ? m.serverHint : m.offlineHint}</p>
       {message && <p class="error">{message}</p>}
       <div class="error-actions">
         {!notFound && (

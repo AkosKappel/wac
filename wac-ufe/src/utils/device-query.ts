@@ -50,7 +50,12 @@ function escapeRegExp(text: string): string {
   return text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
 
-export function applyQuery(devices: DeviceListEntry[], query: DeviceQuery, locale: string, now = new Date()): DeviceListEntry[] {
+export function applyQuery(
+  devices: DeviceListEntry[],
+  query: DeviceQuery,
+  locale: string,
+  now = new Date(),
+): DeviceListEntry[] {
   // the letters in order with anything between them: "defib" and "dfb" both find "Defibrilátor"
   const search = new RegExp(normalize(query.q).split('').map(escapeRegExp).join('.*?'), 'i');
   const filtered = devices.filter(

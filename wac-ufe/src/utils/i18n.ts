@@ -147,7 +147,13 @@ const sk = {
     liveNote:
       'Všetko beží v Docker Compose. Samostatný kontajner každú noc o 3:00 obnoví ukážkové údaje. nginx posiela bezpečnostné hlavičky vrátane Content-Security-Policy a obmedzuje počet požiadaviek.',
     courseSetupTitle: 'V predmete: Kubernetes a GitOps',
-    courseSetup: ['Git repozitár', 'Flux CD', 'Kubernetes (AKS)', 'Envoy Gateway', 'ufe-controller: portál z micro-frontendov'],
+    courseSetup: [
+      'Git repozitár',
+      'Flux CD',
+      'Kubernetes (AKS)',
+      'Envoy Gateway',
+      'ufe-controller: portál z micro-frontendov',
+    ],
     courseSetupNote:
       'Flux CD sledoval repozitár s Kustomize manifestmi a nasadzoval API, MongoDB a micro-frontend do spoločného klastra predmetu. Webový komponent načítal do portálu ufe-controller. Tieto manifesty sú stále v priečinku wac-gitops/.',
     stackTitle: 'Technológie',
@@ -317,7 +323,13 @@ const en: Messages = {
     liveNote:
       'Everything runs in Docker Compose. A separate container restores the demo data every night at 3:00. nginx sends security headers including a Content-Security-Policy and rate limits requests.',
     courseSetupTitle: 'In the course: Kubernetes and GitOps',
-    courseSetup: ['Git repository', 'Flux CD', 'Kubernetes (AKS)', 'Envoy Gateway', 'ufe-controller: a portal of micro-frontends'],
+    courseSetup: [
+      'Git repository',
+      'Flux CD',
+      'Kubernetes (AKS)',
+      'Envoy Gateway',
+      'ufe-controller: a portal of micro-frontends',
+    ],
     courseSetupNote:
       "Flux CD watched a repository of Kustomize manifests and deployed the API, MongoDB and the micro-frontend to the course's shared cluster. The ufe-controller loaded the web component into the portal. The manifests are still in the wac-gitops/ folder.",
     stackTitle: 'Stack',
@@ -359,5 +371,7 @@ export function formatDateTime(iso: string): string {
 }
 
 export function formatPrice(value: number): string {
-  return new Intl.NumberFormat(t().locale, { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 }).format(value);
+  return new Intl.NumberFormat(t().locale, { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 }).format(
+    value,
+  );
 }

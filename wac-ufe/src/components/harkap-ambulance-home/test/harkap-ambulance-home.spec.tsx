@@ -8,8 +8,22 @@ const respondWith = (body: any, status = 200) =>
 describe('harkap-ambulance-home', () => {
   it('shows the overview of the loaded devices', async () => {
     respondWith([
-      { id: '1', name: 'CT', deviceId: '1', price: 900, warrantyUntil: '2000-01-01T00:00:00Z', department: { code: 'rad', name: 'Radiology' } },
-      { id: '2', name: 'MRI', deviceId: '2', price: 100, warrantyUntil: '2100-01-01T00:00:00Z', department: { code: 'rad', name: 'Radiology' } },
+      {
+        id: '1',
+        name: 'CT',
+        deviceId: '1',
+        price: 900,
+        warrantyUntil: '2000-01-01T00:00:00Z',
+        department: { code: 'rad', name: 'Radiology' },
+      },
+      {
+        id: '2',
+        name: 'MRI',
+        deviceId: '2',
+        price: 100,
+        warrantyUntil: '2100-01-01T00:00:00Z',
+        department: { code: 'rad', name: 'Radiology' },
+      },
     ]);
     const page = await newSpecPage({
       components: [HarkapAmbulanceHome],
