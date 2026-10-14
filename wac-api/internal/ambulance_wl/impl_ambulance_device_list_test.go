@@ -2,6 +2,7 @@ package ambulance_wl
 
 import (
 	"context"
+	"errors"
 	"net/http/httptest"
 	"strings"
 	"testing"
@@ -379,4 +380,25 @@ func (suite *AmbulanceDlSuite) Test_UpdateDeviceListEntry_KeepsLogs() {
 	set := update.Map()["$set"].(bson.D).Map()
 	suite.NotContains(set, "logList")
 	suite.NotContains(set, "id")
+}
+
+func (suite *AmbulanceDlSuite) Test_GetDeviceListEntries_HidesDatabaseError() {
+	// ARRANGE
+	suite.dbServiceMock.
+		On("FindDocuments", mock.Anything).
+		Return([]*DeviceListEntry(nil), errors.New("server selection error: db1.internal:27017"))
+
+	gin.SetMode(gin.TestMode)
+	recorder := httptest.NewRecorder()
+	ctx, _ := gin.CreateTestContext(recorder)
+	ctx.Request = httptest.NewRequest("GET", "/device-list/entries", nil)
+
+	sut := implAmbulanceDeviceListAPI{Dependencies{DB: suite.dbServiceMock}}
+
+	// ACT
+	sut.GetDeviceListEntries(ctx)
+
+	// ASSERT
+	suite.Equal(502, recorder.Code)
+	suite.NotContains(recorder.Body.String(), "db1.internal")
 }
