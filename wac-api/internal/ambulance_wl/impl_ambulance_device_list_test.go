@@ -93,13 +93,12 @@ func (suite *AmbulanceDlSuite) Test_GetDeviceListEntry() {
 	gin.SetMode(gin.TestMode)
 	recorder := httptest.NewRecorder()
 	ctx, _ := gin.CreateTestContext(recorder)
-	ctx.Set("db_service", suite.dbServiceMock)
 	ctx.Params = []gin.Param{
 		{Key: "entryId", Value: "test-device"},
 	}
 	ctx.Request = httptest.NewRequest("GET", "/device-list/entries/test-device", nil)
 
-	sut := implAmbulanceDeviceListAPI{}
+	sut := implAmbulanceDeviceListAPI{Dependencies{DB: suite.dbServiceMock}}
 
 	// ACT
 	sut.GetDeviceListEntry(ctx)
@@ -121,13 +120,12 @@ func (suite *AmbulanceDlSuite) Test_GetDeviceListEntry_NotFound() {
 	gin.SetMode(gin.TestMode)
 	recorder := httptest.NewRecorder()
 	ctx, _ := gin.CreateTestContext(recorder)
-	ctx.Set("db_service", suite.dbServiceMock)
 	ctx.Params = []gin.Param{
 		{Key: "entryId", Value: "test-device"},
 	}
 	ctx.Request = httptest.NewRequest("GET", "/device-list/entries/unknown-device", nil)
 
-	sut := implAmbulanceDeviceListAPI{}
+	sut := implAmbulanceDeviceListAPI{Dependencies{DB: suite.dbServiceMock}}
 
 	// ACT
 	sut.GetDeviceListEntry(ctx)
@@ -161,10 +159,9 @@ func (suite *AmbulanceDlSuite) Test_GetDeviceListEntries() {
 	gin.SetMode(gin.TestMode)
 	recorder := httptest.NewRecorder()
 	ctx, _ := gin.CreateTestContext(recorder)
-	ctx.Set("db_service", suite.dbServiceMock)
 	ctx.Request = httptest.NewRequest("GET", "/device-list/entries", nil)
 
-	sut := implAmbulanceDeviceListAPI{}
+	sut := implAmbulanceDeviceListAPI{Dependencies{DB: suite.dbServiceMock}}
 
 	// ACT
 	sut.GetDeviceListEntries(ctx)
@@ -186,10 +183,9 @@ func (suite *AmbulanceDlSuite) Test_GetDeviceListEntries_Empty() {
 	gin.SetMode(gin.TestMode)
 	recorder := httptest.NewRecorder()
 	ctx, _ := gin.CreateTestContext(recorder)
-	ctx.Set("db_service", suite.dbServiceMock)
 	ctx.Request = httptest.NewRequest("GET", "/device-list/entries", nil)
 
-	sut := implAmbulanceDeviceListAPI{}
+	sut := implAmbulanceDeviceListAPI{Dependencies{DB: suite.dbServiceMock}}
 
 	// ACT
 	sut.GetDeviceListEntries(ctx)
@@ -221,10 +217,9 @@ func (suite *AmbulanceDlSuite) Test_CreateDeviceListEntry() {
 	gin.SetMode(gin.TestMode)
 	recorder := httptest.NewRecorder()
 	ctx, _ := gin.CreateTestContext(recorder)
-	ctx.Set("db_service", suite.dbServiceMock)
 	ctx.Request = httptest.NewRequest("POST", "/device-list/entries", strings.NewReader(json))
 
-	sut := implAmbulanceDeviceListAPI{}
+	sut := implAmbulanceDeviceListAPI{Dependencies{DB: suite.dbServiceMock}}
 
 	// ACT
 	sut.CreateDeviceListEntry(ctx)
@@ -255,11 +250,10 @@ func (suite *AmbulanceDlSuite) Test_UpdateDeviceListEntry() {
 	gin.SetMode(gin.TestMode)
 	recorder := httptest.NewRecorder()
 	ctx, _ := gin.CreateTestContext(recorder)
-	ctx.Set("db_service", suite.dbServiceMock)
 	ctx.Params = []gin.Param{{Key: "entryId", Value: "test-device"}}
 	ctx.Request = httptest.NewRequest("PUT", "/device-list/entries/test-device", strings.NewReader(json))
 
-	sut := implAmbulanceDeviceListAPI{}
+	sut := implAmbulanceDeviceListAPI{Dependencies{DB: suite.dbServiceMock}}
 
 	// ACT
 	sut.UpdateDeviceListEntry(ctx)
@@ -291,11 +285,10 @@ func (suite *AmbulanceDlSuite) Test_UpdateDeviceListEntry_NotFound() {
 	gin.SetMode(gin.TestMode)
 	recorder := httptest.NewRecorder()
 	ctx, _ := gin.CreateTestContext(recorder)
-	ctx.Set("db_service", suite.dbServiceMock)
 	ctx.Params = []gin.Param{{Key: "entryId", Value: "unknown-device"}}
 	ctx.Request = httptest.NewRequest("PUT", "/device-list/entries/unknown-device", strings.NewReader(json))
 
-	sut := implAmbulanceDeviceListAPI{}
+	sut := implAmbulanceDeviceListAPI{Dependencies{DB: suite.dbServiceMock}}
 
 	// ACT
 	sut.UpdateDeviceListEntry(ctx)
@@ -313,10 +306,9 @@ func (suite *AmbulanceDlSuite) Test_DeleteDeviceListEntry() {
 	gin.SetMode(gin.TestMode)
 	recorder := httptest.NewRecorder()
 	ctx, _ := gin.CreateTestContext(recorder)
-	ctx.Set("db_service", suite.dbServiceMock)
 	ctx.Request = httptest.NewRequest("DELETE", "/device-list/entries/test-device", nil)
 
-	sut := implAmbulanceDeviceListAPI{}
+	sut := implAmbulanceDeviceListAPI{Dependencies{DB: suite.dbServiceMock}}
 
 	// ACT
 	sut.DeleteDeviceListEntry(ctx)
@@ -334,10 +326,9 @@ func (suite *AmbulanceDlSuite) Test_DeleteDeviceListEntry_NotFound() {
 	gin.SetMode(gin.TestMode)
 	recorder := httptest.NewRecorder()
 	ctx, _ := gin.CreateTestContext(recorder)
-	ctx.Set("db_service", suite.dbServiceMock)
 	ctx.Request = httptest.NewRequest("DELETE", "/device-list/entries/unknown-device", nil)
 
-	sut := implAmbulanceDeviceListAPI{}
+	sut := implAmbulanceDeviceListAPI{Dependencies{DB: suite.dbServiceMock}}
 
 	// ACT
 	sut.DeleteDeviceListEntry(ctx)
@@ -351,11 +342,10 @@ func (suite *AmbulanceDlSuite) Test_UpdateDeviceListEntry_IdMismatch() {
 	gin.SetMode(gin.TestMode)
 	recorder := httptest.NewRecorder()
 	ctx, _ := gin.CreateTestContext(recorder)
-	ctx.Set("db_service", suite.dbServiceMock)
 	ctx.Params = []gin.Param{{Key: "entryId", Value: "test-device"}}
 	ctx.Request = httptest.NewRequest("PUT", "/device-list/entries/test-device", strings.NewReader(`{"id": "other-device", "name": "x", "deviceId": "x"}`))
 
-	sut := implAmbulanceDeviceListAPI{}
+	sut := implAmbulanceDeviceListAPI{Dependencies{DB: suite.dbServiceMock}}
 
 	// ACT
 	sut.UpdateDeviceListEntry(ctx)
@@ -376,11 +366,10 @@ func (suite *AmbulanceDlSuite) Test_UpdateDeviceListEntry_KeepsLogs() {
 	gin.SetMode(gin.TestMode)
 	recorder := httptest.NewRecorder()
 	ctx, _ := gin.CreateTestContext(recorder)
-	ctx.Set("db_service", suite.dbServiceMock)
 	ctx.Params = []gin.Param{{Key: "entryId", Value: "test-device"}}
 	ctx.Request = httptest.NewRequest("PUT", "/device-list/entries/test-device", strings.NewReader(`{"name": "x", "deviceId": "x", "warrantyUntil": "2030-01-01T00:00:00Z", "logList": [], "department": {"name": "x"}}`))
 
-	sut := implAmbulanceDeviceListAPI{}
+	sut := implAmbulanceDeviceListAPI{Dependencies{DB: suite.dbServiceMock}}
 
 	// ACT
 	sut.UpdateDeviceListEntry(ctx)

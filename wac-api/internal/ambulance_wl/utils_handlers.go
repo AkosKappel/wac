@@ -8,14 +8,9 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// dbService returns the database service that the middleware in main puts on every request.
-func dbService(ctx *gin.Context) (db_service.DbService[DeviceListEntry], bool) {
-	value, _ := ctx.Get("db_service")
-	db, ok := value.(db_service.DbService[DeviceListEntry])
-	if !ok {
-		respondError(ctx, http.StatusInternalServerError, "Database is not configured", nil)
-	}
-	return db, ok
+// Dependencies holds what the handlers need; main creates it once and passes it to AddRoutes.
+type Dependencies struct {
+	DB db_service.DbService[DeviceListEntry]
 }
 
 // respondError logs err and answers with a short message; internal details stay in the log.

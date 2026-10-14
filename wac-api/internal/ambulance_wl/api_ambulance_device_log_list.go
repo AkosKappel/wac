@@ -37,13 +37,14 @@ type AmbulanceDeviceLogListAPI interface {
 
 }
 
-// partial implementation of AmbulanceDeviceLogListAPI - all functions must be implemented in add on files
+// partial implementation of AmbulanceDeviceLogListAPI - all functions must be implemented in add on files;
+// Dependencies is defined there too and carries what the handlers need, such as the database
 type implAmbulanceDeviceLogListAPI struct {
-
+  Dependencies
 }
 
-func newAmbulanceDeviceLogListAPI() AmbulanceDeviceLogListAPI {
-  return &implAmbulanceDeviceLogListAPI{}
+func newAmbulanceDeviceLogListAPI(deps Dependencies) AmbulanceDeviceLogListAPI {
+  return &implAmbulanceDeviceLogListAPI{deps}
 }
 
 func (this *implAmbulanceDeviceLogListAPI) addRoutes(routerGroup *gin.RouterGroup) {

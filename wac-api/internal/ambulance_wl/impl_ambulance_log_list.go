@@ -22,8 +22,8 @@ func findLog(device *DeviceListEntry, logId string) *DeviceLog {
 }
 
 // findDevice loads the device from the URL and answers with an error when that fails.
-func findDevice(ctx *gin.Context, db db_service.DbService[DeviceListEntry]) (*DeviceListEntry, bool) {
-	device, err := db.FindDocument(ctx, ctx.Param("entryId"))
+func (this *implAmbulanceDeviceLogListAPI) findDevice(ctx *gin.Context) (*DeviceListEntry, bool) {
+	device, err := this.DB.FindDocument(ctx, ctx.Param("entryId"))
 	switch err {
 	case nil:
 		return device, true
@@ -36,11 +36,7 @@ func findDevice(ctx *gin.Context, db db_service.DbService[DeviceListEntry]) (*De
 }
 
 func (this *implAmbulanceDeviceLogListAPI) GetDeviceLogs(ctx *gin.Context) {
-	db, ok := dbService(ctx)
-	if !ok {
-		return
-	}
-	device, ok := findDevice(ctx, db)
+	device, ok := this.findDevice(ctx)
 	if !ok {
 		return
 	}
@@ -53,11 +49,7 @@ func (this *implAmbulanceDeviceLogListAPI) GetDeviceLogs(ctx *gin.Context) {
 }
 
 func (this *implAmbulanceDeviceLogListAPI) GetDeviceLog(ctx *gin.Context) {
-	db, ok := dbService(ctx)
-	if !ok {
-		return
-	}
-	device, ok := findDevice(ctx, db)
+	device, ok := this.findDevice(ctx)
 	if !ok {
 		return
 	}
@@ -70,10 +62,6 @@ func (this *implAmbulanceDeviceLogListAPI) GetDeviceLog(ctx *gin.Context) {
 }
 
 func (this *implAmbulanceDeviceLogListAPI) CreateDeviceLog(ctx *gin.Context) {
-	db, ok := dbService(ctx)
-	if !ok {
-		return
-	}
 
 	var entry DeviceLog
 	if err := ctx.ShouldBindJSON(&entry); err != nil {
@@ -88,7 +76,7 @@ func (this *implAmbulanceDeviceLogListAPI) CreateDeviceLog(ctx *gin.Context) {
 		entry.CreatedAt = time.Now().UTC()
 	}
 
-	device, err := db.UpdateDocument(ctx, ctx.Param("entryId"),
+	device, err := this.DB.UpdateDocument(ctx, ctx.Param("entryId"),
 		bson.D{
 			{Key: "logList.id", Value: bson.D{{Key: "$ne", Value: entry.Id}}},
 			// the list has fewer than maxLogsPerDevice entries when this index does not exist
@@ -101,7 +89,7 @@ func (this *implAmbulanceDeviceLogListAPI) CreateDeviceLog(ctx *gin.Context) {
 		ctx.JSON(http.StatusOK, findLog(device, entry.Id))
 	case db_service.ErrNotFound:
 		// the device is missing, already has a log with this id, or is full
-		device, ok := findDevice(ctx, db)
+		device, ok := this.findDevice(ctx)
 		if !ok {
 			return
 		}
@@ -116,10 +104,6 @@ func (this *implAmbulanceDeviceLogListAPI) CreateDeviceLog(ctx *gin.Context) {
 }
 
 func (this *implAmbulanceDeviceLogListAPI) UpdateDeviceLog(ctx *gin.Context) {
-	db, ok := dbService(ctx)
-	if !ok {
-		return
-	}
 
 	logId := ctx.Param("logId")
 	var entry DeviceLog
@@ -140,7 +124,7 @@ func (this *implAmbulanceDeviceLogListAPI) UpdateDeviceLog(ctx *gin.Context) {
 	if !entry.CreatedAt.IsZero() {
 		set = append(set, bson.E{Key: "logList.$.createdAt", Value: entry.CreatedAt})
 	}
-	device, err := db.UpdateDocument(ctx, ctx.Param("entryId"),
+	device, err := this.DB.UpdateDocument(ctx, ctx.Param("entryId"),
 		bson.D{{Key: "logList.id", Value: logId}},
 		bson.D{{Key: "$set", Value: set}},
 	)
@@ -155,13 +139,9 @@ func (this *implAmbulanceDeviceLogListAPI) UpdateDeviceLog(ctx *gin.Context) {
 }
 
 func (this *implAmbulanceDeviceLogListAPI) DeleteDeviceLog(ctx *gin.Context) {
-	db, ok := dbService(ctx)
-	if !ok {
-		return
-	}
 
 	logId := ctx.Param("logId")
-	_, err := db.UpdateDocument(ctx, ctx.Param("entryId"),
+	_, err := this.DB.UpdateDocument(ctx, ctx.Param("entryId"),
 		bson.D{{Key: "logList.id", Value: logId}},
 		bson.D{{Key: "$pull", Value: bson.D{{Key: "logList", Value: bson.D{{Key: "id", Value: logId}}}}}},
 	)

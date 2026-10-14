@@ -42,16 +42,10 @@ func main() {
 	})
 	engine.Use(corsMiddleware)
 
-	// setup context update  middleware
 	dbService := db_service.NewMongoService[ambulance_wl.DeviceListEntry](db_service.MongoServiceConfig{})
 	defer dbService.Disconnect(context.Background())
-	engine.Use(func(ctx *gin.Context) {
-		ctx.Set("db_service", dbService)
-		ctx.Next()
-	})
 
-	// request routings
-	ambulance_wl.AddRoutes(engine)
+	ambulance_wl.AddRoutes(engine, ambulance_wl.Dependencies{DB: dbService})
 	engine.GET("/openapi", api.HandleOpenApi)
 	// HEAD too: uptime monitors such as UptimeRobot check with HEAD, which Gin doesn't map to GET
 	health := healthHandler(dbService)

@@ -13,16 +13,16 @@ import (
     "github.com/gin-gonic/gin"
 )
 
-func AddRoutes(engine *gin.Engine) {
+func AddRoutes(engine *gin.Engine, deps Dependencies) {
   group := engine.Group("/api")
   
   {
-    api := newAmbulanceDeviceListAPI()
+    api := newAmbulanceDeviceListAPI(deps)
     api.addRoutes(group)
   }
   
   {
-    api := newAmbulanceDeviceLogListAPI()
+    api := newAmbulanceDeviceLogListAPI(deps)
     api.addRoutes(group)
   }
   

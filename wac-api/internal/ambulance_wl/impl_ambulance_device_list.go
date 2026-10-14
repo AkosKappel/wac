@@ -11,10 +11,6 @@ import (
 
 // CreateDeviceListEntry - Saves new entry into Device list
 func (this *implAmbulanceDeviceListAPI) CreateDeviceListEntry(ctx *gin.Context) {
-	db, ok := dbService(ctx)
-	if !ok {
-		return
-	}
 
 	device := DeviceListEntry{}
 	if err := ctx.ShouldBindJSON(&device); err != nil {
@@ -30,7 +26,7 @@ func (this *implAmbulanceDeviceListAPI) CreateDeviceListEntry(ctx *gin.Context) 
 	}
 	syncLogDeviceIds(&device)
 
-	switch err := db.CreateDocument(ctx, device.Id, &device); err {
+	switch err := this.DB.CreateDocument(ctx, device.Id, &device); err {
 	case nil:
 		ctx.JSON(http.StatusCreated, device)
 	case db_service.ErrConflict:
@@ -42,12 +38,8 @@ func (this *implAmbulanceDeviceListAPI) CreateDeviceListEntry(ctx *gin.Context) 
 
 // DeleteDeviceListEntry - Deletes specific entry
 func (this *implAmbulanceDeviceListAPI) DeleteDeviceListEntry(ctx *gin.Context) {
-	db, ok := dbService(ctx)
-	if !ok {
-		return
-	}
 
-	switch err := db.DeleteDocument(ctx, ctx.Param("entryId")); err {
+	switch err := this.DB.DeleteDocument(ctx, ctx.Param("entryId")); err {
 	case nil:
 		ctx.AbortWithStatus(http.StatusNoContent)
 	case db_service.ErrNotFound:
@@ -59,12 +51,8 @@ func (this *implAmbulanceDeviceListAPI) DeleteDeviceListEntry(ctx *gin.Context) 
 
 // GetDeviceListEntries - Provides the ambulance Device list
 func (this *implAmbulanceDeviceListAPI) GetDeviceListEntries(ctx *gin.Context) {
-	db, ok := dbService(ctx)
-	if !ok {
-		return
-	}
 
-	devices, err := db.FindDocuments(ctx)
+	devices, err := this.DB.FindDocuments(ctx)
 	if err != nil {
 		respondError(ctx, http.StatusBadGateway, "Failed to load devices from database", err)
 		return
@@ -77,12 +65,8 @@ func (this *implAmbulanceDeviceListAPI) GetDeviceListEntries(ctx *gin.Context) {
 
 // GetDeviceListEntry - Provides details about Device list entry
 func (this *implAmbulanceDeviceListAPI) GetDeviceListEntry(ctx *gin.Context) {
-	db, ok := dbService(ctx)
-	if !ok {
-		return
-	}
 
-	device, err := db.FindDocument(ctx, ctx.Param("entryId"))
+	device, err := this.DB.FindDocument(ctx, ctx.Param("entryId"))
 	switch err {
 	case nil:
 		syncLogDeviceIds(device)
@@ -96,11 +80,6 @@ func (this *implAmbulanceDeviceListAPI) GetDeviceListEntry(ctx *gin.Context) {
 
 // UpdateDeviceListEntry - Updates specific entry
 func (this *implAmbulanceDeviceListAPI) UpdateDeviceListEntry(ctx *gin.Context) {
-	db, ok := dbService(ctx)
-	if !ok {
-		return
-	}
-
 	deviceId := ctx.Param("entryId")
 	device := DeviceListEntry{}
 	if err := ctx.ShouldBindJSON(&device); err != nil {
@@ -118,7 +97,7 @@ func (this *implAmbulanceDeviceListAPI) UpdateDeviceListEntry(ctx *gin.Context) 
 
 	// the log list changes only through the log endpoints, so saving a device that was
 	// loaded earlier cannot drop log entries added in the meantime
-	updated, err := db.UpdateDocument(ctx, deviceId, nil, bson.D{{Key: "$set", Value: bson.D{
+	updated, err := this.DB.UpdateDocument(ctx, deviceId, nil, bson.D{{Key: "$set", Value: bson.D{
 		{Key: "name", Value: device.Name},
 		{Key: "deviceId", Value: device.DeviceId},
 		{Key: "warrantyUntil", Value: device.WarrantyUntil},

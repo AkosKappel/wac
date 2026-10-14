@@ -21,13 +21,14 @@ type {{classname}} interface {
    {{/operation}}
 }
 
-// partial implementation of {{classname}} - all functions must be implemented in add on files
+// partial implementation of {{classname}} - all functions must be implemented in add on files;
+// Dependencies is defined there too and carries what the handlers need, such as the database
 type impl{{classname}} struct {
-
+  Dependencies
 }
 
-func new{{classname}}() {{classname}} {
-  return &impl{{classname}}{}
+func new{{classname}}(deps Dependencies) {{classname}} {
+  return &impl{{classname}}{deps}
 }
 
 func (this *impl{{classname}}) addRoutes(routerGroup *gin.RouterGroup) {

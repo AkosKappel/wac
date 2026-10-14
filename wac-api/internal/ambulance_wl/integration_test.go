@@ -34,11 +34,7 @@ func newIntegrationEngine(t *testing.T) *gin.Engine {
 	t.Cleanup(func() { db.Disconnect(context.Background()) })
 
 	engine := gin.New()
-	engine.Use(func(ctx *gin.Context) {
-		ctx.Set("db_service", db)
-		ctx.Next()
-	})
-	AddRoutes(engine)
+	AddRoutes(engine, Dependencies{DB: db})
 	return engine
 }
 
