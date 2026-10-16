@@ -33,6 +33,11 @@ h2 md-icon {
   color: var(--md-sys-color-primary);
 }
 
+/* focused by script when a log entry opens or closes */
+h2:focus {
+  outline: none;
+}
+
 .card {
   background: var(--md-sys-color-surface);
   border: 1px solid var(--md-sys-color-outline-variant);

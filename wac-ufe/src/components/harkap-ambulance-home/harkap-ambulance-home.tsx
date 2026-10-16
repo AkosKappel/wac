@@ -33,7 +33,7 @@ export class HarkapAmbulanceHome {
     const href = (path: string) => hrefTo(this.basePath, path);
     const stat = (icon: string, label: string, value?: string | number, link?: string, tone = '') => {
       const content = [
-        <md-icon>{icon}</md-icon>,
+        <md-icon aria-hidden="true">{icon}</md-icon>,
         <span class="stat-value">{value ?? <span class="skeleton"></span>}</span>,
         <span class="stat-label">{label}</span>,
       ];
@@ -77,7 +77,7 @@ export class HarkapAmbulanceHome {
             <h2 id="overview-title">{m.overview}</h2>
             {this.loadFailed ? (
               <p class="load-failed" role="alert">
-                <md-icon>cloud_off</md-icon>
+                <md-icon aria-hidden="true">cloud_off</md-icon>
                 {m.loadFailed}
               </p>
             ) : (
@@ -120,7 +120,7 @@ export class HarkapAmbulanceHome {
             <div class="quick-links">
               {quickLinks.map(([icon, link, [title, text]]) => (
                 <a class="quick-link" href={link}>
-                  <md-icon>{icon}</md-icon>
+                  <md-icon aria-hidden="true">{icon}</md-icon>
                   <span>
                     <strong>{title}</strong>
                     <span>{text}</span>

@@ -26,6 +26,8 @@ export class HarkapAmbulanceWlEditor {
   @State() confirmDelete = false;
 
   private unwatch: () => void;
+  private logHeading: HTMLElement;
+  private logOpen = false;
 
   @State() departments: Department[] = [];
 
@@ -96,6 +98,15 @@ export class HarkapAmbulanceWlEditor {
       : this.departments;
   }
 
+  componentDidRender() {
+    // opening or closing a log entry swaps the focused element out of the page
+    const logOpen = this.relativePath.includes('log/');
+    if (logOpen !== this.logOpen) {
+      this.logOpen = logOpen;
+      this.logHeading?.focus();
+    }
+  }
+
   render() {
     let element = 'list';
     let logId = '@new';
@@ -125,7 +136,7 @@ export class HarkapAmbulanceWlEditor {
       <Host>
         <header class="page-header">
           <md-icon-button aria-label={m.backToList} onClick={() => this.editorClosed.emit('cancel')}>
-            <md-icon>arrow_back</md-icon>
+            <md-icon aria-hidden="true">arrow_back</md-icon>
           </md-icon-button>
           <div>
             <p class="eyebrow">{this.entryId === '@new' ? m.eyebrowNew : m.eyebrowDetail}</p>
@@ -231,7 +242,7 @@ export class HarkapAmbulanceWlEditor {
 
           {this.actionError && (
             <div class="banner" role="alert">
-              <md-icon>error</md-icon>
+              <md-icon aria-hidden="true">error</md-icon>
               <span>{this.actionError}</span>
             </div>
           )}
@@ -258,8 +269,8 @@ export class HarkapAmbulanceWlEditor {
         </section>
         {this.entryId !== '@new' ? (
           <section class="card device-log">
-            <h2>
-              <md-icon>history</md-icon>
+            <h2 tabindex="-1" ref={el => (this.logHeading = el)}>
+              <md-icon aria-hidden="true">history</md-icon>
               {m.log}
             </h2>
             {element === 'editor' ? (

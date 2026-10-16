@@ -23,6 +23,8 @@ export const config: Config = {
   ],
   testing: {
     browserHeadless: 'new',
+    // one Chrome at a time: parallel e2e workers overloaded the home server on 2026-10-16
+    maxWorkers: 1,
     transform: {
       '^.+\\.(js|jsx)$': 'babel-jest',
     },

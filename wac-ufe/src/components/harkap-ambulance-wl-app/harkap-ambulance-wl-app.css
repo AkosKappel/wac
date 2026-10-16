@@ -146,6 +146,11 @@ main {
   flex: 1;
 }
 
+/* focused by script on route changes only, never by the user */
+main:focus {
+  outline: none;
+}
+
 .app-footer {
   display: flex;
   flex-wrap: wrap;

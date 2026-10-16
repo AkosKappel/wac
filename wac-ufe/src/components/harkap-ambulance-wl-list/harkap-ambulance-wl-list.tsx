@@ -174,7 +174,7 @@ export class HarkapAmbulanceWlList {
                   {devices.map(device => (
                     <md-list-item class="list-item" type="button" onClick={() => this.entryClicked.emit(device.id)}>
                       <div slot="start" class="avatar">
-                        <md-icon>medical_services</md-icon>
+                        <md-icon aria-hidden="true">medical_services</md-icon>
                       </div>
                       <div slot="headline">{device.name}</div>
                       <div slot="supporting-text">
@@ -183,14 +183,14 @@ export class HarkapAmbulanceWlList {
                       </div>
                       <div slot="end" class="meta">
                         {device.warrantyUntil && <WarrantyBadge until={device.warrantyUntil} />}
-                        <md-icon>chevron_right</md-icon>
+                        <md-icon aria-hidden="true">chevron_right</md-icon>
                       </div>
                     </md-list-item>
                   ))}
                 </md-list>
               ) : (
                 <div class="empty">
-                  <md-icon>inventory_2</md-icon>
+                  <md-icon aria-hidden="true">inventory_2</md-icon>
                   <p>{m.empty}</p>
                 </div>
               )}

@@ -120,7 +120,7 @@ export class HarkapAmbulanceLogEditor {
 
         {this.actionError && (
           <div class="banner" role="alert">
-            <md-icon>error</md-icon>
+            <md-icon aria-hidden="true">error</md-icon>
             <span>{this.actionError}</span>
           </div>
         )}

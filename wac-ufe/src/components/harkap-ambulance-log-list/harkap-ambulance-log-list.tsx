@@ -57,10 +57,14 @@ export class HarkapAmbulanceLogList {
               <md-list class="list">
                 {this.filteredLogs().map(log => (
                   <md-list-item class="list-item" type="button" onClick={() => this.logClicked.emit(log.id)}>
-                    <md-icon slot="start">description</md-icon>
+                    <md-icon slot="start" aria-hidden="true">
+                      description
+                    </md-icon>
                     <div slot="headline">{log.text}</div>
                     <div slot="supporting-text">{formatDateTime(log.createdAt)}</div>
-                    <md-icon slot="end">chevron_right</md-icon>
+                    <md-icon slot="end" aria-hidden="true">
+                      chevron_right
+                    </md-icon>
                   </md-list-item>
                 ))}
               </md-list>

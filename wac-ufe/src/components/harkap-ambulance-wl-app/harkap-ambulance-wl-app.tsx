@@ -26,15 +26,41 @@ export class HarkapAmbulanceWlApp {
   @Prop() apiBase: string;
 
   private unwatch: () => void;
+  private main: HTMLElement;
+  private moveFocus = false;
 
   connectedCallback() {
+    let first = true;
     this.unwatch = watchRelativePath(this.basePath, path => {
       const current = currentPath(path);
       if (current !== path) {
         history.replaceState(history.state, '', hrefTo(this.basePath, current) + location.search);
       }
+      // filters change only the query and the log editor opens inside the device page:
+      // neither may move focus away from where the user is
+      const withoutLog = (path: string) => path.replace(/\/log\/.*$/, '');
+      this.moveFocus = !first && withoutLog(current) !== withoutLog(this.relativePath);
+      first = false;
       this.relativePath = current;
     });
+  }
+
+  componentDidRender() {
+    const page = pageOf(this.relativePath);
+    const m = t().shell;
+    const titles: Record<Page, string | undefined> = {
+      'home': undefined,
+      'devices': m.devices,
+      'device': m.devices,
+      'about': m.about,
+      'not-found': t().errors.notFoundTitle,
+    };
+    document.title = [titles[page], 'Ambulance Devices'].filter(Boolean).join(' · ');
+    // screen readers start reading the new page, keyboard users tab on from its top
+    if (this.moveFocus) {
+      this.moveFocus = false;
+      this.main?.focus();
+    }
   }
 
   disconnectedCallback() {
@@ -54,10 +80,10 @@ export class HarkapAmbulanceWlApp {
 
     return (
       <Host data-theme={activeTheme()}>
-        <p class="demo-notice">
-          <md-icon>info</md-icon>
+        <aside class="demo-notice">
+          <md-icon aria-hidden="true">info</md-icon>
           {m.demoNotice}
-        </p>
+        </aside>
         <header class="app-header">
           <a class="brand" href={href('./')}>
             <LogoMark />
@@ -71,7 +97,8 @@ export class HarkapAmbulanceWlApp {
           <div class="header-actions">
             <md-text-button
               class="language"
-              aria-label={m.switchLanguage}
+              lang={m.otherLanguage.toLowerCase()}
+              aria-label={`${m.otherLanguage}, ${m.switchLanguage}`}
               title={m.switchLanguage}
               onClick={() => (settings.state.language = settings.state.language === 'sk' ? 'en' : 'sk')}
             >
@@ -83,11 +110,11 @@ export class HarkapAmbulanceWlApp {
               title={m.theme[settings.state.theme]}
               onClick={() => (settings.state.theme = nextTheme(settings.state.theme))}
             >
-              <md-icon>{THEME_ICONS[settings.state.theme]}</md-icon>
+              <md-icon aria-hidden="true">{THEME_ICONS[settings.state.theme]}</md-icon>
             </md-icon-button>
           </div>
         </header>
-        <main>
+        <main tabindex="-1" ref={el => (this.main = el)}>
           {page === 'home' ? (
             <harkap-ambulance-home api-base={this.apiBase} base-path={this.basePath}></harkap-ambulance-home>
           ) : page === 'devices' ? (
