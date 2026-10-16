@@ -4,6 +4,11 @@ export function format(first: string, middle: string, last: string): string {
   return (first || '') + (middle ? ` ${middle}` : '') + (last ? ` ${last}` : '');
 }
 
+/** The page a path belongs to: a log entry opens inside its device's page. */
+export function pageKey(path: string): string {
+  return path.replace(/\/log\/.*$/, '');
+}
+
 /** Reports the current path relative to basePath now and on every navigation. Returns an unsubscribe function. */
 export function watchRelativePath(basePath: string, onChange: (relativePath: string) => void): () => void {
   const baseUri = new URL(basePath, document.baseURI || '/').pathname;
@@ -15,7 +20,9 @@ export function watchRelativePath(basePath: string, onChange: (relativePath: str
     if (!ev.canIntercept || ev.downloadRequest || ev.navigationType === 'reload' || /^\/api(-docs)?(\/|$)/.test(path)) {
       return;
     }
-    ev.intercept();
+    // A new page starts at the top (back and forward restore the old position); filters only
+    // change the query and a log entry opens inside the device page, so those keep the scroll.
+    ev.intercept({ scroll: pageKey(path) === pageKey(location.pathname) ? 'manual' : 'after-transition' });
     report(path);
   };
   window.navigation?.addEventListener('navigate', listener);

@@ -18,7 +18,6 @@ A register of medical devices in hospital departments: devices with warranty, pr
 - Warranty and service state at a glance: valid, due soon (amber), expired or overdue (red).
 - A printable device label with a QR code to the device page.
 - Installable as a PWA: pages already visited work offline.
-- The service plan page is a second micro-frontend with its own build, loaded by the app shell when the page opens.
 - Slovak and English, light and dark theme, both remembered per browser.
 - About page with the architecture and the stack.
 
@@ -48,7 +47,7 @@ flowchart LR
 
 | Folder | Contents |
 | --- | --- |
-| [`wac-ufe/`](wac-ufe/) | Micro-frontends: the app (Stencil web components with Material Web) and the service plan (`src-maintenance/`, a separate build), API client generated from the OpenAPI spec |
+| [`wac-ufe/`](wac-ufe/) | Micro-frontend: Stencil web components with Material Web, API client generated from the OpenAPI spec |
 | [`wac-api/`](wac-api/) | REST API in Go (Gin) on MongoDB, server stubs generated from [`ambulance-wl.openapi.yaml`](wac-api/api/ambulance-wl.openapi.yaml) |
 | [`wac-gitops/`](wac-gitops/) | Kubernetes manifests (Kustomize) deployed by Flux CD to the course's AKS cluster and to a local cluster, with Envoy Gateway and the ufe-controller that loads the micro-frontend into the shared portal |
 | [`docker/`](docker/) | The single-host deployment used for the live demo |

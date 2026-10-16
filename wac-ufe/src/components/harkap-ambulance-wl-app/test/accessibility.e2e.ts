@@ -91,6 +91,7 @@ describe('accessibility', () => {
     ],
     ['about page', '<harkap-ambulance-about></harkap-ambulance-about>'],
     ['departments page', '<harkap-ambulance-departments api-base="/api"></harkap-ambulance-departments>'],
+    ['service plan', '<harkap-ambulance-maintenance api-base="/api"></harkap-ambulance-maintenance>'],
   ])('%s has no WCAG A/AA violations', async (_, html) => {
     const page = await render(html);
     expect(await violations(page)).toEqual([]);

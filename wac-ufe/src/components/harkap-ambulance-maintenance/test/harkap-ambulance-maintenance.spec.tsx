@@ -1,8 +1,8 @@
 import { newSpecPage } from '@stencil/core/testing';
 import { MockResponse } from '@stencil/core/mock-doc';
-import { HarkapMaintenanceDue } from '../harkap-maintenance-due';
+import { HarkapAmbulanceMaintenance } from '../harkap-ambulance-maintenance';
 
-describe('harkap-maintenance-due', () => {
+describe('harkap-ambulance-maintenance', () => {
   const items = [
     {
       id: 'ct-01',
@@ -26,8 +26,8 @@ describe('harkap-maintenance-due', () => {
   it('lists the devices with their state and links to them', async () => {
     global.fetch = jest.fn().mockResolvedValue(new MockResponse(JSON.stringify(items))) as any;
     const page = await newSpecPage({
-      components: [HarkapMaintenanceDue],
-      html: `<harkap-maintenance-due api-base="/api" base-path="/" language="sk"></harkap-maintenance-due>`,
+      components: [HarkapAmbulanceMaintenance],
+      html: `<harkap-ambulance-maintenance api-base="/api" base-path="/"></harkap-ambulance-maintenance>`,
     });
     await new Promise(resolve => setTimeout(resolve, 0));
     await page.waitForChanges();
@@ -36,20 +36,20 @@ describe('harkap-maintenance-due', () => {
     const rows = page.root.shadowRoot.querySelectorAll('.item');
     expect(rows).toHaveLength(2);
     expect(rows[0].classList.contains('overdue')).toBe(true);
-    expect(rows[0].querySelector('.status').textContent).toBe('Po termíne');
-    expect(rows[1].querySelector('.status').textContent).toBe('O 5 dní');
+    expect(rows[0].querySelector('.badge').textContent).toBe('Overdue');
+    expect(rows[1].querySelector('.badge').textContent).toBe('In 5 days');
     expect(rows[1].querySelector('a').getAttribute('href')).toBe('/devices/ekg%202');
   });
 
-  it('offers a retry when the API fails', async () => {
+  it('shows the error page when the API fails', async () => {
     global.fetch = jest.fn().mockRejectedValue(new TypeError('Failed to fetch')) as any;
     const page = await newSpecPage({
-      components: [HarkapMaintenanceDue],
-      html: `<harkap-maintenance-due api-base="/api"></harkap-maintenance-due>`,
+      components: [HarkapAmbulanceMaintenance],
+      html: `<harkap-ambulance-maintenance api-base="/api"></harkap-ambulance-maintenance>`,
     });
     await new Promise(resolve => setTimeout(resolve, 0));
     await page.waitForChanges();
 
-    expect(page.root.shadowRoot.querySelector('[role=alert]').textContent).toContain('Could not load');
+    expect(page.root.shadowRoot.querySelector('.error-page').textContent).toContain('Could not load the service plan');
   });
 });

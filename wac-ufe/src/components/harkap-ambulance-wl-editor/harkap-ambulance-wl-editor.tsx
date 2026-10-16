@@ -116,7 +116,7 @@ export class HarkapAmbulanceWlEditor {
     const logOpen = this.relativePath.includes('log/');
     if (logOpen !== this.logOpen) {
       this.logOpen = logOpen;
-      this.logHeading?.focus();
+      this.logHeading?.focus({ preventScroll: true });
     }
   }
 

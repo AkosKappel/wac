@@ -168,6 +168,22 @@ const sk = {
     deleteTitle: 'Zmazať záznam?',
     deleteText: 'Záznam bude natrvalo odstránený z prevádzkového logu.',
   },
+  maintenance: {
+    eyebrow: 'Servisný plán',
+    title: 'Zariadenia na servis',
+    intro:
+      'Zariadenia so servisným intervalom, ktorým sa blíži alebo už uplynul termín servisu. Záznam typu Servis v prevádzkovom logu posunie ďalší termín.',
+    within: 'Termín do',
+    days: (days: number) => (days === 365 ? '1 roka' : `${days} dní`),
+    overdue: 'Po termíne',
+    never: 'zatiaľ nebol',
+    dueIn: (days: number) => (days <= 0 ? 'Dnes' : days === 1 ? 'Zajtra' : `O ${days} dní`),
+    lastService: 'Posledný servis',
+    nextService: 'Ďalší servis',
+    interval: (days: number) => `každých ${days} dní`,
+    empty: 'V tomto období nemá servis žiadne zariadenie.',
+    loadFailed: 'Servisný plán sa nepodarilo načítať',
+  },
   departments: {
     eyebrow: 'Nemocnica HarKap',
     title: 'Oddelenia',
@@ -210,7 +226,7 @@ const sk = {
     liveTitle: 'Dnes: živé demo na domácom serveri',
     live: ['Prehliadač', 'Tailscale Funnel (HTTPS)', 'nginx: frontend a proxy /api', 'Go API (Gin)', 'MongoDB 8'],
     liveNote:
-      'Všetko beží v Docker Compose. Samostatný kontajner každú noc o 3:30 obnoví ukážkové údaje. nginx posiela bezpečnostné hlavičky vrátane Content-Security-Policy a obmedzuje počet požiadaviek. Stránku Servis tvorí druhý micro-frontend s vlastným buildom, ktorý aplikácia načíta až pri jej otvorení.',
+      'Všetko beží v Docker Compose. Samostatný kontajner každú noc o 3:30 obnoví ukážkové údaje. nginx posiela bezpečnostné hlavičky vrátane Content-Security-Policy a obmedzuje počet požiadaviek.',
     courseSetupTitle: 'V predmete: Kubernetes a GitOps',
     courseSetup: [
       'Git repozitár',
@@ -225,7 +241,7 @@ const sk = {
     stack: [
       [
         'Frontend',
-        'Stencil 4 (dva micro-frontendy z webových komponentov), Material Web, TypeScript, klient API generovaný z OpenAPI, PWA so service workerom',
+        'Stencil 4 (webové komponenty), Material Web, TypeScript, klient API generovaný z OpenAPI, PWA so service workerom',
       ],
       ['API', 'Go 1.27, Gin 1.12, MongoDB Go driver 1.17, kostra servera generovaná z OpenAPI'],
       ['Databáza', 'MongoDB 8.0'],
@@ -413,6 +429,22 @@ const en: Messages = {
     deleteTitle: 'Delete the entry?',
     deleteText: 'The entry will be removed from the operations log permanently.',
   },
+  maintenance: {
+    eyebrow: 'Service plan',
+    title: 'Devices due for service',
+    intro:
+      'Devices with a service interval whose service is due soon or overdue. A log entry of type Service moves the next date.',
+    within: 'Due within',
+    days: (days: number) => (days === 365 ? '1 year' : `${days} days`),
+    overdue: 'Overdue',
+    never: 'none yet',
+    dueIn: (days: number) => (days <= 0 ? 'Today' : days === 1 ? 'Tomorrow' : `In ${days} days`),
+    lastService: 'Last service',
+    nextService: 'Next service',
+    interval: (days: number) => `every ${days} days`,
+    empty: 'No device is due for service in this period.',
+    loadFailed: 'Could not load the service plan',
+  },
   departments: {
     eyebrow: 'HarKap Hospital',
     title: 'Departments',
@@ -455,7 +487,7 @@ const en: Messages = {
     liveTitle: 'Today: the live demo on a home server',
     live: ['Browser', 'Tailscale Funnel (HTTPS)', 'nginx: frontend and /api proxy', 'Go API (Gin)', 'MongoDB 8'],
     liveNote:
-      'Everything runs in Docker Compose. A separate container restores the demo data every night at 3:30. nginx sends security headers including a Content-Security-Policy and rate limits requests. The Service page is a second micro-frontend with its own build, which the app loads only when the page opens.',
+      'Everything runs in Docker Compose. A separate container restores the demo data every night at 3:30. nginx sends security headers including a Content-Security-Policy and rate limits requests.',
     courseSetupTitle: 'In the course: Kubernetes and GitOps',
     courseSetup: [
       'Git repository',
@@ -470,7 +502,7 @@ const en: Messages = {
     stack: [
       [
         'Frontend',
-        'Stencil 4 (two micro-frontends of web components), Material Web, TypeScript, API client generated from OpenAPI, PWA with a service worker',
+        'Stencil 4 (web components), Material Web, TypeScript, API client generated from OpenAPI, PWA with a service worker',
       ],
       ['API', 'Go 1.27, Gin 1.12, MongoDB Go driver 1.17, server stubs generated from OpenAPI'],
       ['Database', 'MongoDB 8.0'],

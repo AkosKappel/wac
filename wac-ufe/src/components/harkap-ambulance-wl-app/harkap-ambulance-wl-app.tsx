@@ -5,7 +5,7 @@ import { GITHUB_URL, PORTFOLIO_URL } from '../../utils/links';
 import { LogoMark } from '../../utils/logo';
 import { Page, currentPath, pageOf } from '../../utils/routes';
 import { activeTheme, nextTheme, settings } from '../../utils/settings';
-import { hrefTo, navigateTo, watchRelativePath } from '../../utils/utils';
+import { hrefTo, navigateTo, pageKey, watchRelativePath } from '../../utils/utils';
 
 declare global {
   interface Window {
@@ -14,10 +14,6 @@ declare global {
 }
 
 const THEME_ICONS = { system: 'brightness_auto', light: 'light_mode', dark: 'dark_mode' };
-
-// The service plan is a separate micro-frontend with its own build, served by nginx under
-// /maintenance-ufe/; the shell loads its web component the first time the page opens.
-const MAINTENANCE_UFE = '/maintenance-ufe/build/maintenance-ufe.esm.js';
 
 @Component({
   tag: 'harkap-ambulance-wl-app',
@@ -28,7 +24,6 @@ export class HarkapAmbulanceWlApp {
   @State() private relativePath = '';
   @Prop() basePath: string = '';
   @Prop() apiBase: string;
-  @State() maintenanceUfeFailed = false;
 
   private unwatch: () => void;
   private main: HTMLElement;
@@ -43,27 +38,14 @@ export class HarkapAmbulanceWlApp {
       }
       // filters change only the query and the log editor opens inside the device page:
       // neither may move focus away from where the user is
-      const withoutLog = (path: string) => path.replace(/\/log\/.*$/, '');
-      this.moveFocus = !first && withoutLog(current) !== withoutLog(this.relativePath);
+      this.moveFocus = !first && pageKey(current) !== pageKey(this.relativePath);
       first = false;
       this.relativePath = current;
     });
   }
 
-  private loadMaintenanceUfe() {
-    if (customElements.get('harkap-maintenance-due') || document.querySelector(`script[src="${MAINTENANCE_UFE}"]`)) {
-      return;
-    }
-    const script = document.createElement('script');
-    script.type = 'module';
-    script.src = MAINTENANCE_UFE;
-    script.onerror = () => (this.maintenanceUfeFailed = true);
-    document.head.append(script);
-  }
-
   componentDidRender() {
     const page = pageOf(this.relativePath);
-    if (page === 'maintenance') this.loadMaintenanceUfe();
     const m = t().shell;
     const titles: Record<Page, string | undefined> = {
       'home': undefined,
@@ -78,7 +60,8 @@ export class HarkapAmbulanceWlApp {
     // screen readers start reading the new page, keyboard users tab on from its top
     if (this.moveFocus) {
       this.moveFocus = false;
-      this.main?.focus();
+      // the router already scrolled the new page to the top; focusing must not scroll past the header
+      this.main?.focus({ preventScroll: true });
     }
   }
 
@@ -151,15 +134,10 @@ export class HarkapAmbulanceWlApp {
               oneditor-closed={() => navigate('./devices')}
             ></harkap-ambulance-wl-editor>
           ) : page === 'maintenance' ? (
-            this.maintenanceUfeFailed ? (
-              <ErrorPage onBack={() => navigate('./devices')} />
-            ) : (
-              <harkap-maintenance-due
-                api-base={this.apiBase}
-                base-path={this.basePath}
-                language={settings.state.language}
-              ></harkap-maintenance-due>
-            )
+            <harkap-ambulance-maintenance
+              api-base={this.apiBase}
+              base-path={this.basePath}
+            ></harkap-ambulance-maintenance>
           ) : page === 'departments' ? (
             <harkap-ambulance-departments
               api-base={this.apiBase}
