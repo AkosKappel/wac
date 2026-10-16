@@ -7,6 +7,7 @@ tmp
 wac-gitops
 **/node_modules
 wac-ufe/www
+wac-ufe/www-maintenance
 wac-ufe/dist
 wac-ufe/loader
 .worktrees
