@@ -22,11 +22,15 @@ services:
     command: ["--wiredTigerCacheSizeGB", "0.25"]
     environment:
       <<: *mongo-env
-      MONGO_INITDB_ROOT_USERNAME: ${AMBULANCE_API_MONGODB_USERNAME:-root}
-      MONGO_INITDB_ROOT_PASSWORD: ${AMBULANCE_API_MONGODB_PASSWORD:?set AMBULANCE_API_MONGODB_PASSWORD in .env}
+      # root is for admin work only; app-user.js creates the user the API and reset job use
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USERNAME:-root}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD:?set MONGO_ROOT_PASSWORD in .env}
+      AMBULANCE_API_MONGODB_USERNAME: ${AMBULANCE_API_MONGODB_USERNAME:-ambulance}
+      AMBULANCE_API_MONGODB_PASSWORD: ${AMBULANCE_API_MONGODB_PASSWORD:?set AMBULANCE_API_MONGODB_PASSWORD in .env}
     volumes:
       - mongodata:/data/db
-      - ./docker/mongo/seed.js:/docker-entrypoint-initdb.d/seed.js:ro
+      - ./docker/mongo/app-user.js:/docker-entrypoint-initdb.d/1-app-user.js:ro
+      - ./docker/mongo/seed.js:/docker-entrypoint-initdb.d/2-seed.js:ro
     ports:
       - "127.0.0.1:${DB_HOST_PORT:-27019}:27017"
     healthcheck:
@@ -60,7 +64,7 @@ services:
       AMBULANCE_API_PORT: "8080"
       AMBULANCE_API_MONGODB_HOST: mongo
       AMBULANCE_API_MONGODB_PORT: "27017"
-      AMBULANCE_API_MONGODB_USERNAME: ${AMBULANCE_API_MONGODB_USERNAME:-root}
+      AMBULANCE_API_MONGODB_USERNAME: ${AMBULANCE_API_MONGODB_USERNAME:-ambulance}
       AMBULANCE_API_MONGODB_PASSWORD: ${AMBULANCE_API_MONGODB_PASSWORD}
       AMBULANCE_API_MONGODB_TIMEOUT_SECONDS: "5"
     networks:
@@ -82,7 +86,7 @@ services:
     entrypoint: ["/bin/sh", "/seed/reset.sh"]
     environment:
       <<: *mongo-env
-      MONGO_USERNAME: ${AMBULANCE_API_MONGODB_USERNAME:-root}
+      MONGO_USERNAME: ${AMBULANCE_API_MONGODB_USERNAME:-ambulance}
       MONGO_PASSWORD: ${AMBULANCE_API_MONGODB_PASSWORD}
       DEMO_RESET_TIME: ${DEMO_RESET_TIME:-03:00}
       TZ: ${DEMO_RESET_TIMEZONE:-Europe/Bratislava}

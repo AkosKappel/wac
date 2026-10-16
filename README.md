@@ -51,7 +51,7 @@ flowchart LR
 
 ## Run locally
 
-Needs Docker. Copy `.env.example` to `.env`, set `AMBULANCE_API_MONGODB_PASSWORD`, then:
+Needs Docker. Copy `.env.example` to `.env`, set `MONGO_ROOT_PASSWORD` and `AMBULANCE_API_MONGODB_PASSWORD` (the API connects as a user limited to its own database), then:
 
 ```bash
 docker compose up -d --build
