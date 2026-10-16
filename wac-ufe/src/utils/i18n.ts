@@ -18,7 +18,7 @@ const sk = {
     required: 'Toto pole je povinné.',
   },
   shell: {
-    demoNotice: 'Ukážková verzia: údaje sa každú noc o 3:00 obnovia do pôvodného stavu.',
+    demoNotice: 'Ukážková verzia: údaje sa každú noc o 3:30 obnovia do pôvodného stavu.',
     mainNav: 'Hlavná navigácia',
     home: 'Domov',
     devices: 'Zariadenia',
@@ -210,7 +210,7 @@ const sk = {
     liveTitle: 'Dnes: živé demo na domácom serveri',
     live: ['Prehliadač', 'Tailscale Funnel (HTTPS)', 'nginx: frontend a proxy /api', 'Go API (Gin)', 'MongoDB 8'],
     liveNote:
-      'Všetko beží v Docker Compose. Samostatný kontajner každú noc o 3:00 obnoví ukážkové údaje. nginx posiela bezpečnostné hlavičky vrátane Content-Security-Policy a obmedzuje počet požiadaviek. Stránku Servis tvorí druhý micro-frontend s vlastným buildom, ktorý aplikácia načíta až pri jej otvorení.',
+      'Všetko beží v Docker Compose. Samostatný kontajner každú noc o 3:30 obnoví ukážkové údaje. nginx posiela bezpečnostné hlavičky vrátane Content-Security-Policy a obmedzuje počet požiadaviek. Stránku Servis tvorí druhý micro-frontend s vlastným buildom, ktorý aplikácia načíta až pri jej otvorení.',
     courseSetupTitle: 'V predmete: Kubernetes a GitOps',
     courseSetup: [
       'Git repozitár',
@@ -263,7 +263,7 @@ const en: Messages = {
     required: 'This field is required.',
   },
   shell: {
-    demoNotice: 'Demo: the data is restored to its original state every night at 3:00 (CET).',
+    demoNotice: 'Demo: the data is restored to its original state every night at 3:30 (CET).',
     mainNav: 'Main navigation',
     home: 'Home',
     devices: 'Devices',
@@ -455,7 +455,7 @@ const en: Messages = {
     liveTitle: 'Today: the live demo on a home server',
     live: ['Browser', 'Tailscale Funnel (HTTPS)', 'nginx: frontend and /api proxy', 'Go API (Gin)', 'MongoDB 8'],
     liveNote:
-      'Everything runs in Docker Compose. A separate container restores the demo data every night at 3:00. nginx sends security headers including a Content-Security-Policy and rate limits requests. The Service page is a second micro-frontend with its own build, which the app loads only when the page opens.',
+      'Everything runs in Docker Compose. A separate container restores the demo data every night at 3:30. nginx sends security headers including a Content-Security-Policy and rate limits requests. The Service page is a second micro-frontend with its own build, which the app loads only when the page opens.',
     courseSetupTitle: 'In the course: Kubernetes and GitOps',
     courseSetup: [
       'Git repository',

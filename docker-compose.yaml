@@ -88,7 +88,7 @@ services:
       <<: *mongo-env
       MONGO_USERNAME: ${AMBULANCE_API_MONGODB_USERNAME:-ambulance}
       MONGO_PASSWORD: ${AMBULANCE_API_MONGODB_PASSWORD}
-      DEMO_RESET_TIME: ${DEMO_RESET_TIME:-03:00}
+      DEMO_RESET_TIME: ${DEMO_RESET_TIME:-03:30}
       TZ: ${DEMO_RESET_TIMEZONE:-Europe/Bratislava}
     volumes:
       - ./docker/mongo:/seed:ro
