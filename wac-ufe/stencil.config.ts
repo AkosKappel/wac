@@ -18,7 +18,9 @@ export const config: Config = {
     },
     {
       type: 'www',
-      serviceWorker: null, // disable service workers
+      // a hand-written service worker (src/sw.js) instead of Stencil's Workbox one
+      serviceWorker: null,
+      copy: [{ src: 'sw.js' }, { src: 'manifest.webmanifest' }],
     },
   ],
   testing: {
