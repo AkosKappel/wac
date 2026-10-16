@@ -113,8 +113,9 @@ h1 {
     max-width: none;
     flex-basis: 100%;
   }
+  /* full width, so long values such as "All departments" stay on one line */
   .filters md-outlined-select {
-    flex: 1 1 140px;
+    flex: 1 1 100%;
     min-width: 0;
   }
   .count,

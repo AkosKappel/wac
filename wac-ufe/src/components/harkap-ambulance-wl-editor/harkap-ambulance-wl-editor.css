@@ -98,4 +98,8 @@ form > :first-child {
   .card {
     padding: 16px;
   }
+  /* keeps Delete, Back and Save in one row on common phones (390 px) */
+  .actions {
+    gap: 4px;
+  }
 }
