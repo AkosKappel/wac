@@ -2,8 +2,17 @@
   display: block;
 }
 
-.add-button {
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
   margin-bottom: 12px;
+}
+
+.toolbar md-outlined-select {
+  min-width: 180px;
 }
 
 .list {

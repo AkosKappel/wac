@@ -5,7 +5,7 @@ import { downloadText, toCsv } from '../../utils/csv';
 import { DeviceQuery, applyQuery, parseQuery, toSearch } from '../../utils/device-query';
 import { ErrorPage, SkeletonRows } from '../../utils/error-page';
 import { t } from '../../utils/i18n';
-import { WarrantyBadge } from '../../utils/warranty-badge';
+import { ServiceBadge, WarrantyBadge } from '../../utils/warranty-badge';
 
 @Component({
   tag: 'harkap-ambulance-wl-list',
@@ -182,6 +182,7 @@ export class HarkapAmbulanceWlList {
                         {device.deviceId ? ` · ${device.deviceId}` : ''}
                       </div>
                       <div slot="end" class="meta">
+                        <ServiceBadge device={device} />
                         {device.warrantyUntil && <WarrantyBadge until={device.warrantyUntil} />}
                         <md-icon aria-hidden="true">chevron_right</md-icon>
                       </div>

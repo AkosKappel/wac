@@ -186,11 +186,28 @@ a:focus-visible {
   .app-header {
     padding: 10px 16px;
   }
+  /* five links do not fit a phone: the row scrolls sideways instead of widening the page */
   .app-nav {
     order: 1;
     width: 100%;
+    overflow-x: auto;
+    scrollbar-width: none;
   }
   .app-nav a {
-    padding: 6px 12px;
+    flex: none;
+    padding: 6px 10px;
+    white-space: nowrap;
+  }
+}
+
+/* printing a page (the device label) leaves out the shell */
+@media print {
+  .demo-notice,
+  .app-header,
+  .app-footer {
+    display: none;
+  }
+  :host {
+    background: none;
   }
 }

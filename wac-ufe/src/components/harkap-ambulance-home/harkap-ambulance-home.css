@@ -56,7 +56,7 @@ h3 {
 
 .stats {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
   gap: 16px;
   margin-bottom: 16px;
 }
@@ -177,6 +177,50 @@ a.quick-link:hover,
   height: 200px;
 }
 
+.months {
+  margin-top: 16px;
+  padding: 24px;
+}
+
+.month-bars {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  align-items: end;
+  gap: 6px;
+  height: 180px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.month-bars li {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  align-items: center;
+  height: 100%;
+  gap: 4px;
+}
+
+.month-bar {
+  width: 100%;
+  max-width: 40px;
+  min-height: 2px;
+  border-radius: 6px 6px 2px 2px;
+  background: var(--md-sys-color-primary);
+}
+
+.month-count {
+  font-size: 0.75rem;
+  color: var(--md-sys-color-on-surface-variant);
+}
+
+.month-name {
+  font-size: 0.6875rem;
+  color: var(--md-sys-color-on-surface-variant);
+  white-space: nowrap;
+}
+
 .load-failed {
   display: flex;
   align-items: center;
@@ -226,8 +270,15 @@ a:focus-visible {
     gap: 32px;
     padding: 32px 16px 48px;
   }
-  .departments {
+  .stats {
+    grid-template-columns: 1fr;
+  }
+  .departments,
+  .months {
     padding: 16px 8px;
+  }
+  .month-bars {
+    gap: 3px;
   }
   .departments a {
     grid-template-columns: 1fr auto;

@@ -2,6 +2,8 @@ import {
   AmbulanceDepartmentsApi,
   AmbulanceDeviceListApi,
   AmbulanceDeviceLogListApi,
+  AmbulanceMaintenanceApi,
+  AmbulanceStatsApi,
   Configuration,
   ResponseError,
 } from '../api/ambulance-wl';
@@ -14,6 +16,8 @@ export function apiClients(basePath: string) {
     devices: new AmbulanceDeviceListApi(configuration),
     logs: new AmbulanceDeviceLogListApi(configuration),
     departments: new AmbulanceDepartmentsApi(configuration),
+    maintenance: new AmbulanceMaintenanceApi(configuration),
+    stats: new AmbulanceStatsApi(configuration),
   };
 }
 

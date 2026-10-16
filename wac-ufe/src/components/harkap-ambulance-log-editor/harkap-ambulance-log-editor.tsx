@@ -1,9 +1,10 @@
 import { Component, Host, Prop, State, h, EventEmitter, Event } from '@stencil/core';
-import { DeviceLog } from '../../api/ambulance-wl';
+import { DeviceLog, LogType } from '../../api/ambulance-wl';
 import { apiClients, apiError } from '../../utils/api';
 import { ErrorPage } from '../../utils/error-page';
 import { ConfirmDialog } from '../../utils/confirm-dialog';
 import { t } from '../../utils/i18n';
+import { LOG_TYPES, LOG_TYPE_ICONS } from '../../utils/service';
 import { toLocalDateTimeInput, validateOnBlur } from '../../utils/utils';
 
 @Component({
@@ -33,6 +34,7 @@ export class HarkapAmbulanceLogEditor {
         deviceId: '',
         createdAt: new Date().toISOString(),
         text: '',
+        type: 'other',
       };
 
       return this.log;
@@ -99,6 +101,21 @@ export class HarkapAmbulanceLogEditor {
             >
               <md-icon slot="leading-icon">notes</md-icon>
             </md-outlined-text-field>
+
+            <md-outlined-select
+              label={m.type}
+              value={this.log.type ?? 'other'}
+              onChange={(ev: Event) =>
+                (this.log = { ...this.log, type: (ev.target as HTMLSelectElement).value as LogType })
+              }
+            >
+              <md-icon slot="leading-icon">{LOG_TYPE_ICONS[this.log.type ?? 'other']}</md-icon>
+              {LOG_TYPES.map(type => (
+                <md-select-option value={type}>
+                  <div slot="headline">{t().logTypes[type]}</div>
+                </md-select-option>
+              ))}
+            </md-outlined-select>
 
             <md-outlined-text-field
               type="datetime-local"

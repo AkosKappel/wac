@@ -3,9 +3,10 @@ import { Department, DeviceListEntry } from '../../api/ambulance-wl';
 import { apiClients, apiError } from '../../utils/api';
 import { ErrorPage } from '../../utils/error-page';
 import { ConfirmDialog } from '../../utils/confirm-dialog';
-import { WarrantyBadge } from '../../utils/warranty-badge';
-import { t } from '../../utils/i18n';
-import { navigateTo, watchRelativePath, validateOnBlur } from '../../utils/utils';
+import { ServiceBadge, WarrantyBadge } from '../../utils/warranty-badge';
+import { formatDate, formatDateTime, t } from '../../utils/i18n';
+import { nextService } from '../../utils/service';
+import { hrefTo, navigateTo, watchRelativePath, validateOnBlur } from '../../utils/utils';
 
 @Component({
   tag: 'harkap-ambulance-wl-editor',
@@ -24,6 +25,8 @@ export class HarkapAmbulanceWlEditor {
   @State() actionError: string;
   @State() busy = false;
   @State() confirmDelete = false;
+  /** QR code of the device page for the printed label, as SVG markup */
+  @State() qrSvg: string;
 
   private unwatch: () => void;
   private logHeading: HTMLElement;
@@ -42,7 +45,7 @@ export class HarkapAmbulanceWlEditor {
         name: '',
         deviceId: '',
         warrantyUntil: new Date().toISOString(),
-        department: { name: '' },
+        department: { name: '', code: '' },
         price: 0,
       };
 
@@ -57,6 +60,7 @@ export class HarkapAmbulanceWlEditor {
     try {
       this.entry = await apiClients(this.apiBase).devices.getDeviceListEntry({ entryId: this.entryId });
       this.isValid = true;
+      this.makeQrCode();
     } catch (err) {
       const { status, message } = await apiError(err);
       this.errorStatus = status;
@@ -64,6 +68,15 @@ export class HarkapAmbulanceWlEditor {
     }
 
     return undefined;
+  }
+
+  // loaded on demand: only the device page needs the encoder
+  private async makeQrCode() {
+    const { default: qrcode } = await import('qrcode-generator');
+    const qr = qrcode(0, 'M');
+    qr.addData(location.origin + hrefTo(this.basePath, './devices/' + encodeURIComponent(this.entryId)));
+    qr.make();
+    this.qrSvg = qr.createSvgTag({ cellSize: 4, margin: 0, scalable: true });
   }
 
   componentWillLoad() {
@@ -142,7 +155,15 @@ export class HarkapAmbulanceWlEditor {
             <p class="eyebrow">{this.entryId === '@new' ? m.eyebrowNew : m.eyebrowDetail}</p>
             <h1>{this.entryId === '@new' ? m.titleNew : this.entry?.name || '…'}</h1>
           </div>
-          {this.entryId !== '@new' && this.entry?.warrantyUntil && <WarrantyBadge until={this.entry.warrantyUntil} />}
+          {this.entryId !== '@new' && this.entry && (
+            <div class="header-badges">
+              <ServiceBadge device={this.entry} />
+              {this.entry.warrantyUntil && <WarrantyBadge until={this.entry.warrantyUntil} />}
+              <md-icon-button aria-label={m.printLabel} title={m.printLabel} onClick={() => window.print()}>
+                <md-icon aria-hidden="true">print</md-icon>
+              </md-icon-button>
+            </div>
+          )}
         </header>
         <section class="card">
           {!this.entry ? (
@@ -237,8 +258,27 @@ export class HarkapAmbulanceWlEditor {
               >
                 <md-icon slot="leading-icon">euro</md-icon>
               </md-outlined-text-field>
+
+              <md-outlined-text-field
+                type="number"
+                min="1"
+                max="3650"
+                step="1"
+                value={this.entry.serviceIntervalDays?.toString() ?? ''}
+                oninput={(ev: InputEvent) => {
+                  const days = parseInt(this.inputValue(ev), 10);
+                  this.entry.serviceIntervalDays = isNaN(days) ? undefined : days;
+                  this.isValid = this.isFormValid();
+                }}
+                label={m.serviceInterval}
+                supportingText={m.serviceIntervalHint}
+              >
+                <md-icon slot="leading-icon">event_repeat</md-icon>
+              </md-outlined-text-field>
             </form>
           )}
+
+          {this.entry?.serviceIntervalDays > 0 && this.entryId !== '@new' && this.serviceInfo()}
 
           {this.actionError && (
             <div class="banner" role="alert">
@@ -267,6 +307,7 @@ export class HarkapAmbulanceWlEditor {
             </md-filled-button>
           </div>
         </section>
+        {this.entryId !== '@new' && this.entry && this.historyCard()}
         {this.entryId !== '@new' ? (
           <section class="card device-log">
             <h2 tabindex="-1" ref={el => (this.logHeading = el)}>
@@ -293,6 +334,7 @@ export class HarkapAmbulanceWlEditor {
             )}
           </section>
         ) : null}
+        {this.entry && this.qrSvg && this.printLabel()}
         <ConfirmDialog
           open={this.confirmDelete}
           headline={m.deleteTitle}
@@ -307,15 +349,81 @@ export class HarkapAmbulanceWlEditor {
     );
   }
 
+  private serviceInfo() {
+    const m = t().editor;
+    const next = nextService(this.entry);
+    return (
+      <dl class="service-info">
+        <div>
+          <dt>{m.lastService}</dt>
+          <dd>{this.entry.lastServiceAt ? formatDate(this.entry.lastServiceAt) : m.neverServiced}</dd>
+        </div>
+        <div>
+          <dt>{m.nextService}</dt>
+          <dd>{next?.date ? formatDate(next.date) : t().service.overdue}</dd>
+        </div>
+      </dl>
+    );
+  }
+
+  private historyCard() {
+    const m = t().editor;
+    const history = [...(this.entry.history ?? [])].reverse();
+    return (
+      <section class="card history">
+        <h2>
+          <md-icon aria-hidden="true">manage_history</md-icon>
+          {m.history}
+        </h2>
+        {history.length === 0 ? (
+          <p class="hint">{m.historyEmpty}</p>
+        ) : (
+          <ol>
+            {history.map(record => (
+              <li>
+                <time dateTime={record.changedAt}>{formatDateTime(record.changedAt)}</time>
+                <ul>
+                  {record.changes.map(change => (
+                    <li>
+                      <strong>{m.fields[change.field] ?? change.field}:</strong> {change.from || '–'} →{' '}
+                      {change.to || '–'}
+                    </li>
+                  ))}
+                </ul>
+              </li>
+            ))}
+          </ol>
+        )}
+      </section>
+    );
+  }
+
+  /** Only shown when printing: a label to stick on the device. */
+  private printLabel() {
+    return (
+      <section class="print-label" aria-hidden="true">
+        <div class="qr" innerHTML={this.qrSvg}></div>
+        <div>
+          <p class="label-name">{this.entry.name}</p>
+          <p class="label-id">{this.entry.deviceId}</p>
+          <p>{this.entry.department?.name}</p>
+          <p class="label-hint">{t().editor.labelScan}</p>
+        </div>
+      </section>
+    );
+  }
+
   private isFormValid(): boolean {
+    const days = this.entry?.serviceIntervalDays;
     return (
       this.entry?.name &&
       this.entry?.deviceId &&
       this.entry?.warrantyUntil &&
-      this.entry?.department?.name &&
+      this.entry?.department?.code &&
       this.entry?.price !== undefined &&
       this.entry?.price >= 0 &&
-      this.entry?.price <= 100_000_000
+      this.entry?.price <= 100_000_000 &&
+      (days === undefined || (days >= 1 && days <= 3650))
     );
   }
 

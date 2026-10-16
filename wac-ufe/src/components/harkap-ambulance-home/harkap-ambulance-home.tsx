@@ -1,7 +1,9 @@
 import { Component, Host, Prop, State, h } from '@stencil/core';
+import { Stats } from '../../api/ambulance-wl';
 import { apiClients } from '../../utils/api';
 import { formatPrice, t } from '../../utils/i18n';
-import { Overview, overview } from '../../utils/overview';
+import { lastTwelveMonths } from '../../utils/overview';
+import { DUE_DAYS } from '../../utils/service';
 import { hrefTo } from '../../utils/utils';
 
 @Component({
@@ -12,7 +14,8 @@ import { hrefTo } from '../../utils/utils';
 export class HarkapAmbulanceHome {
   @Prop() apiBase: string;
   @Prop() basePath: string = '';
-  @State() overview: Overview;
+  @State() stats: Stats;
+  @State() dueCount: number;
   @State() loadFailed = false;
 
   // not awaited, so the page renders right away with placeholders
@@ -21,8 +24,14 @@ export class HarkapAmbulanceHome {
   }
 
   private async loadOverview() {
+    const api = apiClients(this.apiBase);
     try {
-      this.overview = overview((await apiClients(this.apiBase).devices.getDeviceListEntries()) ?? []);
+      const [stats, due] = await Promise.all([
+        api.stats.getStats(),
+        api.maintenance.getMaintenanceDue({ days: DUE_DAYS }),
+      ]);
+      this.stats = stats;
+      this.dueCount = due.length;
     } catch {
       this.loadFailed = true;
     }
@@ -45,11 +54,17 @@ export class HarkapAmbulanceHome {
         <div class={`stat ${tone}`}>{content}</div>
       );
     };
-    const o = this.overview;
-    const maxValue = o?.departments[0]?.value || 1;
+    const o = this.stats;
+    const maxValue = o?.departments[0]?.totalValue || 1;
+    const months = o && lastTwelveMonths(o.logsPerMonth);
+    const maxMonth = Math.max(1, ...(months ?? []).map(month => month.count));
+    const monthName = (month: string) =>
+      new Date(`${month}-01T00:00:00Z`).toLocaleDateString(t().locale, { month: 'short', timeZone: 'UTC' });
     const quickLinks = [
       ['inventory_2', href('./devices'), m.links.devices],
       ['add_circle', href('./devices/@new'), m.links.newDevice],
+      ['engineering', href('./maintenance'), m.links.maintenance],
+      ['apartment', href('./departments'), m.links.departments],
       ['info', href('./about'), m.links.about],
       ['api', '/api-docs/', m.links.apiDocs],
     ] as const;
@@ -83,10 +98,11 @@ export class HarkapAmbulanceHome {
             ) : (
               [
                 <div class="stats">
-                  {stat('medical_services', m.deviceCount, o?.count, './devices')}
+                  {stat('medical_services', m.deviceCount, o?.deviceCount, './devices')}
                   {stat('euro', m.totalValue, o && formatPrice(o.totalValue))}
-                  {stat('schedule', m.expiringSoon, o?.expiring, './devices?warranty=expiring', 'expiring')}
-                  {stat('error', m.expired, o?.expired, './devices?warranty=expired', 'expired')}
+                  {stat('schedule', m.expiringSoon, o?.warranty.expiring, './devices?warranty=expiring', 'expiring')}
+                  {stat('error', m.expired, o?.warranty.expired, './devices?warranty=expired', 'expired')}
+                  {stat('engineering', m.dueForService, this.dueCount, './maintenance', 'expiring')}
                 </div>,
                 <div class="card departments">
                   <h3>{m.valueByDepartment}</h3>
@@ -102,13 +118,34 @@ export class HarkapAmbulanceHome {
                               <small>{m.devicesIn(department.count)}</small>
                             </span>
                             <span class="bar" aria-hidden="true">
-                              <span style={{ width: `${(department.value / maxValue) * 100}%` }}></span>
+                              <span style={{ width: `${(department.totalValue / maxValue) * 100}%` }}></span>
                             </span>
-                            <span class="department-value">{formatPrice(department.value)}</span>
+                            <span class="department-value">{formatPrice(department.totalValue)}</span>
                           </a>
                         </li>
                       ))}
                     </ul>
+                  )}
+                </div>,
+                <div class="card months">
+                  <h3>{m.logsPerMonth}</h3>
+                  {!months ? (
+                    <span class="skeleton bars-skeleton"></span>
+                  ) : (
+                    <ol class="month-bars">
+                      {months.map(month => (
+                        <li title={`${monthName(month.month)}: ${m.entries(month.count)}`}>
+                          <span class="month-count">{month.count || ''}</span>
+                          {/* the labels above and below take about 36px of the column */}
+                          <span
+                            class="month-bar"
+                            style={{ height: `calc((100% - 36px) * ${month.count / maxMonth})` }}
+                          ></span>
+                          <span class="month-name">{monthName(month.month)}</span>
+                          <span class="visually-hidden">{m.entries(month.count)}</span>
+                        </li>
+                      ))}
+                    </ol>
                   )}
                 </div>,
               ]

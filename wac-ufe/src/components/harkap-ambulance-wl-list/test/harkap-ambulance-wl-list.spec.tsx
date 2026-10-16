@@ -11,14 +11,14 @@ describe('harkap-ambulance-wl-list', () => {
     {
       id: '1',
       name: 'Defibrillator',
-      department: { name: 'Cardiology' },
+      department: { name: 'Cardiology', code: 'kar' },
       deviceId: '1',
       warrantyUntil: '2030-01-01T00:00:00Z',
     },
     {
       id: '2',
       name: 'Ultrasound',
-      department: { name: 'Radiology' },
+      department: { name: 'Radiology', code: 'rad' },
       deviceId: '2',
       warrantyUntil: '2030-01-01T00:00:00Z',
     },
@@ -66,7 +66,7 @@ describe('harkap-ambulance-wl-list', () => {
       {
         id: '1',
         name: 'Defibrillator',
-        department: { name: 'Cardiology' },
+        department: { name: 'Cardiology', code: 'kar' },
         deviceId: '1',
         warrantyUntil: '2030-01-01T00:00:00Z',
       },

@@ -10,22 +10,39 @@ const device = {
   warrantyUntil: '2030-01-01T00:00:00Z',
   price: 1200,
   department: { name: 'Kardiológia', code: 'kar' },
-  logList: [{ id: 'log-1', deviceId: 'ekg-1', text: 'Purchase', createdAt: '2026-01-01T10:00:00Z' }],
+  serviceIntervalDays: 365,
+  lastServiceAt: '2026-01-01T10:00:00Z',
+  logList: [{ id: 'log-1', deviceId: 'ekg-1', text: 'Purchase', type: 'purchase', createdAt: '2026-01-01T10:00:00Z' }],
+  history: [{ changedAt: '2026-02-01T10:00:00Z', changes: [{ field: 'price', from: '1000', to: '1200' }] }],
+};
+
+const stats = {
+  deviceCount: 1,
+  totalValue: 1200,
+  warranty: { ok: 1, expiring: 0, expired: 0 },
+  departments: [{ code: 'kar', name: 'Kardiológia', count: 1, totalValue: 1200, averageValue: 1200 }],
+  logsPerMonth: [{ month: '2026-01', count: 1 }],
 };
 
 // answers the API calls in the browser, so every screen renders with data
 function stubApi(page: E2EPage) {
-  return page.evaluateOnNewDocument(sample => {
-    const json = (body: unknown) =>
-      new Response(JSON.stringify(body), { headers: { 'Content-Type': 'application/json' } });
-    window.fetch = async (input: RequestInfo | URL) => {
-      const url = String(input instanceof Request ? input.url : input);
-      if (url.includes('/departments')) return json([sample.department]);
-      if (url.includes('/logs')) return json(sample.logList);
-      if (/\/entries\/[^/]+$/.test(url)) return json(sample);
-      return json([sample]);
-    };
-  }, device);
+  return page.evaluateOnNewDocument(
+    (sample, stats) => {
+      const json = (body: unknown) =>
+        new Response(JSON.stringify(body), { headers: { 'Content-Type': 'application/json' } });
+      window.fetch = async (input: RequestInfo | URL) => {
+        const url = String(input instanceof Request ? input.url : input);
+        if (url.includes('/stats')) return json(stats);
+        if (url.includes('/maintenance')) return json([]);
+        if (url.includes('/departments')) return json([{ ...sample.department, floor: '2', head: 'MUDr. Ján Novák' }]);
+        if (url.includes('/logs')) return json(sample.logList);
+        if (/\/entries\/[^/]+$/.test(url)) return json(sample);
+        return json([sample]);
+      };
+    },
+    device,
+    stats,
+  );
 }
 
 async function violations(page: E2EPage) {
@@ -73,6 +90,7 @@ describe('accessibility', () => {
       '<harkap-ambulance-log-editor api-base="/api" entry-id="ekg-1" log-id="log-1"></harkap-ambulance-log-editor>',
     ],
     ['about page', '<harkap-ambulance-about></harkap-ambulance-about>'],
+    ['departments page', '<harkap-ambulance-departments api-base="/api"></harkap-ambulance-departments>'],
   ])('%s has no WCAG A/AA violations', async (_, html) => {
     const page = await render(html);
     expect(await violations(page)).toEqual([]);

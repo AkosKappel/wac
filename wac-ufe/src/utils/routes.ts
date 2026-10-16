@@ -1,4 +1,4 @@
-export type Page = 'home' | 'devices' | 'device' | 'about' | 'not-found';
+export type Page = 'home' | 'devices' | 'device' | 'maintenance' | 'departments' | 'about' | 'not-found';
 
 /** Old links (/list, /entry/<id>) point to the device list and detail under /devices. */
 export function currentPath(relativePath: string): string {
@@ -10,6 +10,8 @@ export function pageOf(path: string): Page {
   if (clean === '') return 'home';
   if (clean === 'devices') return 'devices';
   if (/^devices\/[^/]+(\/log\/[^/]+)?$/.test(clean)) return 'device';
+  if (clean === 'maintenance') return 'maintenance';
+  if (clean === 'departments') return 'departments';
   if (clean === 'about') return 'about';
   return 'not-found';
 }

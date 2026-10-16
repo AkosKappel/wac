@@ -8,6 +8,13 @@ import { HTMLStencilElement, JSXBase } from "@stencil/core/internal";
 export namespace Components {
     interface HarkapAmbulanceAbout {
     }
+    interface HarkapAmbulanceDepartments {
+        "apiBase": string;
+        /**
+          * @default ''
+         */
+        "basePath": string;
+    }
     interface HarkapAmbulanceHome {
         "apiBase": string;
         /**
@@ -65,6 +72,12 @@ declare global {
     var HTMLHarkapAmbulanceAboutElement: {
         prototype: HTMLHarkapAmbulanceAboutElement;
         new (): HTMLHarkapAmbulanceAboutElement;
+    };
+    interface HTMLHarkapAmbulanceDepartmentsElement extends Components.HarkapAmbulanceDepartments, HTMLStencilElement {
+    }
+    var HTMLHarkapAmbulanceDepartmentsElement: {
+        prototype: HTMLHarkapAmbulanceDepartmentsElement;
+        new (): HTMLHarkapAmbulanceDepartmentsElement;
     };
     interface HTMLHarkapAmbulanceHomeElement extends Components.HarkapAmbulanceHome, HTMLStencilElement {
     }
@@ -148,6 +161,7 @@ declare global {
     };
     interface HTMLElementTagNameMap {
         "harkap-ambulance-about": HTMLHarkapAmbulanceAboutElement;
+        "harkap-ambulance-departments": HTMLHarkapAmbulanceDepartmentsElement;
         "harkap-ambulance-home": HTMLHarkapAmbulanceHomeElement;
         "harkap-ambulance-log-editor": HTMLHarkapAmbulanceLogEditorElement;
         "harkap-ambulance-log-list": HTMLHarkapAmbulanceLogListElement;
@@ -158,6 +172,13 @@ declare global {
 }
 declare namespace LocalJSX {
     interface HarkapAmbulanceAbout {
+    }
+    interface HarkapAmbulanceDepartments {
+        "apiBase"?: string;
+        /**
+          * @default ''
+         */
+        "basePath"?: string;
     }
     interface HarkapAmbulanceHome {
         "apiBase"?: string;
@@ -198,6 +219,10 @@ declare namespace LocalJSX {
         "onEntry-clicked"?: (event: HarkapAmbulanceWlListCustomEvent<string>) => void;
     }
 
+    interface HarkapAmbulanceDepartmentsAttributes {
+        "apiBase": string;
+        "basePath": string;
+    }
     interface HarkapAmbulanceHomeAttributes {
         "apiBase": string;
         "basePath": string;
@@ -226,6 +251,7 @@ declare namespace LocalJSX {
 
     interface IntrinsicElements {
         "harkap-ambulance-about": HarkapAmbulanceAbout;
+        "harkap-ambulance-departments": Omit<HarkapAmbulanceDepartments, keyof HarkapAmbulanceDepartmentsAttributes> & { [K in keyof HarkapAmbulanceDepartments & keyof HarkapAmbulanceDepartmentsAttributes]?: HarkapAmbulanceDepartments[K] } & { [K in keyof HarkapAmbulanceDepartments & keyof HarkapAmbulanceDepartmentsAttributes as `attr:${K}`]?: HarkapAmbulanceDepartmentsAttributes[K] } & { [K in keyof HarkapAmbulanceDepartments & keyof HarkapAmbulanceDepartmentsAttributes as `prop:${K}`]?: HarkapAmbulanceDepartments[K] };
         "harkap-ambulance-home": Omit<HarkapAmbulanceHome, keyof HarkapAmbulanceHomeAttributes> & { [K in keyof HarkapAmbulanceHome & keyof HarkapAmbulanceHomeAttributes]?: HarkapAmbulanceHome[K] } & { [K in keyof HarkapAmbulanceHome & keyof HarkapAmbulanceHomeAttributes as `attr:${K}`]?: HarkapAmbulanceHomeAttributes[K] } & { [K in keyof HarkapAmbulanceHome & keyof HarkapAmbulanceHomeAttributes as `prop:${K}`]?: HarkapAmbulanceHome[K] };
         "harkap-ambulance-log-editor": Omit<HarkapAmbulanceLogEditor, keyof HarkapAmbulanceLogEditorAttributes> & { [K in keyof HarkapAmbulanceLogEditor & keyof HarkapAmbulanceLogEditorAttributes]?: HarkapAmbulanceLogEditor[K] } & { [K in keyof HarkapAmbulanceLogEditor & keyof HarkapAmbulanceLogEditorAttributes as `attr:${K}`]?: HarkapAmbulanceLogEditorAttributes[K] } & { [K in keyof HarkapAmbulanceLogEditor & keyof HarkapAmbulanceLogEditorAttributes as `prop:${K}`]?: HarkapAmbulanceLogEditor[K] };
         "harkap-ambulance-log-list": Omit<HarkapAmbulanceLogList, keyof HarkapAmbulanceLogListAttributes> & { [K in keyof HarkapAmbulanceLogList & keyof HarkapAmbulanceLogListAttributes]?: HarkapAmbulanceLogList[K] } & { [K in keyof HarkapAmbulanceLogList & keyof HarkapAmbulanceLogListAttributes as `attr:${K}`]?: HarkapAmbulanceLogListAttributes[K] } & { [K in keyof HarkapAmbulanceLogList & keyof HarkapAmbulanceLogListAttributes as `prop:${K}`]?: HarkapAmbulanceLogList[K] };
@@ -239,6 +265,7 @@ declare module "@stencil/core" {
     export namespace JSX {
         interface IntrinsicElements {
             "harkap-ambulance-about": LocalJSX.IntrinsicElements["harkap-ambulance-about"] & JSXBase.HTMLAttributes<HTMLHarkapAmbulanceAboutElement>;
+            "harkap-ambulance-departments": LocalJSX.IntrinsicElements["harkap-ambulance-departments"] & JSXBase.HTMLAttributes<HTMLHarkapAmbulanceDepartmentsElement>;
             "harkap-ambulance-home": LocalJSX.IntrinsicElements["harkap-ambulance-home"] & JSXBase.HTMLAttributes<HTMLHarkapAmbulanceHomeElement>;
             "harkap-ambulance-log-editor": LocalJSX.IntrinsicElements["harkap-ambulance-log-editor"] & JSXBase.HTMLAttributes<HTMLHarkapAmbulanceLogEditorElement>;
             "harkap-ambulance-log-list": LocalJSX.IntrinsicElements["harkap-ambulance-log-list"] & JSXBase.HTMLAttributes<HTMLHarkapAmbulanceLogListElement>;

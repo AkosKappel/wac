@@ -8,7 +8,7 @@ describe('harkap-ambulance-wl-editor', () => {
     name: 'Ultrasound',
     deviceId: 'US-001',
     warrantyUntil: new Date().toISOString(),
-    department: { name: 'Radiology' },
+    department: { name: 'Radiology', code: 'rad' },
     price: 5000,
   };
 

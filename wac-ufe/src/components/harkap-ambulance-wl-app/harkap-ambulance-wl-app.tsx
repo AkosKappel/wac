@@ -15,6 +15,10 @@ declare global {
 
 const THEME_ICONS = { system: 'brightness_auto', light: 'light_mode', dark: 'dark_mode' };
 
+// The service plan is a separate micro-frontend with its own build, served by nginx under
+// /maintenance-ufe/; the shell loads its web component the first time the page opens.
+const MAINTENANCE_UFE = '/maintenance-ufe/build/maintenance-ufe.esm.js';
+
 @Component({
   tag: 'harkap-ambulance-wl-app',
   styleUrls: ['harkap-ambulance-wl-app.css', '../../utils/shared.css'],
@@ -24,6 +28,7 @@ export class HarkapAmbulanceWlApp {
   @State() private relativePath = '';
   @Prop() basePath: string = '';
   @Prop() apiBase: string;
+  @State() maintenanceUfeFailed = false;
 
   private unwatch: () => void;
   private main: HTMLElement;
@@ -45,13 +50,27 @@ export class HarkapAmbulanceWlApp {
     });
   }
 
+  private loadMaintenanceUfe() {
+    if (customElements.get('harkap-maintenance-due') || document.querySelector(`script[src="${MAINTENANCE_UFE}"]`)) {
+      return;
+    }
+    const script = document.createElement('script');
+    script.type = 'module';
+    script.src = MAINTENANCE_UFE;
+    script.onerror = () => (this.maintenanceUfeFailed = true);
+    document.head.append(script);
+  }
+
   componentDidRender() {
     const page = pageOf(this.relativePath);
+    if (page === 'maintenance') this.loadMaintenanceUfe();
     const m = t().shell;
     const titles: Record<Page, string | undefined> = {
       'home': undefined,
       'devices': m.devices,
       'device': m.devices,
+      'maintenance': m.maintenance,
+      'departments': m.departments,
       'about': m.about,
       'not-found': t().errors.notFoundTitle,
     };
@@ -92,6 +111,8 @@ export class HarkapAmbulanceWlApp {
           <nav class="app-nav" aria-label={m.mainNav}>
             {navLink('./', ['home'], m.home)}
             {navLink('./devices', ['devices', 'device'], m.devices)}
+            {navLink('./maintenance', ['maintenance'], m.maintenance)}
+            {navLink('./departments', ['departments'], m.departments)}
             {navLink('./about', ['about'], m.about)}
           </nav>
           <div class="header-actions">
@@ -129,6 +150,21 @@ export class HarkapAmbulanceWlApp {
               api-base={this.apiBase}
               oneditor-closed={() => navigate('./devices')}
             ></harkap-ambulance-wl-editor>
+          ) : page === 'maintenance' ? (
+            this.maintenanceUfeFailed ? (
+              <ErrorPage onBack={() => navigate('./devices')} />
+            ) : (
+              <harkap-maintenance-due
+                api-base={this.apiBase}
+                base-path={this.basePath}
+                language={settings.state.language}
+              ></harkap-maintenance-due>
+            )
+          ) : page === 'departments' ? (
+            <harkap-ambulance-departments
+              api-base={this.apiBase}
+              base-path={this.basePath}
+            ></harkap-ambulance-departments>
           ) : page === 'about' ? (
             <harkap-ambulance-about></harkap-ambulance-about>
           ) : (

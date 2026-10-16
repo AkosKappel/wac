@@ -25,19 +25,22 @@
     "start:app": "stencil build --dev --watch --serve",
     "start:mock": "run-s convert-openapi mock-api",
     "start": "run-p -r start:mock start:app",
-    "build": "stencil build",
+    "build": "stencil build && npm run build:maintenance",
     "test": "stencil test --spec --e2e",
     "test.watch": "stencil test --spec --e2e --watchAll",
     "generate": "stencil generate",
     "openapi": "../scripts/generate-api.sh",
     "test:jest": "jest --config ./jest.config.js",
     "format": "prettier --write .",
-    "lint": "prettier --check ."
+    "lint": "prettier --check .",
+    "build:maintenance": "stencil build --config stencil.maintenance.config.ts",
+    "start:maintenance": "stencil build --config stencil.maintenance.config.ts --dev --watch --serve --port 3340"
   },
   "dependencies": {
     "@material/web": "^2.5.0",
     "@stencil/core": "^4.45.1",
-    "@stencil/store": "^2.2.4"
+    "@stencil/store": "^2.2.4",
+    "qrcode-generator": "^2.0.4"
   },
   "devDependencies": {
     "@babel/preset-env": "^7.24.3",

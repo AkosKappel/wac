@@ -20,6 +20,7 @@
 - [harkap-ambulance-home](../harkap-ambulance-home)
 - [harkap-ambulance-wl-list](../harkap-ambulance-wl-list)
 - [harkap-ambulance-wl-editor](../harkap-ambulance-wl-editor)
+- [harkap-ambulance-departments](../harkap-ambulance-departments)
 - [harkap-ambulance-about](../harkap-ambulance-about)
 
 ### Graph
@@ -28,6 +29,7 @@ graph TD;
   harkap-ambulance-wl-app --> harkap-ambulance-home
   harkap-ambulance-wl-app --> harkap-ambulance-wl-list
   harkap-ambulance-wl-app --> harkap-ambulance-wl-editor
+  harkap-ambulance-wl-app --> harkap-ambulance-departments
   harkap-ambulance-wl-app --> harkap-ambulance-about
   harkap-ambulance-wl-editor --> harkap-ambulance-log-editor
   harkap-ambulance-wl-editor --> harkap-ambulance-log-list
