@@ -2,7 +2,17 @@ internal/ambulance_wl/README.md
 internal/ambulance_wl/api_ambulance_departments.go
 internal/ambulance_wl/api_ambulance_device_list.go
 internal/ambulance_wl/api_ambulance_device_log_list.go
+internal/ambulance_wl/api_ambulance_maintenance.go
+internal/ambulance_wl/api_ambulance_stats.go
+internal/ambulance_wl/model_change_record.go
 internal/ambulance_wl/model_department.go
+internal/ambulance_wl/model_department_stats.go
 internal/ambulance_wl/model_device_list_entry.go
 internal/ambulance_wl/model_device_log.go
+internal/ambulance_wl/model_field_change.go
+internal/ambulance_wl/model_log_type.go
+internal/ambulance_wl/model_maintenance_item.go
+internal/ambulance_wl/model_month_count.go
+internal/ambulance_wl/model_stats.go
+internal/ambulance_wl/model_warranty_stats.go
 internal/ambulance_wl/routers.go

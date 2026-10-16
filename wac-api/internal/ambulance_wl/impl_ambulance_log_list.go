@@ -82,7 +82,7 @@ func (this *implAmbulanceDeviceLogListAPI) CreateDeviceLog(ctx *gin.Context) {
 			// the list has fewer than maxLogsPerDevice entries when this index does not exist
 			{Key: fmt.Sprintf("logList.%d", maxLogsPerDevice-1), Value: bson.D{{Key: "$exists", Value: false}}},
 		},
-		bson.D{{Key: "$push", Value: bson.D{{Key: "logList", Value: entry}}}},
+		withServiceDate(bson.D{{Key: "$push", Value: bson.D{{Key: "logList", Value: entry}}}}, &entry),
 	)
 	switch err {
 	case nil:
@@ -115,18 +115,18 @@ func (this *implAmbulanceDeviceLogListAPI) UpdateDeviceLog(ctx *gin.Context) {
 		respondError(ctx, http.StatusBadRequest, "Log id in the body does not match the URL", nil)
 		return
 	}
-	if message := validateText(&entry.Text, "Text", maxLogTextLength); message != "" {
+	if message := validateLogFields(&entry); message != "" {
 		respondError(ctx, http.StatusBadRequest, message, nil)
 		return
 	}
 
-	set := bson.D{{Key: "logList.$.text", Value: entry.Text}}
+	set := bson.D{{Key: "logList.$.text", Value: entry.Text}, {Key: "logList.$.type", Value: entry.Type}}
 	if !entry.CreatedAt.IsZero() {
 		set = append(set, bson.E{Key: "logList.$.createdAt", Value: entry.CreatedAt})
 	}
 	device, err := this.DB.UpdateDocument(ctx, ctx.Param("entryId"),
 		bson.D{{Key: "logList.id", Value: logId}},
-		bson.D{{Key: "$set", Value: set}},
+		withServiceDate(bson.D{{Key: "$set", Value: set}}, &entry),
 	)
 	switch err {
 	case nil:
@@ -153,4 +153,13 @@ func (this *implAmbulanceDeviceLogListAPI) DeleteDeviceLog(ctx *gin.Context) {
 	default:
 		respondError(ctx, http.StatusBadGateway, "Failed to delete log entry from database", err)
 	}
+}
+
+// withServiceDate adds moving the device's lastServiceAt to a service entry's date, unless
+// a later service is already recorded. Changing or deleting an entry never moves it back.
+func withServiceDate(update bson.D, entry *DeviceLog) bson.D {
+	if entry.Type != SERVICE || entry.CreatedAt.IsZero() {
+		return update
+	}
+	return append(update, bson.E{Key: "$max", Value: bson.D{{Key: "lastServiceAt", Value: entry.CreatedAt}}})
 }

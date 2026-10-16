@@ -1,8 +1,8 @@
 /* tslint:disable */
 /* eslint-disable */
 /**
- * Device List Api
- * Ambulance Device List management for Web-In-Cloud system
+ * Ambulance Devices API
+ * Medical devices of hospital departments, their operations log, service plan and statistics
  *
  * The version of the OpenAPI document: 1.0.0
  * 
@@ -17,10 +17,178 @@ import type {
     Department,
 } from '../models/index';
 
+export interface CreateDepartmentRequest {
+    /**
+     * 
+     */
+    department: Department;
+}
+
+export interface DeleteDepartmentRequest {
+    /**
+     * code of the department
+     */
+    code: string;
+}
+
+export interface GetDepartmentRequest {
+    /**
+     * code of the department
+     */
+    code: string;
+}
+
+export interface UpdateDepartmentRequest {
+    /**
+     * code of the department
+     */
+    code: string;
+    /**
+     * 
+     */
+    department: Department;
+}
+
 /**
  * 
  */
 export class AmbulanceDepartmentsApi extends runtime.BaseAPI {
+
+    /**
+     * Creates request options for createDepartment without sending the request
+     */
+    async createDepartmentRequestOpts(requestParameters: CreateDepartmentRequest): Promise<runtime.RequestOpts> {
+        if (requestParameters['department'] == null) {
+            throw new runtime.RequiredError(
+                'department',
+                'Required parameter "department" was null or undefined when calling createDepartment().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        headerParameters['Content-Type'] = 'application/json';
+
+
+        let urlPath = `/departments`;
+
+        return {
+            path: urlPath,
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+            body: requestParameters['department'],
+        };
+    }
+
+    /**
+     * Creates a department
+     */
+    async createDepartmentRaw(requestParameters: CreateDepartmentRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Department>> {
+        const requestOptions = await this.createDepartmentRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
+
+        return new runtime.JSONApiResponse(response);
+    }
+
+    /**
+     * Creates a department
+     */
+    async createDepartment(requestParameters: CreateDepartmentRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Department> {
+        const response = await this.createDepartmentRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     * Creates request options for deleteDepartment without sending the request
+     */
+    async deleteDepartmentRequestOpts(requestParameters: DeleteDepartmentRequest): Promise<runtime.RequestOpts> {
+        if (requestParameters['code'] == null) {
+            throw new runtime.RequiredError(
+                'code',
+                'Required parameter "code" was null or undefined when calling deleteDepartment().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+
+        let urlPath = `/departments/{code}`;
+        urlPath = urlPath.replace('{code}', encodeURIComponent(String(requestParameters['code'])));
+
+        return {
+            path: urlPath,
+            method: 'DELETE',
+            headers: headerParameters,
+            query: queryParameters,
+        };
+    }
+
+    /**
+     * Deletes a department
+     */
+    async deleteDepartmentRaw(requestParameters: DeleteDepartmentRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+        const requestOptions = await this.deleteDepartmentRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
+
+        return new runtime.VoidApiResponse(response);
+    }
+
+    /**
+     * Deletes a department
+     */
+    async deleteDepartment(requestParameters: DeleteDepartmentRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
+        await this.deleteDepartmentRaw(requestParameters, initOverrides);
+    }
+
+    /**
+     * Creates request options for getDepartment without sending the request
+     */
+    async getDepartmentRequestOpts(requestParameters: GetDepartmentRequest): Promise<runtime.RequestOpts> {
+        if (requestParameters['code'] == null) {
+            throw new runtime.RequiredError(
+                'code',
+                'Required parameter "code" was null or undefined when calling getDepartment().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+
+        let urlPath = `/departments/{code}`;
+        urlPath = urlPath.replace('{code}', encodeURIComponent(String(requestParameters['code'])));
+
+        return {
+            path: urlPath,
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        };
+    }
+
+    /**
+     * Provides one department
+     */
+    async getDepartmentRaw(requestParameters: GetDepartmentRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Department>> {
+        const requestOptions = await this.getDepartmentRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
+
+        return new runtime.JSONApiResponse(response);
+    }
+
+    /**
+     * Provides one department
+     */
+    async getDepartment(requestParameters: GetDepartmentRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Department> {
+        const response = await this.getDepartmentRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
 
     /**
      * Creates request options for getDepartments without sending the request
@@ -58,6 +226,63 @@ export class AmbulanceDepartmentsApi extends runtime.BaseAPI {
      */
     async getDepartments(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<Department>> {
         const response = await this.getDepartmentsRaw(initOverrides);
+        return await response.value();
+    }
+
+    /**
+     * Creates request options for updateDepartment without sending the request
+     */
+    async updateDepartmentRequestOpts(requestParameters: UpdateDepartmentRequest): Promise<runtime.RequestOpts> {
+        if (requestParameters['code'] == null) {
+            throw new runtime.RequiredError(
+                'code',
+                'Required parameter "code" was null or undefined when calling updateDepartment().'
+            );
+        }
+
+        if (requestParameters['department'] == null) {
+            throw new runtime.RequiredError(
+                'department',
+                'Required parameter "department" was null or undefined when calling updateDepartment().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        headerParameters['Content-Type'] = 'application/json';
+
+
+        let urlPath = `/departments/{code}`;
+        urlPath = urlPath.replace('{code}', encodeURIComponent(String(requestParameters['code'])));
+
+        return {
+            path: urlPath,
+            method: 'PUT',
+            headers: headerParameters,
+            query: queryParameters,
+            body: requestParameters['department'],
+        };
+    }
+
+    /**
+     * The code cannot change. A new name is copied to the devices of the department.
+     * Updates a department
+     */
+    async updateDepartmentRaw(requestParameters: UpdateDepartmentRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Department>> {
+        const requestOptions = await this.updateDepartmentRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
+
+        return new runtime.JSONApiResponse(response);
+    }
+
+    /**
+     * The code cannot change. A new name is copied to the devices of the department.
+     * Updates a department
+     */
+    async updateDepartment(requestParameters: UpdateDepartmentRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Department> {
+        const response = await this.updateDepartmentRaw(requestParameters, initOverrides);
         return await response.value();
     }
 

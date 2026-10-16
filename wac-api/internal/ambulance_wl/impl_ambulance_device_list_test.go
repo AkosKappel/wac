@@ -17,7 +17,8 @@ import (
 
 type AmbulanceDlSuite struct {
 	suite.Suite
-	dbServiceMock *DbServiceMock[DeviceListEntry]
+	dbServiceMock   *DbServiceMock[DeviceListEntry]
+	departmentsMock *DbServiceMock[Department]
 }
 
 func TestAmbulanceDlSuite(t *testing.T) {
@@ -40,7 +41,23 @@ func (this *DbServiceMock[DocType]) CreateDocument(ctx context.Context, id strin
 
 func (this *DbServiceMock[DocType]) FindDocument(ctx context.Context, id string) (*DocType, error) {
 	args := this.Called(ctx, id)
-	return args.Get(0).(*DocType), args.Error(1)
+	document, _ := args.Get(0).(*DocType)
+	return document, args.Error(1)
+}
+
+func (this *DbServiceMock[DocType]) CountDocuments(ctx context.Context, filter bson.D) (int64, error) {
+	args := this.Called(ctx, filter)
+	return args.Get(0).(int64), args.Error(1)
+}
+
+func (this *DbServiceMock[DocType]) UpdateDocuments(ctx context.Context, filter bson.D, update bson.D) error {
+	args := this.Called(ctx, filter, update)
+	return args.Error(0)
+}
+
+func (this *DbServiceMock[DocType]) Aggregate(ctx context.Context, pipeline any, results any) error {
+	args := this.Called(ctx, pipeline, results)
+	return args.Error(0)
 }
 
 func (this *DbServiceMock[DocType]) UpdateDocument(ctx context.Context, id string, filter bson.D, update bson.D) (*DocType, error) {
@@ -66,9 +83,24 @@ func (this *DbServiceMock[DocType]) Ping(ctx context.Context) error {
 
 func (suite *AmbulanceDlSuite) SetupTest() {
 	suite.dbServiceMock = &DbServiceMock[DeviceListEntry]{}
+	suite.departmentsMock = &DbServiceMock[Department]{}
+	suite.departmentsMock.
+		On("FindDocument", mock.Anything, mock.Anything).
+		Return(&Department{Code: "test-department-code", Name: "Stored department"}, nil)
 
 	// Compile time Assert that the mock is of type db_service.DbService[DeviceListEntry]
 	var _ db_service.DbService[DeviceListEntry] = suite.dbServiceMock
+}
+
+func (suite *AmbulanceDlSuite) deps() Dependencies {
+	return Dependencies{DB: suite.dbServiceMock, Departments: suite.departmentsMock}
+}
+
+// storedDevice makes the update handlers find the device before changing it.
+func (suite *AmbulanceDlSuite) storedDevice() {
+	suite.dbServiceMock.
+		On("FindDocument", mock.Anything, "test-device").
+		Return(&DeviceListEntry{Id: "test-device", Name: "old name", Price: 37, Department: Department{Code: "test-department-code", Name: "Stored department"}}, nil)
 }
 
 func (suite *AmbulanceDlSuite) Test_GetDeviceListEntry() {
@@ -99,7 +131,7 @@ func (suite *AmbulanceDlSuite) Test_GetDeviceListEntry() {
 	}
 	ctx.Request = httptest.NewRequest("GET", "/device-list/entries/test-device", nil)
 
-	sut := implAmbulanceDeviceListAPI{Dependencies{DB: suite.dbServiceMock}}
+	sut := implAmbulanceDeviceListAPI{suite.deps()}
 
 	// ACT
 	sut.GetDeviceListEntry(ctx)
@@ -126,7 +158,7 @@ func (suite *AmbulanceDlSuite) Test_GetDeviceListEntry_NotFound() {
 	}
 	ctx.Request = httptest.NewRequest("GET", "/device-list/entries/unknown-device", nil)
 
-	sut := implAmbulanceDeviceListAPI{Dependencies{DB: suite.dbServiceMock}}
+	sut := implAmbulanceDeviceListAPI{suite.deps()}
 
 	// ACT
 	sut.GetDeviceListEntry(ctx)
@@ -162,7 +194,7 @@ func (suite *AmbulanceDlSuite) Test_GetDeviceListEntries() {
 	ctx, _ := gin.CreateTestContext(recorder)
 	ctx.Request = httptest.NewRequest("GET", "/device-list/entries", nil)
 
-	sut := implAmbulanceDeviceListAPI{Dependencies{DB: suite.dbServiceMock}}
+	sut := implAmbulanceDeviceListAPI{suite.deps()}
 
 	// ACT
 	sut.GetDeviceListEntries(ctx)
@@ -186,7 +218,7 @@ func (suite *AmbulanceDlSuite) Test_GetDeviceListEntries_Empty() {
 	ctx, _ := gin.CreateTestContext(recorder)
 	ctx.Request = httptest.NewRequest("GET", "/device-list/entries", nil)
 
-	sut := implAmbulanceDeviceListAPI{Dependencies{DB: suite.dbServiceMock}}
+	sut := implAmbulanceDeviceListAPI{suite.deps()}
 
 	// ACT
 	sut.GetDeviceListEntries(ctx)
@@ -220,7 +252,7 @@ func (suite *AmbulanceDlSuite) Test_CreateDeviceListEntry() {
 	ctx, _ := gin.CreateTestContext(recorder)
 	ctx.Request = httptest.NewRequest("POST", "/device-list/entries", strings.NewReader(json))
 
-	sut := implAmbulanceDeviceListAPI{Dependencies{DB: suite.dbServiceMock}}
+	sut := implAmbulanceDeviceListAPI{suite.deps()}
 
 	// ACT
 	sut.CreateDeviceListEntry(ctx)
@@ -231,6 +263,7 @@ func (suite *AmbulanceDlSuite) Test_CreateDeviceListEntry() {
 
 func (suite *AmbulanceDlSuite) Test_UpdateDeviceListEntry() {
 	// ARRANGE
+	suite.storedDevice()
 	suite.dbServiceMock.
 		On("UpdateDocument", mock.Anything, "test-device", mock.Anything, mock.Anything).
 		Return(&DeviceListEntry{Id: "test-device", Name: "test-device-name-updated"}, nil)
@@ -254,7 +287,7 @@ func (suite *AmbulanceDlSuite) Test_UpdateDeviceListEntry() {
 	ctx.Params = []gin.Param{{Key: "entryId", Value: "test-device"}}
 	ctx.Request = httptest.NewRequest("PUT", "/device-list/entries/test-device", strings.NewReader(json))
 
-	sut := implAmbulanceDeviceListAPI{Dependencies{DB: suite.dbServiceMock}}
+	sut := implAmbulanceDeviceListAPI{suite.deps()}
 
 	// ACT
 	sut.UpdateDeviceListEntry(ctx)
@@ -267,7 +300,7 @@ func (suite *AmbulanceDlSuite) Test_UpdateDeviceListEntry() {
 func (suite *AmbulanceDlSuite) Test_UpdateDeviceListEntry_NotFound() {
 	// ARRANGE
 	suite.dbServiceMock.
-		On("UpdateDocument", mock.Anything, mock.Anything, mock.Anything, mock.Anything).
+		On("FindDocument", mock.Anything, mock.Anything).
 		Return(nil, db_service.ErrNotFound)
 
 	json := `{
@@ -289,7 +322,7 @@ func (suite *AmbulanceDlSuite) Test_UpdateDeviceListEntry_NotFound() {
 	ctx.Params = []gin.Param{{Key: "entryId", Value: "unknown-device"}}
 	ctx.Request = httptest.NewRequest("PUT", "/device-list/entries/unknown-device", strings.NewReader(json))
 
-	sut := implAmbulanceDeviceListAPI{Dependencies{DB: suite.dbServiceMock}}
+	sut := implAmbulanceDeviceListAPI{suite.deps()}
 
 	// ACT
 	sut.UpdateDeviceListEntry(ctx)
@@ -309,7 +342,7 @@ func (suite *AmbulanceDlSuite) Test_DeleteDeviceListEntry() {
 	ctx, _ := gin.CreateTestContext(recorder)
 	ctx.Request = httptest.NewRequest("DELETE", "/device-list/entries/test-device", nil)
 
-	sut := implAmbulanceDeviceListAPI{Dependencies{DB: suite.dbServiceMock}}
+	sut := implAmbulanceDeviceListAPI{suite.deps()}
 
 	// ACT
 	sut.DeleteDeviceListEntry(ctx)
@@ -329,7 +362,7 @@ func (suite *AmbulanceDlSuite) Test_DeleteDeviceListEntry_NotFound() {
 	ctx, _ := gin.CreateTestContext(recorder)
 	ctx.Request = httptest.NewRequest("DELETE", "/device-list/entries/unknown-device", nil)
 
-	sut := implAmbulanceDeviceListAPI{Dependencies{DB: suite.dbServiceMock}}
+	sut := implAmbulanceDeviceListAPI{suite.deps()}
 
 	// ACT
 	sut.DeleteDeviceListEntry(ctx)
@@ -346,7 +379,7 @@ func (suite *AmbulanceDlSuite) Test_UpdateDeviceListEntry_IdMismatch() {
 	ctx.Params = []gin.Param{{Key: "entryId", Value: "test-device"}}
 	ctx.Request = httptest.NewRequest("PUT", "/device-list/entries/test-device", strings.NewReader(`{"id": "other-device", "name": "x", "deviceId": "x"}`))
 
-	sut := implAmbulanceDeviceListAPI{Dependencies{DB: suite.dbServiceMock}}
+	sut := implAmbulanceDeviceListAPI{suite.deps()}
 
 	// ACT
 	sut.UpdateDeviceListEntry(ctx)
@@ -358,6 +391,7 @@ func (suite *AmbulanceDlSuite) Test_UpdateDeviceListEntry_IdMismatch() {
 
 func (suite *AmbulanceDlSuite) Test_UpdateDeviceListEntry_KeepsLogs() {
 	// ARRANGE
+	suite.storedDevice()
 	var update bson.D
 	suite.dbServiceMock.
 		On("UpdateDocument", mock.Anything, "test-device", mock.Anything, mock.Anything).
@@ -368,9 +402,9 @@ func (suite *AmbulanceDlSuite) Test_UpdateDeviceListEntry_KeepsLogs() {
 	recorder := httptest.NewRecorder()
 	ctx, _ := gin.CreateTestContext(recorder)
 	ctx.Params = []gin.Param{{Key: "entryId", Value: "test-device"}}
-	ctx.Request = httptest.NewRequest("PUT", "/device-list/entries/test-device", strings.NewReader(`{"name": "x", "deviceId": "x", "warrantyUntil": "2030-01-01T00:00:00Z", "logList": [], "department": {"name": "x"}}`))
+	ctx.Request = httptest.NewRequest("PUT", "/device-list/entries/test-device", strings.NewReader(`{"name": "x", "deviceId": "x", "warrantyUntil": "2030-01-01T00:00:00Z", "logList": [], "department": {"code": "test-department-code"}}`))
 
-	sut := implAmbulanceDeviceListAPI{Dependencies{DB: suite.dbServiceMock}}
+	sut := implAmbulanceDeviceListAPI{suite.deps()}
 
 	// ACT
 	sut.UpdateDeviceListEntry(ctx)
@@ -393,7 +427,7 @@ func (suite *AmbulanceDlSuite) Test_GetDeviceListEntries_HidesDatabaseError() {
 	ctx, _ := gin.CreateTestContext(recorder)
 	ctx.Request = httptest.NewRequest("GET", "/device-list/entries", nil)
 
-	sut := implAmbulanceDeviceListAPI{Dependencies{DB: suite.dbServiceMock}}
+	sut := implAmbulanceDeviceListAPI{suite.deps()}
 
 	// ACT
 	sut.GetDeviceListEntries(ctx)
@@ -401,4 +435,60 @@ func (suite *AmbulanceDlSuite) Test_GetDeviceListEntries_HidesDatabaseError() {
 	// ASSERT
 	suite.Equal(502, recorder.Code)
 	suite.NotContains(recorder.Body.String(), "db1.internal")
+}
+
+func (suite *AmbulanceDlSuite) Test_CreateDeviceListEntry_UnknownDepartment() {
+	// ARRANGE
+	departments := &DbServiceMock[Department]{}
+	departments.On("FindDocument", mock.Anything, "nope").Return(nil, db_service.ErrNotFound)
+
+	gin.SetMode(gin.TestMode)
+	recorder := httptest.NewRecorder()
+	ctx, _ := gin.CreateTestContext(recorder)
+	ctx.Request = httptest.NewRequest("POST", "/device-list/entries", strings.NewReader(`{"name": "x", "deviceId": "x", "warrantyUntil": "2030-01-01T00:00:00Z", "department": {"code": "nope"}}`))
+
+	sut := implAmbulanceDeviceListAPI{Dependencies{DB: suite.dbServiceMock, Departments: departments}}
+
+	// ACT
+	sut.CreateDeviceListEntry(ctx)
+
+	// ASSERT
+	suite.Equal(400, recorder.Code)
+	suite.Contains(recorder.Body.String(), "Unknown department")
+	suite.dbServiceMock.AssertNotCalled(suite.T(), "CreateDocument")
+}
+
+func (suite *AmbulanceDlSuite) Test_UpdateDeviceListEntry_RecordsChanges() {
+	// ARRANGE
+	suite.storedDevice()
+	var update bson.D
+	suite.dbServiceMock.
+		On("UpdateDocument", mock.Anything, "test-device", mock.Anything, mock.Anything).
+		Run(func(args mock.Arguments) { update = args.Get(3).(bson.D) }).
+		Return(&DeviceListEntry{Id: "test-device"}, nil)
+
+	gin.SetMode(gin.TestMode)
+	recorder := httptest.NewRecorder()
+	ctx, _ := gin.CreateTestContext(recorder)
+	ctx.Params = []gin.Param{{Key: "entryId", Value: "test-device"}}
+	// the name stays; device ID, warranty and price change; the stored department name wins
+	ctx.Request = httptest.NewRequest("PUT", "/device-list/entries/test-device", strings.NewReader(`{"name": "old name", "deviceId": "1", "warrantyUntil": "2030-01-01T00:00:00Z", "price": 40, "department": {"code": "test-department-code", "name": "typed by the client"}}`))
+
+	sut := implAmbulanceDeviceListAPI{suite.deps()}
+
+	// ACT
+	sut.UpdateDeviceListEntry(ctx)
+
+	// ASSERT
+	suite.Equal(200, recorder.Code)
+	push := update.Map()["$push"].(bson.D).Map()["history"].(bson.D).Map()
+	record := push["$each"].([]ChangeRecord)[0]
+	fields := []string{}
+	for _, change := range record.Changes {
+		fields = append(fields, change.Field)
+	}
+	suite.Equal([]string{"deviceId", "warrantyUntil", "price"}, fields)
+	suite.Equal(-maxHistory, push["$slice"])
+	set := update.Map()["$set"].(bson.D).Map()
+	suite.Equal(Department{Code: "test-department-code", Name: "Stored department"}, set["department"])
 }

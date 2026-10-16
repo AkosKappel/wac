@@ -10,19 +10,20 @@ const today = new Date();
 today.setUTCHours(0, 0, 0, 0);
 const day = offset => new Date(today.getTime() + offset * DAY);
 
-// same codes as the department list in the API (impl_ambulance_departments.go)
-const departments = {
-  aro: { name: 'ARO', code: 'aro' },
-  chir: { name: 'Chirurgia', code: 'chir' },
-  dets: { name: 'Detské', code: 'dets' },
-  int: { name: 'Interné', code: 'int' },
-  kar: { name: 'Kardiológia', code: 'kar' },
-  lab: { name: 'Laboratórium', code: 'lab' },
-  ort: { name: 'Ortopedické', code: 'ort' },
-  ped: { name: 'Pediatrické', code: 'ped' },
-  rad: { name: 'Rádiológia', code: 'rad' },
-  urg: { name: 'Urgentný príjem', code: 'urg' },
-};
+// departments live in their own collection; devices keep a copy of the code and name
+const departmentList = [
+  { code: 'aro', name: 'ARO', floor: '3', head: 'MUDr. Peter Horváth' },
+  { code: 'chir', name: 'Chirurgia', floor: '2', head: 'doc. MUDr. Eva Kováčová' },
+  { code: 'dets', name: 'Detské', floor: '4', head: 'MUDr. Martin Varga' },
+  { code: 'int', name: 'Interné', floor: '1', head: 'MUDr. Zuzana Tóthová' },
+  { code: 'kar', name: 'Kardiológia', floor: '2', head: 'prof. MUDr. Ján Novák' },
+  { code: 'lab', name: 'Laboratórium', floor: '-1', head: 'RNDr. Katarína Baláž' },
+  { code: 'ort', name: 'Ortopedické', floor: '5', head: 'MUDr. Tomáš Molnár' },
+  { code: 'ped', name: 'Pediatrické', floor: '4', head: 'MUDr. Lucia Szabová' },
+  { code: 'rad', name: 'Rádiológia', floor: '0', head: 'MUDr. Michal Kráľ' },
+  { code: 'urg', name: 'Urgentný príjem', floor: '0', head: 'MUDr. Andrea Šimková' },
+];
+const departments = Object.fromEntries(departmentList.map(({ code, name }) => [code, { name, code }]));
 
 const PURCHASE = 'Zakúpenie zariadenia';
 const INSTALL = 'Inštalácia a uvedenie do prevádzky';
@@ -31,21 +32,48 @@ const SAFETY = 'Bezpečnostno-technická kontrola (BTK)';
 const SERVICE = 'Ročná servisná prehliadka';
 const CALIBRATION = 'Kalibrácia podľa výrobcu';
 
+// the type of a log entry from its text
+const typeOf = text =>
+  text === PURCHASE
+    ? 'purchase'
+    : /^(Inštalácia|Preberacia)/.test(text)
+      ? 'installation'
+      : text === SERVICE || text === SAFETY
+        ? 'service'
+        : /^Kalibrácia/.test(text)
+          ? 'calibration'
+          : /^(Oprava|Výmena)/.test(text)
+            ? 'repair'
+            : 'other';
+
+// Devices with a service entry are serviced yearly; these two have a plan but were never
+// serviced, so the maintenance page also shows an overdue device without a service date.
+const neverServiced = { 'ang-01': 365, 'inf-01': 180 };
+
 // logs: [days ago, text], oldest first
-const device = (id, name, deviceId, warrantyInDays, price, departmentCode, logs) => ({
-  id,
-  name,
-  deviceId,
-  warrantyUntil: day(warrantyInDays),
-  price,
-  department: departments[departmentCode],
-  logList: logs.map(([daysAgo, text], i) => ({
+const device = (id, name, deviceId, warrantyInDays, price, departmentCode, logs) => {
+  const logList = logs.map(([daysAgo, text], i) => ({
     id: `${id}-${i + 1}`,
     text,
+    type: typeOf(text),
     deviceId,
     createdAt: new Date(day(-daysAgo).getTime() + (7 + ((i * 3) % 9)) * 60 * 60 * 1000),
-  })),
-});
+  }));
+  const services = logList.filter(log => log.type === 'service').map(log => log.createdAt);
+  const entry = { id, name, deviceId, warrantyUntil: day(warrantyInDays), price, department: departments[departmentCode], logList };
+  if (services.length) {
+    entry.serviceIntervalDays = 365;
+    entry.lastServiceAt = new Date(Math.max(...services));
+  } else if (neverServiced[id]) {
+    entry.serviceIntervalDays = neverServiced[id];
+  }
+  return entry;
+};
+
+const departmentCollection = database.getCollection('departments');
+departmentCollection.deleteMany({});
+departmentCollection.createIndex({ code: 1 }, { unique: true });
+departmentCollection.insertMany(departmentList);
 
 collection.deleteMany({});
 // the API also creates this index; here it protects the data before the API first connects

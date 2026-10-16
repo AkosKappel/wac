@@ -10,7 +10,8 @@ import (
 
 // Dependencies holds what the handlers need; main creates it once and passes it to AddRoutes.
 type Dependencies struct {
-	DB db_service.DbService[DeviceListEntry]
+	DB          db_service.DbService[DeviceListEntry]
+	Departments db_service.DbService[Department]
 }
 
 // respondError logs err and answers with a short message; internal details stay in the log.

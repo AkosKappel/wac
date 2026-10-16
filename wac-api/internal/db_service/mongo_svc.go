@@ -25,6 +25,12 @@ type DbService[DocType interface{}] interface {
 	DeleteDocument(ctx context.Context, id string) error
 	Disconnect(ctx context.Context) error
 	FindDocuments(ctx context.Context) ([]*DocType, error)
+	CountDocuments(ctx context.Context, filter bson.D) (int64, error)
+	// UpdateDocuments applies update to every document that matches filter.
+	UpdateDocuments(ctx context.Context, filter bson.D, update bson.D) error
+	// Aggregate runs pipeline on the collection and decodes all results into results,
+	// a pointer to a slice.
+	Aggregate(ctx context.Context, pipeline any, results any) error
 	Ping(ctx context.Context) error
 }
 
@@ -38,7 +44,9 @@ type MongoServiceConfig struct {
 	Password   string
 	DbName     string
 	Collection string
-	Timeout    time.Duration
+	// KeyField holds the unique key that the id arguments refer to; "id" when empty
+	KeyField string
+	Timeout  time.Duration
 }
 
 type mongoSvc[DocType interface{}] struct {
@@ -86,6 +94,10 @@ func NewMongoService[DocType interface{}](config MongoServiceConfig) DbService[D
 
 	if svc.Collection == "" {
 		svc.Collection = enviro("AMBULANCE_API_MONGODB_COLLECTION", "ambulance")
+	}
+
+	if svc.KeyField == "" {
+		svc.KeyField = "id"
 	}
 
 	if svc.Timeout == 0 {
@@ -137,11 +149,11 @@ func (this *mongoSvc[DocType]) connect(ctx context.Context) (*mongo.Client, erro
 	}
 	// the unique index turns a duplicate id into an insert error instead of a second document
 	_, err = client.Database(this.DbName).Collection(this.Collection).Indexes().CreateOne(ctx, mongo.IndexModel{
-		Keys:    bson.D{{Key: "id", Value: 1}},
+		Keys:    bson.D{{Key: this.KeyField, Value: 1}},
 		Options: options.Index().SetUnique(true),
 	})
 	if err != nil {
-		slog.Error("failed to create the unique index on id", "error", err)
+		slog.Error("failed to create the unique index", "collection", this.Collection, "key", this.KeyField, "error", err)
 	}
 	this.client.Store(client)
 	return client, nil
@@ -201,7 +213,7 @@ func (this *mongoSvc[DocType]) FindDocument(ctx context.Context, id string) (*Do
 	}
 	db := client.Database(this.DbName)
 	collection := db.Collection(this.Collection)
-	result := collection.FindOne(ctx, bson.D{{Key: "id", Value: id}})
+	result := collection.FindOne(ctx, bson.D{{Key: this.KeyField, Value: id}})
 	switch result.Err() {
 	case nil:
 	case mongo.ErrNoDocuments:
@@ -252,7 +264,7 @@ func (this *mongoSvc[DocType]) UpdateDocument(ctx context.Context, id string, fi
 	collection := client.Database(this.DbName).Collection(this.Collection)
 	result := collection.FindOneAndUpdate(
 		ctx,
-		append(bson.D{{Key: "id", Value: id}}, filter...),
+		append(bson.D{{Key: this.KeyField, Value: id}}, filter...),
 		update,
 		options.FindOneAndUpdate().SetReturnDocument(options.After),
 	)
@@ -276,7 +288,7 @@ func (this *mongoSvc[DocType]) DeleteDocument(ctx context.Context, id string) er
 	}
 	db := client.Database(this.DbName)
 	collection := db.Collection(this.Collection)
-	result, err := collection.DeleteOne(ctx, bson.D{{Key: "id", Value: id}})
+	result, err := collection.DeleteOne(ctx, bson.D{{Key: this.KeyField, Value: id}})
 	if err != nil {
 		return err
 	}
@@ -284,4 +296,39 @@ func (this *mongoSvc[DocType]) DeleteDocument(ctx context.Context, id string) er
 		return ErrNotFound
 	}
 	return nil
+}
+
+func (this *mongoSvc[DocType]) CountDocuments(ctx context.Context, filter bson.D) (int64, error) {
+	ctx, contextCancel := context.WithTimeout(ctx, this.Timeout)
+	defer contextCancel()
+	client, err := this.connect(ctx)
+	if err != nil {
+		return 0, err
+	}
+	return client.Database(this.DbName).Collection(this.Collection).CountDocuments(ctx, filter)
+}
+
+func (this *mongoSvc[DocType]) UpdateDocuments(ctx context.Context, filter bson.D, update bson.D) error {
+	ctx, contextCancel := context.WithTimeout(ctx, this.Timeout)
+	defer contextCancel()
+	client, err := this.connect(ctx)
+	if err != nil {
+		return err
+	}
+	_, err = client.Database(this.DbName).Collection(this.Collection).UpdateMany(ctx, filter, update)
+	return err
+}
+
+func (this *mongoSvc[DocType]) Aggregate(ctx context.Context, pipeline any, results any) error {
+	ctx, contextCancel := context.WithTimeout(ctx, this.Timeout)
+	defer contextCancel()
+	client, err := this.connect(ctx)
+	if err != nil {
+		return err
+	}
+	cursor, err := client.Database(this.DbName).Collection(this.Collection).Aggregate(ctx, pipeline)
+	if err != nil {
+		return err
+	}
+	return cursor.All(ctx, results)
 }

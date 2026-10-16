@@ -3,9 +3,9 @@ servers:
   - description: Cluster Endpoint
     url: /api
 info:
-  description: Ambulance Device List management for Web-In-Cloud system
+  description: Medical devices of hospital departments, their operations log, service plan and statistics
   version: "1.0.0"
-  title: Device List Api
+  title: Ambulance Devices API
   contact:
     name: Ákos Kappel
     url: https://github.com/AkosKappel/wac
@@ -19,6 +19,10 @@ tags:
     description: Ambulance Device Log API
   - name: ambulanceDepartments
     description: Hospital departments
+  - name: ambulanceMaintenance
+    description: Service plan of the devices
+  - name: ambulanceStats
+    description: Totals for the overview
 paths:
   "/device-list/entries":
     get:
@@ -341,6 +345,143 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/Department"
+    post:
+      tags:
+        - ambulanceDepartments
+      summary: Creates a department
+      operationId: createDepartment
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Department"
+        required: true
+      responses:
+        "201":
+          description: The stored department
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Department"
+        "400":
+          description: Invalid input
+        "409":
+          description: A department with this code already exists
+  "/departments/{code}":
+    get:
+      tags:
+        - ambulanceDepartments
+      summary: Provides one department
+      operationId: getDepartment
+      parameters:
+        - in: path
+          name: code
+          description: code of the department
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: The department
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Department"
+        "404":
+          description: No department with this code
+    put:
+      tags:
+        - ambulanceDepartments
+      summary: Updates a department
+      operationId: updateDepartment
+      description: The code cannot change. A new name is copied to the devices of the department.
+      parameters:
+        - in: path
+          name: code
+          description: code of the department
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Department"
+        required: true
+      responses:
+        "200":
+          description: The updated department
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Department"
+        "400":
+          description: Invalid input, or the code in the body does not match the URL
+        "404":
+          description: No department with this code
+    delete:
+      tags:
+        - ambulanceDepartments
+      summary: Deletes a department
+      operationId: deleteDepartment
+      parameters:
+        - in: path
+          name: code
+          description: code of the department
+          required: true
+          schema:
+            type: string
+      responses:
+        "204":
+          description: Department deleted
+        "404":
+          description: No department with this code
+        "409":
+          description: Devices still belong to the department
+  "/maintenance/due":
+    get:
+      tags:
+        - ambulanceMaintenance
+      summary: Devices due for service
+      operationId: getMaintenanceDue
+      description: >-
+        Devices with a service interval whose next service is due within the given number
+        of days, or overdue, soonest first. A device never serviced is due now.
+      parameters:
+        - in: query
+          name: days
+          description: how many days ahead to look
+          required: false
+          schema:
+            type: integer
+            minimum: 0
+            maximum: 365
+            default: 30
+      responses:
+        "200":
+          description: Devices due for service
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/MaintenanceItem"
+        "400":
+          description: Invalid number of days
+  "/stats":
+    get:
+      tags:
+        - ambulanceStats
+      summary: Totals for the overview
+      operationId: getStats
+      description: Device count, value per department, warranty states and log entries per month.
+      responses:
+        "200":
+          description: The totals
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Stats"
 components:
   schemas:
     DeviceListEntry:
@@ -382,12 +523,32 @@ components:
             $ref: "#/components/schemas/DeviceLog"
         department:
           $ref: "#/components/schemas/Department"
+        serviceIntervalDays:
+          type: integer
+          minimum: 1
+          maximum: 3650
+          example: 365
+          description: Days between two services; no service plan when missing
+        lastServiceAt:
+          type: string
+          format: date-time
+          readOnly: true
+          example: "2038-12-24T10:05:00Z"
+          description: Latest log entry of type service; set by the server
+        history:
+          type: array
+          maxItems: 50
+          readOnly: true
+          description: Changes of the device fields, newest last; kept by the server
+          items:
+            $ref: "#/components/schemas/ChangeRecord"
       example:
         $ref: "#/components/examples/DeviceListEntryExample"
     Department:
-      description: "Department of the hospital"
+      description: "Department of the hospital; devices refer to it by code"
       required:
         - name
+        - code
       properties:
         name:
           type: string
@@ -396,8 +557,19 @@ components:
           example: Chirurgia
         code:
           type: string
+          minLength: 1
           maxLength: 50
+          pattern: "^[a-z0-9-]+$"
           example: chir
+        floor:
+          type: string
+          maxLength: 20
+          example: "2"
+        head:
+          type: string
+          maxLength: 100
+          example: MUDr. Jana Nováková
+          description: Head of the department
       example:
         $ref: "#/components/examples/DepartmentExample"
     DeviceLog:
@@ -423,8 +595,129 @@ components:
           format: date-time
           example: "2038-12-24T10:05:00Z"
           description: When the operation happened; set by the server when missing
+        type:
+          $ref: "#/components/schemas/LogType"
       example:
         $ref: "#/components/examples/DeviceLogExample"
+    LogType:
+      type: string
+      description: Kind of operation; a service entry moves the device's lastServiceAt
+      enum: [purchase, installation, service, calibration, repair, other]
+      example: service
+    ChangeRecord:
+      type: object
+      required: [changedAt, changes]
+      properties:
+        changedAt:
+          type: string
+          format: date-time
+          example: "2038-12-24T10:05:00Z"
+        changes:
+          type: array
+          items:
+            $ref: "#/components/schemas/FieldChange"
+    FieldChange:
+      type: object
+      required: [field, from, to]
+      properties:
+        field:
+          type: string
+          example: price
+          description: "One of name, deviceId, warrantyUntil, price, department, serviceIntervalDays"
+        from:
+          type: string
+          example: "4.5"
+        to:
+          type: string
+          example: "5"
+    MaintenanceItem:
+      type: object
+      required: [id, name, deviceId, serviceIntervalDays, nextServiceAt, overdue]
+      properties:
+        id:
+          type: string
+          example: x321ab3
+        name:
+          type: string
+          example: CRP
+        deviceId:
+          type: string
+          example: 1-crp
+        department:
+          $ref: "#/components/schemas/Department"
+        serviceIntervalDays:
+          type: integer
+          example: 365
+        lastServiceAt:
+          type: string
+          format: date-time
+          example: "2038-12-24T10:05:00Z"
+        nextServiceAt:
+          type: string
+          format: date-time
+          example: "2039-12-24T10:05:00Z"
+        overdue:
+          type: boolean
+          description: The next service date has passed, or the device was never serviced
+    Stats:
+      type: object
+      required: [deviceCount, totalValue, warranty, departments, logsPerMonth]
+      properties:
+        deviceCount:
+          type: integer
+          example: 27
+        totalValue:
+          type: number
+          format: double
+          example: 2450000
+        warranty:
+          $ref: "#/components/schemas/WarrantyStats"
+        departments:
+          type: array
+          description: Highest total value first
+          items:
+            $ref: "#/components/schemas/DepartmentStats"
+        logsPerMonth:
+          type: array
+          description: The last 12 months with entries, oldest first
+          items:
+            $ref: "#/components/schemas/MonthCount"
+    WarrantyStats:
+      type: object
+      required: [ok, expiring, expired]
+      properties:
+        ok:
+          type: integer
+        expiring:
+          type: integer
+          description: Ends within 90 days
+        expired:
+          type: integer
+    DepartmentStats:
+      type: object
+      required: [code, name, count, totalValue, averageValue]
+      properties:
+        code:
+          type: string
+        name:
+          type: string
+        count:
+          type: integer
+        totalValue:
+          type: number
+          format: double
+        averageValue:
+          type: number
+          format: double
+    MonthCount:
+      type: object
+      required: [month, count]
+      properties:
+        month:
+          type: string
+          example: 2026-09
+        count:
+          type: integer
   examples:
     DeviceListEntryExample:
       summary: CRP device
@@ -436,11 +729,13 @@ components:
         deviceId: 1-crp
         warrantyUntil: "2038-12-24T10:05:00.000Z"
         price: 4.5
+        serviceIntervalDays: 365
         logList:
           - id: 1
             text: zakupenie zariadenia
             deviceId: 1-crp
             createdAt: "2038-12-24T10:05:00.000Z"
+            type: purchase
           - id: 2
             text: nainstalovanie zariadenia
             deviceId: 1-crp
@@ -488,6 +783,7 @@ components:
         text: zakupenie zariadenia
         deviceId: 1-crp
         createdAt: "2038-12-24T10:05:00.000Z"
+        type: purchase
     DeviceLogListExample:
       summary: List of device logs
       description: |

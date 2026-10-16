@@ -2,6 +2,7 @@ package ambulance_wl
 
 import (
 	"net/http"
+	"time"
 
 	"github.com/AkosKappel/wac/wac-api/internal/db_service"
 	"github.com/gin-gonic/gin"
@@ -21,9 +22,15 @@ func (this *implAmbulanceDeviceListAPI) CreateDeviceListEntry(ctx *gin.Context) 
 		respondError(ctx, http.StatusBadRequest, message, nil)
 		return
 	}
+	if !this.resolveDepartment(ctx, &device) {
+		return
+	}
 	if device.Id == "" {
 		device.Id = uuid.New().String()
 	}
+	// both are kept by the server: lastServiceAt from service log entries, history from updates
+	device.LastServiceAt = latestService(device.LogList)
+	device.History = nil
 	syncLogDeviceIds(&device)
 
 	switch err := this.DB.CreateDocument(ctx, device.Id, &device); err {
@@ -94,16 +101,39 @@ func (this *implAmbulanceDeviceListAPI) UpdateDeviceListEntry(ctx *gin.Context) 
 		respondError(ctx, http.StatusBadRequest, message, nil)
 		return
 	}
+	if !this.resolveDepartment(ctx, &device) {
+		return
+	}
+	stored, err := this.DB.FindDocument(ctx, deviceId)
+	switch err {
+	case nil:
+	case db_service.ErrNotFound:
+		respondError(ctx, http.StatusNotFound, "Device not found", nil)
+		return
+	default:
+		respondError(ctx, http.StatusBadGateway, "Failed to load device from database", err)
+		return
+	}
 
 	// the log list changes only through the log endpoints, so saving a device that was
 	// loaded earlier cannot drop log entries added in the meantime
-	updated, err := this.DB.UpdateDocument(ctx, deviceId, nil, bson.D{{Key: "$set", Value: bson.D{
+	update := bson.D{{Key: "$set", Value: bson.D{
 		{Key: "name", Value: device.Name},
 		{Key: "deviceId", Value: device.DeviceId},
 		{Key: "warrantyUntil", Value: device.WarrantyUntil},
 		{Key: "price", Value: device.Price},
 		{Key: "department", Value: device.Department},
-	}}})
+		{Key: "serviceIntervalDays", Value: device.ServiceIntervalDays},
+	}}}
+	if changes := deviceChanges(stored, &device); len(changes) > 0 {
+		record := ChangeRecord{ChangedAt: time.Now().UTC(), Changes: changes}
+		// $slice keeps only the newest entries, so the history cannot grow without limit
+		update = append(update, bson.E{Key: "$push", Value: bson.D{{Key: "history", Value: bson.D{
+			{Key: "$each", Value: []ChangeRecord{record}},
+			{Key: "$slice", Value: -maxHistory},
+		}}}})
+	}
+	updated, err := this.DB.UpdateDocument(ctx, deviceId, nil, update)
 	switch err {
 	case nil:
 		syncLogDeviceIds(updated)
@@ -113,4 +143,21 @@ func (this *implAmbulanceDeviceListAPI) UpdateDeviceListEntry(ctx *gin.Context) 
 	default:
 		respondError(ctx, http.StatusBadGateway, "Failed to update device in database", err)
 	}
+}
+
+// resolveDepartment replaces the device's department with the stored one, so devices only
+// refer to existing departments and carry their current name. It answers with an error and
+// returns false when that fails.
+func (this *implAmbulanceDeviceListAPI) resolveDepartment(ctx *gin.Context, device *DeviceListEntry) bool {
+	department, err := this.Departments.FindDocument(ctx, device.Department.Code)
+	switch err {
+	case nil:
+		device.Department = Department{Code: department.Code, Name: department.Name}
+		return true
+	case db_service.ErrNotFound:
+		respondError(ctx, http.StatusBadRequest, "Unknown department", nil)
+	default:
+		respondError(ctx, http.StatusBadGateway, "Failed to load department from database", err)
+	}
+	return false
 }

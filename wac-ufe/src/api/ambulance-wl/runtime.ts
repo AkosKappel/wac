@@ -1,8 +1,8 @@
 /* tslint:disable */
 /* eslint-disable */
 /**
- * Device List Api
- * Ambulance Device List management for Web-In-Cloud system
+ * Ambulance Devices API
+ * Medical devices of hospital departments, their operations log, service plan and statistics
  *
  * The version of the OpenAPI document: 1.0.0
  * 

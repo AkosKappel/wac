@@ -2,6 +2,8 @@
 apis/AmbulanceDepartmentsApi.ts
 apis/AmbulanceDeviceListApi.ts
 apis/AmbulanceDeviceLogListApi.ts
+apis/AmbulanceMaintenanceApi.ts
+apis/AmbulanceStatsApi.ts
 apis/index.ts
 index.ts
 models/index.ts

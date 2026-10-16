@@ -49,8 +49,13 @@ func main() {
 
 	dbService := db_service.NewMongoService[ambulance_wl.DeviceListEntry](db_service.MongoServiceConfig{})
 	defer dbService.Disconnect(context.Background())
+	departments := db_service.NewMongoService[ambulance_wl.Department](db_service.MongoServiceConfig{
+		Collection: "departments",
+		KeyField:   "code",
+	})
+	defer departments.Disconnect(context.Background())
 
-	ambulance_wl.AddRoutes(engine, ambulance_wl.Dependencies{DB: dbService})
+	ambulance_wl.AddRoutes(engine, ambulance_wl.Dependencies{DB: dbService, Departments: departments})
 	// /openapi for the course's Kubernetes setup, /api/openapi behind the nginx /api proxy
 	engine.GET("/openapi", api.HandleOpenApi)
 	engine.GET("/api/openapi", api.HandleOpenApi)
