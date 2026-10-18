@@ -259,7 +259,10 @@ export class HarkapAmbulanceMaintenance {
           <h2 id="month" class="visually-hidden" aria-live="polite">
             {monthName(selectedMonth)}
           </h2>
+          {/* Material's select keeps its old value when the chosen option arrives in the same render,
+              so a new range of months gets a new select */}
           <md-outlined-select
+            key={`${first}-${last}`}
             class="month-picker"
             label={m.month}
             value={String(selectedMonth)}
