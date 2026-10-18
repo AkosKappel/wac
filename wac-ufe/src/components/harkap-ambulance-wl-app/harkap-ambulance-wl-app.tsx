@@ -99,6 +99,10 @@ export class HarkapAmbulanceWlApp {
             {navLink('./about', ['about'], m.about)}
           </nav>
           <div class="header-actions">
+            <harkap-ambulance-command-palette
+              api-base={this.apiBase}
+              base-path={this.basePath}
+            ></harkap-ambulance-command-palette>
             <md-text-button
               class="language"
               lang={m.otherLanguage.toLowerCase()}

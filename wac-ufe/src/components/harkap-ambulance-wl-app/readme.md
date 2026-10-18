@@ -17,6 +17,7 @@
 
 ### Depends on
 
+- [harkap-ambulance-command-palette](../harkap-ambulance-command-palette)
 - [harkap-ambulance-home](../harkap-ambulance-home)
 - [harkap-ambulance-wl-list](../harkap-ambulance-wl-list)
 - [harkap-ambulance-wl-editor](../harkap-ambulance-wl-editor)
@@ -27,6 +28,7 @@
 ### Graph
 ```mermaid
 graph TD;
+  harkap-ambulance-wl-app --> harkap-ambulance-command-palette
   harkap-ambulance-wl-app --> harkap-ambulance-home
   harkap-ambulance-wl-app --> harkap-ambulance-wl-list
   harkap-ambulance-wl-app --> harkap-ambulance-wl-editor

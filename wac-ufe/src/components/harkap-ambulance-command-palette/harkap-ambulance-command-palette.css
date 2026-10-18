@@ -1,0 +1,116 @@
+:host {
+  display: contents;
+}
+
+/* the theme tokens inherit from the app shell, also into the top layer */
+dialog {
+  width: min(560px, calc(100% - 32px));
+  max-height: min(520px, calc(100% - 96px));
+  margin: 12vh auto auto;
+  padding: 0;
+  border: 1px solid var(--md-sys-color-outline-variant);
+  border-radius: 16px;
+  background: var(--md-sys-color-surface-container-high);
+  color: var(--md-sys-color-on-surface);
+  font-family: var(--md-ref-typeface-plain);
+  box-shadow: 0 24px 48px rgb(0 0 0 / 0.25);
+  overflow: hidden;
+}
+
+dialog[open] {
+  display: flex;
+  flex-direction: column;
+}
+
+dialog::backdrop {
+  background: rgb(0 0 0 / 0.45);
+}
+
+.search {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0 16px;
+  border-bottom: 1px solid var(--md-sys-color-outline-variant);
+  color: var(--md-sys-color-on-surface-variant);
+}
+
+/* the caret shows the focus; the input is the only control in the dialog */
+input {
+  flex: 1;
+  min-width: 0;
+  padding: 16px 0;
+  border: 0;
+  background: none;
+  color: var(--md-sys-color-on-surface);
+  font: inherit;
+  font-size: 1rem;
+  outline: none;
+}
+
+input::placeholder {
+  color: var(--md-sys-color-on-surface-variant);
+}
+
+ul {
+  flex: 1;
+  margin: 0;
+  padding: 8px;
+  list-style: none;
+  overflow-y: auto;
+}
+
+li {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+li:hover {
+  background: var(--md-sys-color-surface-container-highest);
+}
+
+li[aria-selected='true'] {
+  background: var(--md-sys-color-primary-container);
+  color: var(--md-sys-color-on-primary-container);
+}
+
+li md-icon {
+  --md-icon-size: 20px;
+  flex: none;
+  color: var(--md-sys-color-on-surface-variant);
+}
+
+.text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.detail {
+  color: var(--md-sys-color-on-surface-variant);
+  font-size: 0.8125rem;
+}
+
+li[aria-selected='true'] md-icon,
+li[aria-selected='true'] .detail {
+  color: inherit;
+}
+
+.hint {
+  margin: 0;
+  padding: 8px 16px;
+  border-top: 1px solid var(--md-sys-color-outline-variant);
+  color: var(--md-sys-color-on-surface-variant);
+  font-size: 0.75rem;
+}
+
+kbd {
+  padding: 1px 6px;
+  border: 1px solid var(--md-sys-color-outline-variant);
+  border-radius: 4px;
+  font: inherit;
+}

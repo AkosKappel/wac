@@ -101,4 +101,17 @@ describe('accessibility', () => {
     const page = await render('<harkap-ambulance-wl-app api-base="/api"></harkap-ambulance-wl-app>', 'dark');
     expect(await violations(page)).toEqual([]);
   });
+
+  it('open command palette has no WCAG A/AA violations', async () => {
+    const page = await render('<harkap-ambulance-wl-app api-base="/api"></harkap-ambulance-wl-app>');
+    await page.keyboard.down('Control');
+    await page.keyboard.press('k');
+    await page.keyboard.up('Control');
+    await page.keyboard.type('ekg');
+    await page.waitForChanges();
+    expect(
+      await page.find('harkap-ambulance-wl-app >>> harkap-ambulance-command-palette >>> dialog[open]'),
+    ).not.toBeNull();
+    expect(await violations(page)).toEqual([]);
+  });
 });

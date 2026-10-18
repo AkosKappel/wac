@@ -37,7 +37,7 @@ export function toSearch(query: DeviceQuery): string {
   return search ? `?${search}` : '';
 }
 
-function normalize(text: string): string {
+export function normalize(text: string): string {
   return (text ?? '')
     .normalize('NFD')
     .replace(/[̀-ͯ]/g, '') // accents, so "rontgen" finds "Röntgen"

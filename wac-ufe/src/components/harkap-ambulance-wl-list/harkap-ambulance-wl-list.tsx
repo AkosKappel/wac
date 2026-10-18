@@ -32,6 +32,22 @@ export class HarkapAmbulanceWlList {
     }
   }
 
+  // a link to the list from the list itself (the command palette) changes only the query
+  private readQuery = (ev: any) => {
+    const url = new URL(ev.destination.url);
+    if (url.pathname === location.pathname) {
+      this.query = parseQuery(url.search);
+    }
+  };
+
+  connectedCallback() {
+    window.navigation?.addEventListener('navigate', this.readQuery);
+  }
+
+  disconnectedCallback() {
+    window.navigation?.removeEventListener('navigate', this.readQuery);
+  }
+
   componentWillLoad() {
     this.getDevicesAsync().then(devices => (this.devices = devices));
   }

@@ -8,6 +8,17 @@ import { HTMLStencilElement, JSXBase } from "@stencil/core/internal";
 export namespace Components {
     interface HarkapAmbulanceAbout {
     }
+    /**
+     * Ctrl+K / Cmd+K jump list: type to filter the pages and actions, find devices and
+     * departments by name or code, or search the device list for what was typed.
+     */
+    interface HarkapAmbulanceCommandPalette {
+        "apiBase": string;
+        /**
+          * @default ''
+         */
+        "basePath": string;
+    }
     interface HarkapAmbulanceDepartments {
         "apiBase": string;
         /**
@@ -79,6 +90,16 @@ declare global {
     var HTMLHarkapAmbulanceAboutElement: {
         prototype: HTMLHarkapAmbulanceAboutElement;
         new (): HTMLHarkapAmbulanceAboutElement;
+    };
+    /**
+     * Ctrl+K / Cmd+K jump list: type to filter the pages and actions, find devices and
+     * departments by name or code, or search the device list for what was typed.
+     */
+    interface HTMLHarkapAmbulanceCommandPaletteElement extends Components.HarkapAmbulanceCommandPalette, HTMLStencilElement {
+    }
+    var HTMLHarkapAmbulanceCommandPaletteElement: {
+        prototype: HTMLHarkapAmbulanceCommandPaletteElement;
+        new (): HTMLHarkapAmbulanceCommandPaletteElement;
     };
     interface HTMLHarkapAmbulanceDepartmentsElement extends Components.HarkapAmbulanceDepartments, HTMLStencilElement {
     }
@@ -174,6 +195,7 @@ declare global {
     };
     interface HTMLElementTagNameMap {
         "harkap-ambulance-about": HTMLHarkapAmbulanceAboutElement;
+        "harkap-ambulance-command-palette": HTMLHarkapAmbulanceCommandPaletteElement;
         "harkap-ambulance-departments": HTMLHarkapAmbulanceDepartmentsElement;
         "harkap-ambulance-home": HTMLHarkapAmbulanceHomeElement;
         "harkap-ambulance-log-editor": HTMLHarkapAmbulanceLogEditorElement;
@@ -186,6 +208,17 @@ declare global {
 }
 declare namespace LocalJSX {
     interface HarkapAmbulanceAbout {
+    }
+    /**
+     * Ctrl+K / Cmd+K jump list: type to filter the pages and actions, find devices and
+     * departments by name or code, or search the device list for what was typed.
+     */
+    interface HarkapAmbulanceCommandPalette {
+        "apiBase"?: string;
+        /**
+          * @default ''
+         */
+        "basePath"?: string;
     }
     interface HarkapAmbulanceDepartments {
         "apiBase"?: string;
@@ -240,6 +273,10 @@ declare namespace LocalJSX {
         "onEntry-clicked"?: (event: HarkapAmbulanceWlListCustomEvent<string>) => void;
     }
 
+    interface HarkapAmbulanceCommandPaletteAttributes {
+        "apiBase": string;
+        "basePath": string;
+    }
     interface HarkapAmbulanceDepartmentsAttributes {
         "apiBase": string;
         "basePath": string;
@@ -276,6 +313,7 @@ declare namespace LocalJSX {
 
     interface IntrinsicElements {
         "harkap-ambulance-about": HarkapAmbulanceAbout;
+        "harkap-ambulance-command-palette": Omit<HarkapAmbulanceCommandPalette, keyof HarkapAmbulanceCommandPaletteAttributes> & { [K in keyof HarkapAmbulanceCommandPalette & keyof HarkapAmbulanceCommandPaletteAttributes]?: HarkapAmbulanceCommandPalette[K] } & { [K in keyof HarkapAmbulanceCommandPalette & keyof HarkapAmbulanceCommandPaletteAttributes as `attr:${K}`]?: HarkapAmbulanceCommandPaletteAttributes[K] } & { [K in keyof HarkapAmbulanceCommandPalette & keyof HarkapAmbulanceCommandPaletteAttributes as `prop:${K}`]?: HarkapAmbulanceCommandPalette[K] };
         "harkap-ambulance-departments": Omit<HarkapAmbulanceDepartments, keyof HarkapAmbulanceDepartmentsAttributes> & { [K in keyof HarkapAmbulanceDepartments & keyof HarkapAmbulanceDepartmentsAttributes]?: HarkapAmbulanceDepartments[K] } & { [K in keyof HarkapAmbulanceDepartments & keyof HarkapAmbulanceDepartmentsAttributes as `attr:${K}`]?: HarkapAmbulanceDepartmentsAttributes[K] } & { [K in keyof HarkapAmbulanceDepartments & keyof HarkapAmbulanceDepartmentsAttributes as `prop:${K}`]?: HarkapAmbulanceDepartments[K] };
         "harkap-ambulance-home": Omit<HarkapAmbulanceHome, keyof HarkapAmbulanceHomeAttributes> & { [K in keyof HarkapAmbulanceHome & keyof HarkapAmbulanceHomeAttributes]?: HarkapAmbulanceHome[K] } & { [K in keyof HarkapAmbulanceHome & keyof HarkapAmbulanceHomeAttributes as `attr:${K}`]?: HarkapAmbulanceHomeAttributes[K] } & { [K in keyof HarkapAmbulanceHome & keyof HarkapAmbulanceHomeAttributes as `prop:${K}`]?: HarkapAmbulanceHome[K] };
         "harkap-ambulance-log-editor": Omit<HarkapAmbulanceLogEditor, keyof HarkapAmbulanceLogEditorAttributes> & { [K in keyof HarkapAmbulanceLogEditor & keyof HarkapAmbulanceLogEditorAttributes]?: HarkapAmbulanceLogEditor[K] } & { [K in keyof HarkapAmbulanceLogEditor & keyof HarkapAmbulanceLogEditorAttributes as `attr:${K}`]?: HarkapAmbulanceLogEditorAttributes[K] } & { [K in keyof HarkapAmbulanceLogEditor & keyof HarkapAmbulanceLogEditorAttributes as `prop:${K}`]?: HarkapAmbulanceLogEditor[K] };
@@ -291,6 +329,11 @@ declare module "@stencil/core" {
     export namespace JSX {
         interface IntrinsicElements {
             "harkap-ambulance-about": LocalJSX.IntrinsicElements["harkap-ambulance-about"] & JSXBase.HTMLAttributes<HTMLHarkapAmbulanceAboutElement>;
+            /**
+             * Ctrl+K / Cmd+K jump list: type to filter the pages and actions, find devices and
+             * departments by name or code, or search the device list for what was typed.
+             */
+            "harkap-ambulance-command-palette": LocalJSX.IntrinsicElements["harkap-ambulance-command-palette"] & JSXBase.HTMLAttributes<HTMLHarkapAmbulanceCommandPaletteElement>;
             "harkap-ambulance-departments": LocalJSX.IntrinsicElements["harkap-ambulance-departments"] & JSXBase.HTMLAttributes<HTMLHarkapAmbulanceDepartmentsElement>;
             "harkap-ambulance-home": LocalJSX.IntrinsicElements["harkap-ambulance-home"] & JSXBase.HTMLAttributes<HTMLHarkapAmbulanceHomeElement>;
             "harkap-ambulance-log-editor": LocalJSX.IntrinsicElements["harkap-ambulance-log-editor"] & JSXBase.HTMLAttributes<HTMLHarkapAmbulanceLogEditorElement>;
