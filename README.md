@@ -74,10 +74,10 @@ cd wac-api && gofmt -l . && go vet ./... && go test ./...
 The API tests include an integration test against a real MongoDB, which runs when the `AMBULANCE_API_MONGODB_*` variables point at one and is skipped otherwise.
 
 ```bash
-cd wac-ufe && npm run lint && npm test
+cd wac-ufe && npm run lint && npm run test:spec
 ```
 
-`npm test` runs the spec tests and the end-to-end tests in a headless Chrome; `npx stencil test --spec` runs only the spec tests. `npm run build` also type-checks.
+`npm test` runs the spec tests and the end-to-end tests in a headless Chrome, as CI does. On the home server run only the spec tests and single end-to-end files (`npm run test:e2e -- <file>`): the full suite overloads the machine and the live apps. The scripts pass `--max-workers=1` because Stencil ignores `testing.maxWorkers` and starts one worker per CPU otherwise. `npm run build` also type-checks.
 
 After changing [`ambulance-wl.openapi.yaml`](wac-api/api/ambulance-wl.openapi.yaml), run `scripts/generate-api.sh` (needs Docker and Go) and commit the result.
 
