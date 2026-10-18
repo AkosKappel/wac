@@ -24,16 +24,30 @@ const stats = {
   logsPerMonth: [{ month: '2026-01', count: 1 }],
 };
 
+// one device due in three days and one never serviced (due now, overdue), relative to the test run
+const due = [
+  { ...device, nextServiceAt: new Date(Date.now() + 3 * 86_400_000).toISOString(), overdue: false },
+  {
+    ...device,
+    id: 'ct-1',
+    name: 'CT',
+    deviceId: 'CT-001',
+    lastServiceAt: undefined,
+    nextServiceAt: new Date().toISOString(),
+    overdue: true,
+  },
+];
+
 // answers the API calls in the browser, so every screen renders with data
 function stubApi(page: E2EPage) {
   return page.evaluateOnNewDocument(
-    (sample, stats) => {
+    (sample, stats, due) => {
       const json = (body: unknown) =>
         new Response(JSON.stringify(body), { headers: { 'Content-Type': 'application/json' } });
       window.fetch = async (input: RequestInfo | URL) => {
         const url = String(input instanceof Request ? input.url : input);
         if (url.includes('/stats')) return json(stats);
-        if (url.includes('/maintenance')) return json([]);
+        if (url.includes('/maintenance')) return json(due);
         if (url.includes('/departments')) return json([{ ...sample.department, floor: '2', head: 'MUDr. Ján Novák' }]);
         if (url.includes('/logs')) return json(sample.logList);
         if (/\/entries\/[^/]+$/.test(url)) return json(sample);
@@ -42,6 +56,7 @@ function stubApi(page: E2EPage) {
     },
     device,
     stats,
+    due,
   );
 }
 
@@ -99,6 +114,15 @@ describe('accessibility', () => {
 
   it('dark theme has no WCAG A/AA violations', async () => {
     const page = await render('<harkap-ambulance-wl-app api-base="/api"></harkap-ambulance-wl-app>', 'dark');
+    expect(await violations(page)).toEqual([]);
+  });
+
+  it('service calendar has no WCAG A/AA violations', async () => {
+    const page = await render('<harkap-ambulance-maintenance api-base="/api"></harkap-ambulance-maintenance>');
+    const buttons = await page.findAll('harkap-ambulance-maintenance >>> .segmented button');
+    await buttons[1].click();
+    await page.waitForChanges();
+    expect(await page.find('harkap-ambulance-maintenance >>> .calendar td.overdue')).not.toBeNull();
     expect(await violations(page)).toEqual([]);
   });
 

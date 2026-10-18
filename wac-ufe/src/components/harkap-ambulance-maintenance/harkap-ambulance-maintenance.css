@@ -22,9 +22,166 @@ h1 {
   color: var(--md-sys-color-on-surface-variant);
 }
 
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px 16px;
+  margin-bottom: 20px;
+}
+
 .period {
   min-width: 200px;
-  margin-bottom: 20px;
+}
+
+.export {
+  margin-left: auto;
+}
+
+.segmented {
+  display: inline-flex;
+  border: 1px solid var(--md-sys-color-outline);
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.segmented button {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 40px;
+  padding: 0 16px;
+  border: 0;
+  background: transparent;
+  color: var(--md-sys-color-on-surface);
+  font: inherit;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.segmented button + button {
+  border-left: 1px solid var(--md-sys-color-outline);
+}
+
+.segmented button[aria-pressed='true'] {
+  background: var(--md-sys-color-secondary-container);
+  color: var(--md-sys-color-on-secondary-container);
+}
+
+.segmented button:focus-visible {
+  outline: 3px solid var(--md-sys-color-primary);
+  outline-offset: -3px;
+}
+
+.segmented md-icon {
+  --md-icon-size: 18px;
+}
+
+.hint {
+  margin: 0 0 8px;
+  font-size: 0.875rem;
+  color: var(--md-sys-color-on-surface-variant);
+}
+
+.calendar-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.calendar-head h2 {
+  min-width: 11em;
+  margin: 0;
+  font-size: 1.125rem;
+  font-weight: 600;
+  text-align: center;
+}
+
+.calendar {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 4px;
+  table-layout: fixed;
+}
+
+.calendar th {
+  padding: 4px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--md-sys-color-on-surface-variant);
+  text-transform: uppercase;
+}
+
+.calendar td {
+  height: 84px;
+  padding: 6px;
+  border: 1px solid var(--md-sys-color-outline-variant);
+  border-radius: 10px;
+  background: var(--md-sys-color-surface);
+  vertical-align: top;
+  overflow: hidden;
+  cursor: pointer;
+}
+
+.calendar td.outside {
+  background: transparent;
+  color: var(--md-sys-color-on-surface-variant);
+}
+
+.calendar td.due {
+  background: var(--app-color-warning-container);
+  color: var(--app-color-on-warning-container);
+}
+
+.calendar td.overdue {
+  background: var(--md-sys-color-error-container);
+  color: var(--md-sys-color-on-error-container);
+}
+
+.calendar td[aria-current='date'] .date {
+  background: var(--md-sys-color-primary);
+  color: var(--md-sys-color-on-primary);
+}
+
+.calendar td[aria-selected='true'] {
+  border-color: var(--md-sys-color-primary);
+  box-shadow: inset 0 0 0 1px var(--md-sys-color-primary);
+}
+
+.calendar td:focus-visible {
+  outline: 3px solid var(--md-sys-color-primary);
+  outline-offset: 2px;
+}
+
+.calendar .date {
+  display: inline-grid;
+  place-items: center;
+  min-width: 26px;
+  height: 26px;
+  border-radius: 999px;
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.calendar .chip,
+.calendar .more {
+  display: block;
+  margin-top: 2px;
+  overflow: hidden;
+  font-size: 0.75rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.calendar .more {
+  font-weight: 600;
+}
+
+.agenda h3 {
+  margin: 20px 0 12px;
+  font-size: 1rem;
+  font-weight: 600;
 }
 
 .card {
@@ -111,5 +268,20 @@ h1 {
   }
   .item .badge {
     margin-left: 60px;
+  }
+  .export {
+    margin-left: 0;
+  }
+  .calendar {
+    border-spacing: 2px;
+  }
+  .calendar td {
+    height: 52px;
+    padding: 4px;
+  }
+  /* no room for names on a phone: the colour marks the day, the agenda lists the devices */
+  .calendar .chip,
+  .calendar .more {
+    display: none;
   }
 }

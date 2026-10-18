@@ -130,6 +130,26 @@
   background: var(--md-sys-color-surface-container-highest);
 }
 
+.nav-badge {
+  display: inline-grid;
+  place-items: center;
+  min-width: 20px;
+  height: 20px;
+  margin-left: 6px;
+  padding: 0 6px;
+  border-radius: 999px;
+  background: var(--app-color-warning-container);
+  color: var(--app-color-on-warning-container);
+  font-size: 0.75rem;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.nav-badge.overdue {
+  background: var(--md-sys-color-error-container);
+  color: var(--md-sys-color-on-error-container);
+}
+
 .app-nav a[aria-current='page'] {
   background: var(--md-sys-color-primary-container);
   color: var(--md-sys-color-on-primary-container);

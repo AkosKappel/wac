@@ -1,4 +1,5 @@
 import { newSpecPage } from '@stencil/core/testing';
+import { MockResponse } from '@stencil/core/mock-doc';
 import { HarkapAmbulanceWlApp } from './../harkap-ambulance-wl-app';
 import { currentPath, pageOf } from '../../../utils/routes';
 
@@ -28,6 +29,20 @@ describe('harkap-ambulance-wl-app', () => {
   it('marks the current page in the navigation', async () => {
     const page = await render('http://localhost/about');
     expect(page.root.shadowRoot.querySelector('.app-nav [aria-current="page"]').getAttribute('href')).toEqual('/about');
+  });
+
+  it('shows how many devices are due for service on the navigation', async () => {
+    const due = [{ overdue: true }, { overdue: false }, { overdue: false }];
+    global.fetch = jest.fn().mockResolvedValue(new MockResponse(JSON.stringify(due))) as any;
+    const page = await render('http://localhost/devices');
+    await new Promise(resolve => setTimeout(resolve, 0));
+    await page.waitForChanges();
+
+    expect((global.fetch as jest.Mock).mock.calls[0][0]).toContain('/maintenance/due?days=30');
+    const link = page.root.shadowRoot.querySelector('.app-nav a[href="/maintenance"]');
+    expect(link.querySelector('.nav-badge').textContent).toBe('3');
+    expect(link.querySelector('.nav-badge').classList.contains('overdue')).toBe(true);
+    expect(link.querySelector('.visually-hidden').textContent).toContain('1 of them overdue');
   });
 });
 

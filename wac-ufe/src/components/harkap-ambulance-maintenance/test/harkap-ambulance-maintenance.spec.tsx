@@ -41,6 +41,39 @@ describe('harkap-ambulance-maintenance', () => {
     expect(rows[1].querySelector('a').getAttribute('href')).toBe('/devices/ekg%202');
   });
 
+  it('places the devices on a month calendar that the keyboard can move through', async () => {
+    global.fetch = jest.fn().mockResolvedValue(new MockResponse(JSON.stringify(items))) as any;
+    const page = await newSpecPage({
+      components: [HarkapAmbulanceMaintenance],
+      html: `<harkap-ambulance-maintenance api-base="/api" base-path="/"></harkap-ambulance-maintenance>`,
+    });
+    await new Promise(resolve => setTimeout(resolve, 0));
+    const root = page.root.shadowRoot;
+    root.querySelectorAll<HTMLButtonElement>('.segmented button')[1].click();
+    await new Promise(resolve => setTimeout(resolve, 0));
+    await page.waitForChanges();
+
+    expect((global.fetch as jest.Mock).mock.calls[1][0]).toContain('/api/maintenance/due?days=365');
+    const selected = () => root.querySelector('.calendar td[tabindex="0"]');
+    expect(selected().getAttribute('aria-current')).toBe('date');
+    expect(root.querySelectorAll('.calendar td[aria-selected="true"]')).toHaveLength(1);
+
+    // the EKG is due in five days: move there day by day and its row shows in the agenda
+    for (let i = 0; i < 5; i++) {
+      selected().dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowRight', bubbles: true }));
+      await page.waitForChanges();
+    }
+    expect(selected().classList.contains('due')).toBe(true);
+    expect(selected().querySelector('.visually-hidden').textContent).toContain('1 device');
+    expect(root.querySelector('.agenda .item a').getAttribute('href')).toBe('/devices/ekg%202');
+
+    const title = root.querySelector('#month').textContent;
+    selected().dispatchEvent(new KeyboardEvent('keydown', { key: 'PageDown', bubbles: true }));
+    await page.waitForChanges();
+    expect(root.querySelector('#month').textContent).not.toBe(title);
+    expect(root.querySelector('.agenda .empty')).not.toBeNull();
+  });
+
   it('shows the error page when the API fails', async () => {
     global.fetch = jest.fn().mockRejectedValue(new TypeError('Failed to fetch')) as any;
     const page = await newSpecPage({

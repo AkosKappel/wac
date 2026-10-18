@@ -8,9 +8,10 @@ export function toCsv(rows: (string | number)[][]): string {
   return rows.map(row => row.map(cell).join(',')).join('\r\n') + '\r\n';
 }
 
-/** Saves text as a file; the BOM makes Excel read the UTF-8 diacritics correctly. */
+/** Saves text as a file; for CSV a BOM makes Excel read the UTF-8 diacritics correctly. */
 export function downloadText(fileName: string, text: string, type = 'text/csv') {
-  const url = URL.createObjectURL(new Blob(['﻿', text], { type: `${type};charset=utf-8` }));
+  const parts = type === 'text/csv' ? ['﻿', text] : [text];
+  const url = URL.createObjectURL(new Blob(parts, { type: `${type};charset=utf-8` }));
   const link = document.createElement('a');
   link.href = url;
   link.download = fileName;

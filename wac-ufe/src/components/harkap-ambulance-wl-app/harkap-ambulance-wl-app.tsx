@@ -1,9 +1,11 @@
 import { Component, Host, Prop, State, h } from '@stencil/core';
+import { apiClients } from '../../utils/api';
 import { ErrorPage } from '../../utils/error-page';
 import { t } from '../../utils/i18n';
 import { GITHUB_URL, PORTFOLIO_URL } from '../../utils/links';
 import { LogoMark } from '../../utils/logo';
 import { Page, currentPath, pageOf } from '../../utils/routes';
+import { DUE_DAYS } from '../../utils/service';
 import { activeTheme, nextTheme, settings } from '../../utils/settings';
 import { hrefTo, navigateTo, pageKey, watchRelativePath } from '../../utils/utils';
 
@@ -22,6 +24,7 @@ const THEME_ICONS = { system: 'brightness_auto', light: 'light_mode', dark: 'dar
 })
 export class HarkapAmbulanceWlApp {
   @State() private relativePath = '';
+  @State() private due: { count: number; overdue: number };
   @Prop() basePath: string = '';
   @Prop() apiBase: string;
 
@@ -39,9 +42,23 @@ export class HarkapAmbulanceWlApp {
       // filters change only the query and the log editor opens inside the device page:
       // neither may move focus away from where the user is
       this.moveFocus = !first && pageKey(current) !== pageKey(this.relativePath);
+      // a new path is also how a saved log entry comes back to its device, so the count follows a service entry
+      if (first || current !== this.relativePath) {
+        this.refreshDue();
+      }
       first = false;
       this.relativePath = current;
     });
+  }
+
+  private async refreshDue() {
+    try {
+      const items = await apiClients(this.apiBase).maintenance.getMaintenanceDue({ days: DUE_DAYS });
+      this.due = { count: items.length, overdue: items.filter(item => item.overdue).length };
+    } catch {
+      // the badge is only a hint; the service page reports the error
+      this.due = undefined;
+    }
   }
 
   componentDidRender() {
@@ -74,11 +91,13 @@ export class HarkapAmbulanceWlApp {
     const href = (path: string) => hrefTo(this.basePath, path);
     const navigate = (path: string) => navigateTo(this.basePath, path);
     const m = t().shell;
-    const navLink = (path: string, target: Page[], label: string) => (
+    const navLink = (path: string, target: Page[], label: string, extra?: any) => (
       <a href={href(path)} aria-current={target.includes(page) ? 'page' : undefined}>
         {label}
+        {extra}
       </a>
     );
+    const dueText = this.due?.count ? m.dueBadge(this.due.count, this.due.overdue) : undefined;
 
     return (
       <Host data-theme={activeTheme()}>
@@ -94,7 +113,17 @@ export class HarkapAmbulanceWlApp {
           <nav class="app-nav" aria-label={m.mainNav}>
             {navLink('./', ['home'], m.home)}
             {navLink('./devices', ['devices', 'device'], m.devices)}
-            {navLink('./maintenance', ['maintenance'], m.maintenance)}
+            {navLink(
+              './maintenance',
+              ['maintenance'],
+              m.maintenance,
+              dueText && [
+                <span class={{ 'nav-badge': true, 'overdue': this.due.overdue > 0 }} title={dueText} aria-hidden="true">
+                  {this.due.count}
+                </span>,
+                <span class="visually-hidden">, {dueText}</span>,
+              ],
+            )}
             {navLink('./departments', ['departments'], m.departments)}
             {navLink('./about', ['about'], m.about)}
           </nav>
