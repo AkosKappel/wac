@@ -203,6 +203,8 @@ const sk = {
     viewCalendar: 'Kalendár',
     previousMonth: 'Predchádzajúci mesiac',
     nextMonth: 'Nasledujúci mesiac',
+    month: 'Mesiac',
+    today: 'Dnes',
     calendarHint:
       'Termíny na najbližší rok. Šípkami sa presúvate medzi dňami, klávesy Page Up a Page Down menia mesiac.',
     devices: (count: number) => `${count} ${skPlural(count, 'zariadenie', 'zariadenia', 'zariadení')}`,
@@ -500,6 +502,8 @@ const en: Messages = {
     viewCalendar: 'Calendar',
     previousMonth: 'Previous month',
     nextMonth: 'Next month',
+    month: 'Month',
+    today: 'Today',
     calendarHint: 'Due dates for the next year. Arrow keys move between days, Page Up and Page Down change the month.',
     devices: (count: number) => `${count} ${count === 1 ? 'device' : 'devices'}`,
     overdueCount: (count: number) => `${count} overdue`,

@@ -21,6 +21,9 @@ function daysUntil(iso: string, now = new Date()): number {
   return Math.round((day(new Date(iso)) - day(now)) / 86_400_000);
 }
 
+/** Months ahead the calendar offers in its month picker: the API looks at most a year ahead. */
+const MONTHS_AHEAD = 12;
+
 /** Arrow keys move by a day or a week, Home and End to the ends of the week. */
 const KEY_MOVES: Record<string, (day: Date) => number> = {
   ArrowLeft: () => -1,
@@ -40,7 +43,7 @@ export class HarkapAmbulanceMaintenance {
   @Element() el: HTMLElement;
   @Prop() apiBase: string;
   @Prop() basePath: string = '';
-  @State() view: View = 'list';
+  @State() view: View = 'calendar';
   @State() days = PERIODS[0];
   @State() selected = new Date();
   @State() items: MaintenanceItem[];
@@ -93,6 +96,11 @@ export class HarkapAmbulanceMaintenance {
     );
   }
 
+  /** Moves to a month as a count of months since year 0, so months compare and subtract easily. */
+  private goToMonth(index: number) {
+    this.moveMonth(index - (this.selected.getFullYear() * 12 + this.selected.getMonth()));
+  }
+
   private onGridKey(ev: KeyboardEvent) {
     if (ev.key === 'PageUp' || ev.key === 'PageDown') {
       this.moveMonth(ev.key === 'PageUp' ? -1 : 1);
@@ -139,7 +147,7 @@ export class HarkapAmbulanceMaintenance {
 
           <div class="toolbar">
             <div class="segmented" role="group" aria-label={m.view}>
-              {(['list', 'calendar'] as View[]).map(view => (
+              {(['calendar', 'list'] as View[]).map(view => (
                 <button type="button" aria-pressed={String(this.view === view)} onClick={() => this.setView(view)}>
                   <md-icon aria-hidden="true">{view === 'list' ? 'view_list' : 'calendar_month'}</md-icon>
                   {view === 'list' ? m.viewList : m.viewCalendar}
@@ -223,7 +231,17 @@ export class HarkapAmbulanceMaintenance {
       byDay.set(key, [...(byDay.get(key) ?? []), item]);
     }
     const month = this.selected.getMonth();
-    const today = dayKey(new Date());
+    const now = new Date();
+    const today = dayKey(now);
+    // the picker offers the year ahead that the API covers, plus the shown month when the arrows went elsewhere
+    const monthIndex = (date: Date) => date.getFullYear() * 12 + date.getMonth();
+    const selectedMonth = monthIndex(this.selected);
+    const currentMonth = monthIndex(now);
+    const first = Math.min(currentMonth, selectedMonth);
+    const last = Math.max(currentMonth + MONTHS_AHEAD, selectedMonth);
+    const months = Array.from({ length: last - first + 1 }, (_, i) => first + i);
+    const monthName = (index: number) =>
+      new Date(Math.floor(index / 12), index % 12, 1).toLocaleDateString(locale, { month: 'long', year: 'numeric' });
     const selectedKey = dayKey(this.selected);
     const selectedItems = byDay.get(selectedKey) ?? [];
     // 2024-01-01 was a Monday
@@ -238,12 +256,32 @@ export class HarkapAmbulanceMaintenance {
           <md-icon-button aria-label={m.previousMonth} title={m.previousMonth} onClick={() => this.moveMonth(-1)}>
             <md-icon aria-hidden="true">chevron_left</md-icon>
           </md-icon-button>
-          <h2 id="month" aria-live="polite">
-            {this.selected.toLocaleDateString(locale, { month: 'long', year: 'numeric' })}
+          <h2 id="month" class="visually-hidden" aria-live="polite">
+            {monthName(selectedMonth)}
           </h2>
+          <md-outlined-select
+            class="month-picker"
+            label={m.month}
+            value={String(selectedMonth)}
+            onChange={(ev: Event) => this.goToMonth(Number((ev.target as HTMLSelectElement).value))}
+          >
+            {months.map(index => (
+              <md-select-option value={String(index)}>
+                <div slot="headline">{monthName(index)}</div>
+              </md-select-option>
+            ))}
+          </md-outlined-select>
           <md-icon-button aria-label={m.nextMonth} title={m.nextMonth} onClick={() => this.moveMonth(1)}>
             <md-icon aria-hidden="true">chevron_right</md-icon>
           </md-icon-button>
+          {selectedMonth !== currentMonth && (
+            <md-text-button class="today" onClick={() => this.select(new Date(), false)}>
+              <md-icon slot="icon" aria-hidden="true">
+                today
+              </md-icon>
+              {m.today}
+            </md-text-button>
+          )}
         </div>
         <table
           class="calendar"

@@ -106,7 +106,7 @@ describe('accessibility', () => {
     ],
     ['about page', '<harkap-ambulance-about></harkap-ambulance-about>'],
     ['departments page', '<harkap-ambulance-departments api-base="/api"></harkap-ambulance-departments>'],
-    ['service plan', '<harkap-ambulance-maintenance api-base="/api"></harkap-ambulance-maintenance>'],
+    ['service plan (calendar)', '<harkap-ambulance-maintenance api-base="/api"></harkap-ambulance-maintenance>'],
   ])('%s has no WCAG A/AA violations', async (_, html) => {
     const page = await render(html);
     expect(await violations(page)).toEqual([]);
@@ -117,12 +117,22 @@ describe('accessibility', () => {
     expect(await violations(page)).toEqual([]);
   });
 
-  it('service calendar has no WCAG A/AA violations', async () => {
+  it('service calendar on another month has no WCAG A/AA violations', async () => {
+    const page = await render('<harkap-ambulance-maintenance api-base="/api"></harkap-ambulance-maintenance>');
+    expect(await page.find('harkap-ambulance-maintenance >>> .calendar td.overdue')).not.toBeNull();
+    // the next month shows the Today button too
+    await (await page.find('harkap-ambulance-maintenance >>> .calendar-head md-icon-button:last-of-type')).click();
+    await page.waitForChanges();
+    expect(await page.find('harkap-ambulance-maintenance >>> .today')).not.toBeNull();
+    expect(await violations(page)).toEqual([]);
+  });
+
+  it('service list has no WCAG A/AA violations', async () => {
     const page = await render('<harkap-ambulance-maintenance api-base="/api"></harkap-ambulance-maintenance>');
     const buttons = await page.findAll('harkap-ambulance-maintenance >>> .segmented button');
     await buttons[1].click();
     await page.waitForChanges();
-    expect(await page.find('harkap-ambulance-maintenance >>> .calendar td.overdue')).not.toBeNull();
+    expect(await page.find('harkap-ambulance-maintenance >>> .items .item')).not.toBeNull();
     expect(await violations(page)).toEqual([]);
   });
 

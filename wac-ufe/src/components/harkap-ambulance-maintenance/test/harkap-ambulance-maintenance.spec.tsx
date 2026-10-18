@@ -30,9 +30,11 @@ describe('harkap-ambulance-maintenance', () => {
       html: `<harkap-ambulance-maintenance api-base="/api" base-path="/"></harkap-ambulance-maintenance>`,
     });
     await new Promise(resolve => setTimeout(resolve, 0));
+    page.root.shadowRoot.querySelectorAll<HTMLButtonElement>('.segmented button')[1].click();
+    await new Promise(resolve => setTimeout(resolve, 0));
     await page.waitForChanges();
 
-    expect((global.fetch as jest.Mock).mock.calls[0][0]).toContain('/api/maintenance/due?days=30');
+    expect((global.fetch as jest.Mock).mock.calls[1][0]).toContain('/api/maintenance/due?days=30');
     const rows = page.root.shadowRoot.querySelectorAll('.item');
     expect(rows).toHaveLength(2);
     expect(rows[0].classList.contains('overdue')).toBe(true);
@@ -48,12 +50,12 @@ describe('harkap-ambulance-maintenance', () => {
       html: `<harkap-ambulance-maintenance api-base="/api" base-path="/"></harkap-ambulance-maintenance>`,
     });
     await new Promise(resolve => setTimeout(resolve, 0));
-    const root = page.root.shadowRoot;
-    root.querySelectorAll<HTMLButtonElement>('.segmented button')[1].click();
-    await new Promise(resolve => setTimeout(resolve, 0));
     await page.waitForChanges();
+    const root = page.root.shadowRoot;
 
-    expect((global.fetch as jest.Mock).mock.calls[1][0]).toContain('/api/maintenance/due?days=365');
+    // the calendar is the default view
+    expect((global.fetch as jest.Mock).mock.calls[0][0]).toContain('/api/maintenance/due?days=365');
+    expect(root.querySelector('.segmented button[aria-pressed="true"]').textContent).toContain('Calendar');
     const selected = () => root.querySelector('.calendar td[tabindex="0"]');
     expect(selected().getAttribute('aria-current')).toBe('date');
     expect(root.querySelectorAll('.calendar td[aria-selected="true"]')).toHaveLength(1);
@@ -72,6 +74,40 @@ describe('harkap-ambulance-maintenance', () => {
     await page.waitForChanges();
     expect(root.querySelector('#month').textContent).not.toBe(title);
     expect(root.querySelector('.agenda .empty')).not.toBeNull();
+  });
+
+  it('jumps to a month from the picker and back to today', async () => {
+    global.fetch = jest.fn().mockResolvedValue(new MockResponse(JSON.stringify(items))) as any;
+    const page = await newSpecPage({
+      components: [HarkapAmbulanceMaintenance],
+      html: `<harkap-ambulance-maintenance api-base="/api" base-path="/"></harkap-ambulance-maintenance>`,
+    });
+    await new Promise(resolve => setTimeout(resolve, 0));
+    await page.waitForChanges();
+    const root = page.root.shadowRoot;
+    const now = new Date();
+    const current = now.getFullYear() * 12 + now.getMonth();
+
+    // this month and the twelve after it; no way back to today while on today's month
+    const options = Array.from(root.querySelectorAll('.month-picker md-select-option'), o =>
+      Number(o.getAttribute('value')),
+    );
+    expect(options).toEqual(Array.from({ length: 13 }, (_, i) => current + i));
+    expect(root.querySelector('.today')).toBeNull();
+
+    const picker = root.querySelector('.month-picker') as any;
+    picker.value = String(current + 6);
+    picker.dispatchEvent(new Event('change'));
+    await page.waitForChanges();
+    const target = new Date(now.getFullYear(), now.getMonth() + 6, 1);
+    expect(root.querySelector('#month').textContent).toBe(
+      target.toLocaleDateString('en-GB', { month: 'long', year: 'numeric' }),
+    );
+
+    (root.querySelector('.today') as HTMLElement).click();
+    await page.waitForChanges();
+    expect(root.querySelector('.calendar td[tabindex="0"]').getAttribute('aria-current')).toBe('date');
+    expect(root.querySelector('.today')).toBeNull();
   });
 
   it('shows the error page when the API fails', async () => {
