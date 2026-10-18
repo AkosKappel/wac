@@ -39,6 +39,15 @@ export class HarkapAmbulanceAbout {
           </section>
 
           <section>
+            <h2>{m.tipsTitle}</h2>
+            <ul>
+              {m.tips.map(item => (
+                <li>{item}</li>
+              ))}
+            </ul>
+          </section>
+
+          <section>
             <h2>{m.courseTitle}</h2>
             <p>{m.course}</p>
           </section>
