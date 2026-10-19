@@ -1,9 +1,9 @@
 .env
 tmp/
 
-# Tailscale sidecar secrets and state
-docker/tailscale/ts.env
-docker/tailscale/state/
+# Tailscale sidecar secrets; config fetched by deploy.sh in a local test run
+ts.env
+deploy/config/
 
 # git worktrees
 .worktrees/

@@ -61,7 +61,7 @@ Needs Docker. Copy `.env.example` to `.env`, set `MONGO_ROOT_PASSWORD` and `AMBU
 docker compose up -d --build
 ```
 
-The app is served at http://127.0.0.1:8084. nginx serves the built frontend and proxies `/api` to the Go service; MongoDB starts with the demo data from [`docker/mongo/seed.js`](docker/mongo/seed.js) and is reachable at `127.0.0.1:27019` for tools such as Compass.
+The app is served at http://127.0.0.1:8081. nginx serves the built frontend and proxies `/api` to the Go service; MongoDB starts with the demo data from [`docker/mongo/seed.js`](docker/mongo/seed.js) and is reachable at `127.0.0.1:27018` for tools such as Compass.
 
 For frontend work, `npm start` in `wac-ufe/` serves the app at http://localhost:3333 against a mock API generated from the spec. To use the real API from that dev server instead, start the API with `AMBULANCE_API_CORS_ORIGINS=http://localhost:3333`.
 
@@ -85,4 +85,4 @@ After changing [`ambulance-wl.openapi.yaml`](wac-api/api/ambulance-wl.openapi.ya
 
 ## Deployment
 
-The live demo runs on a home server with Docker Compose instead of Kubernetes: nginx, the API, MongoDB and a small service that restores the demo data every night. A Tailscale sidecar ([`docker-compose.tailscale.yml`](docker-compose.tailscale.yml)) publishes it over HTTPS with Funnel. CI builds the API and nginx images on every push to `main` and pushes them to GHCR (`ghcr.io/akoskappel/wac-api`, `wac-nginx`), so the server only pulls them. The Kubernetes setup in `wac-gitops/` is kept as it ran in the course.
+The live demo runs on a home server with Docker Compose instead of Kubernetes: nginx, the API, MongoDB and a small service that restores the demo data every night. CI builds the API and nginx images on every push to `main` and pushes them to GHCR (`ghcr.io/akoskappel/wac-api`, `wac-nginx`). Production runs those images from its own folder on the server, with a Tailscale sidecar publishing it over HTTPS with Funnel; see [`deploy/`](deploy/README.md). The compose file in the repository root is for development only. The Kubernetes setup in `wac-gitops/` is kept as it ran in the course.

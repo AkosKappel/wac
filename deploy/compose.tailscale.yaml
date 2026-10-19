@@ -1,10 +1,10 @@
-# Public HTTPS entry point: a Tailscale sidecar that serves this app at
+# Public HTTPS entry point: a Tailscale sidecar that serves the app at
 # https://ambulance.tailb52c43.ts.net via Funnel, proxying to nginx on app-network.
-# Enabled on the server through COMPOSE_FILE in .env; see .env.example.
+# Enabled through COMPOSE_FILE in .env.
 services:
   tailscale:
-    image: tailscale/tailscale:v1.102.5
-    container_name: ${CONTAINER_PREFIX:-ambulance}-tailscale
+    image: tailscale/tailscale:v1.104.1
+    container_name: ambulance-tailscale
     restart: unless-stopped
     logging:
       driver: json-file
@@ -16,7 +16,7 @@ services:
         limits:
           memory: 256M
     env_file:
-      - docker/tailscale/ts.env
+      - tailscale/ts.env
     environment:
       TS_HOSTNAME: ambulance
       TS_EXTRA_ARGS: --advertise-tags=tag:container
@@ -25,7 +25,7 @@ services:
       TS_USERSPACE: "true"
     volumes:
       - tailscale-state:/var/lib/tailscale
-      - ./docker/tailscale/serve.json:/config/serve.json:ro
+      - ./tailscale/serve.json:/config/serve.json:ro
     networks:
       - app-network
     depends_on:

@@ -1,7 +1,7 @@
 # Secrets and local folders must not end up in image layers.
 .env
 .env.*
-docker/tailscale/
+deploy/
 .git
 tmp
 wac-gitops

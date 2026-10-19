@@ -1,0 +1,126 @@
+# Production stack of ambulance, copied to ~/deploy/ambulance (see README.md). It runs the
+# images CI publishes to GHCR and reads its config from ./config, which deploy.sh fetches
+# from GitHub at the deployed commit: nothing comes from the development checkout.
+name: ambulance
+
+# Container output is kept in at most 3 files of 10 MB each.
+x-logging: &logging
+  driver: json-file
+  options:
+    max-size: "10m"
+    max-file: "3"
+
+x-mongo-env: &mongo-env
+  AMBULANCE_API_MONGODB_DATABASE: ${AMBULANCE_API_MONGODB_DATABASE:-harkap-ambulance}
+  AMBULANCE_API_MONGODB_COLLECTION: ${AMBULANCE_API_MONGODB_COLLECTION:-ambulance}
+
+services:
+  mongo:
+    image: mongo:8.0
+    container_name: ambulance-mongo
+    restart: unless-stopped
+    logging: *logging
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+    command: ["--wiredTigerCacheSizeGB", "0.25"]
+    environment:
+      <<: *mongo-env
+      # root is for admin work only; app-user.js creates the user the API and reset job use
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USERNAME:-root}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD:?set MONGO_ROOT_PASSWORD in .env}
+      AMBULANCE_API_MONGODB_USERNAME: ${AMBULANCE_API_MONGODB_USERNAME:-ambulance}
+      AMBULANCE_API_MONGODB_PASSWORD: ${AMBULANCE_API_MONGODB_PASSWORD:?set AMBULANCE_API_MONGODB_PASSWORD in .env}
+    # Only applied when the volume is first created.
+    volumes:
+      - mongodata:/data/db
+      - ./config/mongo/app-user.js:/docker-entrypoint-initdb.d/1-app-user.js:ro
+      - ./config/mongo/seed.js:/docker-entrypoint-initdb.d/2-seed.js:ro
+    # No host port: only the API reaches it. Use `docker compose exec mongo mongosh`.
+    healthcheck:
+      test: ["CMD", "mongosh", "--quiet", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+      start_interval: 2s
+    networks:
+      - app-network
+
+  api:
+    image: ghcr.io/akoskappel/wac-api:${IMAGE_TAG:?set IMAGE_TAG in .env}
+    container_name: ambulance-api
+    restart: unless-stopped
+    logging: *logging
+    deploy:
+      resources:
+        limits:
+          memory: 128M
+    environment:
+      <<: *mongo-env
+      AMBULANCE_API_ENVIRONMENT: production
+      GIN_MODE: release
+      AMBULANCE_API_PORT: "8080"
+      AMBULANCE_API_MONGODB_HOST: mongo
+      AMBULANCE_API_MONGODB_PORT: "27017"
+      AMBULANCE_API_MONGODB_USERNAME: ${AMBULANCE_API_MONGODB_USERNAME:-ambulance}
+      AMBULANCE_API_MONGODB_PASSWORD: ${AMBULANCE_API_MONGODB_PASSWORD}
+      AMBULANCE_API_MONGODB_TIMEOUT_SECONDS: "5"
+    networks:
+      - app-network
+    depends_on:
+      mongo:
+        condition: service_healthy
+
+  # Restores the demo data every night from config/mongo/seed.js.
+  reset:
+    image: mongo:8.0
+    container_name: ambulance-reset
+    restart: unless-stopped
+    logging: *logging
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+    entrypoint: ["/bin/sh", "/seed/reset.sh"]
+    environment:
+      <<: *mongo-env
+      MONGO_USERNAME: ${AMBULANCE_API_MONGODB_USERNAME:-ambulance}
+      MONGO_PASSWORD: ${AMBULANCE_API_MONGODB_PASSWORD}
+      DEMO_RESET_TIME: ${DEMO_RESET_TIME:-03:30}
+      TZ: ${DEMO_RESET_TIMEZONE:-Europe/Bratislava}
+    volumes:
+      - ./config/mongo:/seed:ro
+    networks:
+      - app-network
+    depends_on:
+      mongo:
+        condition: service_healthy
+
+  nginx:
+    image: ghcr.io/akoskappel/wac-nginx:${IMAGE_TAG}
+    container_name: ambulance-nginx
+    restart: unless-stopped
+    logging: *logging
+    deploy:
+      resources:
+        limits:
+          memory: 128M
+    ports:
+      - "127.0.0.1:${APP_PORT:-8084}:80"
+    volumes:
+      # A folder, not a single file, so an updated config is seen after a restart.
+      - ./config/nginx:/etc/nginx/conf.d:ro
+      - ${ACCESS_LOG_DIR:?set ACCESS_LOG_DIR in .env}:/var/log/nginx/shared
+    networks:
+      - app-network
+    depends_on:
+      - api
+
+networks:
+  app-network:
+    driver: bridge
+
+volumes:
+  mongodata:

@@ -12,7 +12,7 @@ x-mongo-env: &mongo-env
 services:
   mongo:
     image: mongo:8.0
-    container_name: ${CONTAINER_PREFIX:-ambulance}-mongo
+    container_name: ${CONTAINER_PREFIX:-wac-dev}-mongo
     restart: unless-stopped
     logging: *logging
     deploy:
@@ -32,7 +32,7 @@ services:
       - ./docker/mongo/app-user.js:/docker-entrypoint-initdb.d/1-app-user.js:ro
       - ./docker/mongo/seed.js:/docker-entrypoint-initdb.d/2-seed.js:ro
     ports:
-      - "127.0.0.1:${DB_HOST_PORT:-27019}:27017"
+      - "127.0.0.1:${DB_HOST_PORT:-27018}:27017"
     healthcheck:
       test: ["CMD", "mongosh", "--quiet", "--eval", "db.adminCommand('ping')"]
       interval: 10s
@@ -50,7 +50,7 @@ services:
     build:
       context: ./wac-api
       dockerfile: build/docker/Dockerfile
-    container_name: ${CONTAINER_PREFIX:-ambulance}-api
+    container_name: ${CONTAINER_PREFIX:-wac-dev}-api
     restart: unless-stopped
     logging: *logging
     deploy:
@@ -76,7 +76,7 @@ services:
   # restores the demo data every night
   reset:
     image: mongo:8.0
-    container_name: ${CONTAINER_PREFIX:-ambulance}-reset
+    container_name: ${CONTAINER_PREFIX:-wac-dev}-reset
     restart: unless-stopped
     logging: *logging
     deploy:
@@ -103,7 +103,7 @@ services:
     build:
       context: .
       dockerfile: docker/nginx/Dockerfile
-    container_name: ${CONTAINER_PREFIX:-ambulance}-nginx
+    container_name: ${CONTAINER_PREFIX:-wac-dev}-nginx
     restart: unless-stopped
     logging: *logging
     deploy:
@@ -111,7 +111,7 @@ services:
         limits:
           memory: 128M
     ports:
-      - "${APP_BIND:-127.0.0.1}:${APP_PORT:-8084}:80"
+      - "${APP_BIND:-127.0.0.1}:${APP_PORT:-8081}:80"
     volumes:
       - ./docker/nginx/nginx.conf:/etc/nginx/conf.d/default.conf:ro
       - ${ACCESS_LOG_DIR:-./tmp/nginx}:/var/log/nginx/shared
