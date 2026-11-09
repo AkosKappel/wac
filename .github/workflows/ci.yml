@@ -25,6 +25,8 @@ jobs:
         env:
           MONGO_INITDB_ROOT_USERNAME: root
           MONGO_INITDB_ROOT_PASSWORD: ci-only-password
+          # Mongo 8 refuses to start on Linux 6.19+ (SERVER-121912) unless glibc owns rseq.
+          GLIBC_TUNABLES: glibc.pthread.rseq=1
         ports:
           - 27017:27017
         options: >-
