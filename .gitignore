@@ -3,6 +3,7 @@ tmp/
 
 # Tailscale sidecar secrets; config fetched by deploy.sh in a local test run
 ts.env
+cloudflared/tunnel.env
 deploy/config/
 
 # git worktrees

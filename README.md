@@ -4,7 +4,7 @@
 
 A register of medical devices in hospital departments: devices with warranty, price and department, each with its own operations log. Built in the course *Webové aplikácie v prostredí cloudu* (Web Applications in the Cloud, FIIT STU) as a micro-frontend, a REST API and a GitOps setup for Kubernetes. The UI is in Slovak and English.
 
-**Live demo:** https://ambulance.tailb52c43.ts.net (the demo data is restored every night at 03:30 CET). API docs: [/api-docs/](https://ambulance.tailb52c43.ts.net/api-docs/).
+**Live demo:** https://ambulance.akoskappel.dev (the demo data is restored every night at 03:30 CET). API docs: [/api-docs/](https://ambulance.akoskappel.dev/api-docs/).
 
 ![Homepage with the device overview](docs/screenshot.png)
 
@@ -25,7 +25,7 @@ A register of medical devices in hospital departments: devices with warranty, pr
 
 ```mermaid
 flowchart LR
-  browser[Browser] --> funnel[Tailscale Funnel<br/>HTTPS sidecar]
+  browser[Browser] --> funnel[Cloudflare Tunnel<br/>HTTPS connector]
   funnel --> nginx[nginx<br/>frontend, /api proxy, CSP]
   nginx --> api[Go API<br/>Gin]
   api --> mongo[(MongoDB 8)]
@@ -85,4 +85,4 @@ After changing [`ambulance-wl.openapi.yaml`](wac-api/api/ambulance-wl.openapi.ya
 
 ## Deployment
 
-The live demo runs on a home server with Docker Compose instead of Kubernetes: nginx, the API, MongoDB and a small service that restores the demo data every night. CI builds the API and nginx images on every push to `main` and pushes them to GHCR (`ghcr.io/akoskappel/wac-api`, `wac-nginx`). Production runs those images from its own folder on the server, with a Tailscale sidecar publishing it over HTTPS with Funnel; see [`deploy/`](deploy/README.md). The compose file in the repository root is for development only. The Kubernetes setup in `wac-gitops/` is kept as it ran in the course.
+The live demo runs on a home server with Docker Compose instead of Kubernetes: nginx, the API, MongoDB and a small service that restores the demo data every night. CI builds the API and nginx images on every push to `main` and pushes them to GHCR (`ghcr.io/akoskappel/wac-api`, `wac-nginx`). Production runs those images from its own folder on the server, with a Cloudflare Tunnel connector publishing it over HTTPS; see [`deploy/`](deploy/README.md). The compose file in the repository root is for development only. The Kubernetes setup in `wac-gitops/` is kept as it ran in the course.

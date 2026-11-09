@@ -10,13 +10,13 @@ touching it. Operations live in the infra repository (`apps/ambulance/`).
 | Images | built locally or pulled | `ghcr.io/akoskappel/wac-api` and `wac-nginx` at `IMAGE_TAG` |
 | Config (nginx, Mongo scripts) | `docker/` in the checkout | `config/`, fetched from GitHub at the deployed commit |
 | Ports | staging `8081`, `27018` | `127.0.0.1:8084`, MongoDB without a host port |
-| Public URL | none (no sidecar) | https://ambulance.tailb52c43.ts.net |
+| Public URL | none (no sidecar) | https://ambulance.akoskappel.dev |
 
 ## First setup
 
 ```bash
-mkdir -p ~/deploy/ambulance/tailscale
-cp deploy/compose.yaml deploy/compose.tailscale.yaml deploy/deploy.sh ~/deploy/ambulance/
+mkdir -p ~/deploy/ambulance/tailscale ~/deploy/ambulance/cloudflared
+cp deploy/compose.yaml deploy/compose.tailscale.yaml deploy/compose.cloudflare.yaml deploy/deploy.sh ~/deploy/ambulance/
 cp deploy/tailscale/serve.json ~/deploy/ambulance/tailscale/
 cp deploy/.env.example ~/deploy/ambulance/.env   # fill in the passwords, chmod 600
 ```
@@ -34,3 +34,12 @@ reset, fetches `nginx.conf` and the Mongo scripts of that commit into `config/`,
 `./deploy.sh sha-1234567` deploys a given tag, which is also how to go back.
 
 When a file in this `deploy/` folder changed, copy it to the deploy folder first.
+
+## Public address
+
+https://ambulance.akoskappel.dev goes through a Cloudflare Tunnel: `compose.cloudflare.yaml` runs a
+`cloudflared` connector that forwards every request to nginx. Its token goes into
+`cloudflared/tunnel.env` (`TUNNEL_TOKEN=...`, `chmod 600`; print it with
+`cloudflared tunnel token ambulance` on a machine logged in to the `akoskappel.dev` zone).
+The Tailscale sidecar still serves the old `ambulance.tailb52c43.ts.net` address, where nginx
+answers with a 301 to the new domain.
