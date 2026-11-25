@@ -6,6 +6,8 @@ A register of medical devices in hospital departments: devices with warranty, pr
 
 **Live demo:** https://ambulance.akoskappel.dev (the demo data is restored every night at 03:30 CET). API docs: [/api-docs/](https://ambulance.akoskappel.dev/api-docs/).
 
+**Case study:** [akoskappel.dev/projects/wac-microfrontends](https://akoskappel.dev/projects/wac-microfrontends)
+
 ![Homepage with the device overview](docs/screenshot.png)
 
 ## Features
